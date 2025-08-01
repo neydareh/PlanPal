@@ -43,7 +43,19 @@ export function serveStatic(app: Express) {
     throw new Error(`Could not find the build directory: ${distPath}`);
   }
 
+  // Serve static assets with proper caching
+  app.use(
+    "/assets",
+    express.static(path.join(distPath, "assets"), {
+      maxAge: "1y",
+      immutable: true,
+    })
+  );
+
+  // Serve other static files
   app.use(express.static(distPath));
+
+  // SPA fallback - serve index.html for all non-API routes
   app.get("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
