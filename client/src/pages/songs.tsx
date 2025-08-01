@@ -112,7 +112,7 @@ export default function Songs() {
         <Sidebar currentPath="/songs" />
         <div className="ml-64">
           <TopNavBar title="Song Library" />
-          <main className="p-6">
+          <main className="p-4 lg:p-6">
             <Card className="glass-card">
               <CardContent className="p-8 text-center">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -146,10 +146,10 @@ export default function Songs() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar currentPath="/songs" />
       
-      <div className="ml-64">
+      <div className="lg:ml-64">
         <TopNavBar title="Song Library" />
         
-        <main className="p-6">
+        <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between">
@@ -216,13 +216,13 @@ export default function Songs() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-4 lg:p-6">
               {songs.map((song) => {
                 const thumbnail = song.youtubeUrl ? getYouTubeThumbnail(song.youtubeUrl) : null;
                 
                 return (
                   <Card key={song.id} className="glass-card">
-                    <CardContent className="p-6">
+                    <CardContent className="p-4 lg:p-6">
                       {/* Song Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">

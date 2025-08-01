@@ -180,6 +180,7 @@
   /* Calendar day effect */
   .calendar-day {
     transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 120px;
   }
 
   .calendar-day:hover {
@@ -188,6 +189,55 @@
 
   .dark .calendar-day:hover {
     background: rgba(99, 102, 241, 0.2);
+  }
+
+  /* Mobile responsive calendar */
+  @media (max-width: 768px) {
+    .calendar-day {
+      min-height: 80px;
+      font-size: 0.875rem;
+    }
+    
+    .calendar-grid {
+      gap: 1px;
+    }
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .glass-card {
+      border-radius: 0.75rem;
+      padding: 1rem;
+    }
+    
+    /* Touch-friendly buttons */
+    button {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Better text sizing for mobile */
+    .text-2xl {
+      font-size: 1.5rem;
+      line-height: 2rem;
+    }
+    
+    .text-xl {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+    }
+    
+    /* Improved spacing for mobile cards */
+    .mobile-card {
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Stack elements vertically on mobile */
+    .mobile-stack {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
   }
 
   /* Gradient backgrounds */

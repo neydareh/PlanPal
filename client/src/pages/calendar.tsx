@@ -124,12 +124,12 @@ export default function Calendar() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar currentPath="/calendar" />
       
-      <div className="ml-64">
+      <div className="lg:ml-64">
         <TopNavBar title="Calendar" />
         
-        <main className="p-6">
+        <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
           <Card className="glass-card">
-            <CardContent className="p-6">
+            <CardContent className="p-4 lg:p-6">
               {/* Calendar Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">

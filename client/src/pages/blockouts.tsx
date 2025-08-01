@@ -226,10 +226,10 @@ export default function Blockouts() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar currentPath="/blockouts" />
       
-      <div className="ml-64">
+      <div className="lg:ml-64">
         <TopNavBar title="My Blockouts" />
         
-        <main className="p-6">
+        <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between">
@@ -349,7 +349,7 @@ export default function Blockouts() {
                 
                 return (
                   <Card key={blockout.id} className="glass-card">
-                    <CardContent className="p-6">
+                    <CardContent className="p-4 lg:p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">

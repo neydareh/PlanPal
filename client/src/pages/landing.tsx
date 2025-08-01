@@ -21,9 +21,9 @@ export default function Landing() {
         </div>
 
         {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-4 lg:p-6 mb-16">
           <Card className="glass-card">
-            <CardContent className="p-6 text-center">
+            <CardContent className="p-4 lg:p-6 text-center">
               <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Calendar className="w-6 h-6 text-primary-600 dark:text-primary-400" />
               </div>
@@ -37,7 +37,7 @@ export default function Landing() {
           </Card>
 
           <Card className="glass-card">
-            <CardContent className="p-6 text-center">
+            <CardContent className="p-4 lg:p-6 text-center">
               <div className="w-12 h-12 bg-secondary-100 dark:bg-secondary-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Music className="w-6 h-6 text-secondary-600 dark:text-secondary-400" />
               </div>
@@ -51,7 +51,7 @@ export default function Landing() {
           </Card>
 
           <Card className="glass-card">
-            <CardContent className="p-6 text-center">
+            <CardContent className="p-4 lg:p-6 text-center">
               <div className="w-12 h-12 bg-accent-100 dark:bg-accent-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Users className="w-6 h-6 text-accent-600 dark:text-accent-400" />
               </div>
@@ -65,7 +65,7 @@ export default function Landing() {
           </Card>
 
           <Card className="glass-card">
-            <CardContent className="p-6 text-center">
+            <CardContent className="p-4 lg:p-6 text-center">
               <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Church className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>

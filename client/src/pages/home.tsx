@@ -69,14 +69,14 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar currentPath="/" />
       
-      <div className="ml-64">
+      <div className="lg:ml-64">
         <TopNavBar title="Dashboard" />
         
-        <main className="p-6">
+        <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
           {/* Analytics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-4 lg:gap-4 lg:p-6 mb-6 lg:mb-6 lg:mb-8">
             <Card className="glass-card">
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 <div className="flex items-center">
                   <div className="p-3 rounded-full bg-primary-100 dark:bg-primary-900/30">
                     <Calendar className="w-5 h-5 text-primary-600 dark:text-primary-400" />
@@ -96,7 +96,7 @@ export default function Home() {
             </Card>
 
             <Card className="glass-card">
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 <div className="flex items-center">
                   <div className="p-3 rounded-full bg-accent-100 dark:bg-accent-900/30">
                     <Users className="w-5 h-5 text-accent-600 dark:text-accent-400" />
@@ -116,7 +116,7 @@ export default function Home() {
 
             {user.role === 'admin' && (
               <Card className="glass-card">
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-center">
                     <div className="p-3 rounded-full bg-secondary-100 dark:bg-secondary-900/30">
                       <Music className="w-5 h-5 text-secondary-600 dark:text-secondary-400" />
@@ -134,7 +134,7 @@ export default function Home() {
             )}
 
             <Card className="glass-card">
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 <div className="flex items-center">
                   <div className="p-3 rounded-full bg-orange-100 dark:bg-orange-900/30">
                     <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
@@ -156,10 +156,10 @@ export default function Home() {
           </div>
 
           {/* Quick Actions and Upcoming Events */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-4 lg:gap-4 lg:p-6 mb-6 lg:mb-6 lg:mb-8">
             {/* Quick Actions */}
             <Card className="glass-card">
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
                 <div className="space-y-3">
                   <Link href="/calendar">
@@ -201,7 +201,7 @@ export default function Home() {
 
             {/* Upcoming Events */}
             <Card className="lg:col-span-2 glass-card">
-              <CardContent className="p-6">
+              <CardContent className="p-4 lg:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Upcoming Events</h3>
                   <Link href="/calendar">
@@ -251,7 +251,7 @@ export default function Home() {
 
           {/* Welcome Message */}
           <Card className="glass-card">
-            <CardContent className="p-6">
+            <CardContent className="p-4 lg:p-6">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
                   <Heart className="w-6 h-6 text-white" />

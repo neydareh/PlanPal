@@ -1,14 +1,18 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
   Church, 
   Calendar, 
   CalendarX, 
   Music, 
   Plus,
-  Settings
+  Settings,
+  X,
+  Menu
 } from "lucide-react";
 import { Link } from "wouter";
+import { useState, useEffect } from "react";
 
 interface SidebarProps {
   currentPath: string;
@@ -16,6 +20,24 @@ interface SidebarProps {
 
 export default function Sidebar({ currentPath }: SidebarProps) {
   const { user } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Close sidebar when route changes on mobile
+  useEffect(() => {
+    setIsOpen(false);
+  }, [currentPath]);
+
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const navItems = [
     {
@@ -45,15 +67,37 @@ export default function Sidebar({ currentPath }: SidebarProps) {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-colors duration-300">
-      <div className="h-full px-3 py-4 overflow-y-auto">
-        {/* Logo and Brand */}
-        <div className="flex items-center mb-8 p-4">
-          <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center mr-3">
-            <Church className="w-5 h-5 text-white" />
+    <>
+      {/* Mobile Menu Button */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-white dark:bg-gray-800 shadow-lg"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </Button>
+
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed left-0 top-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ${
+        isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
+        <div className="h-full px-3 py-4 overflow-y-auto">
+          {/* Logo and Brand */}
+          <div className="flex items-center mb-8 p-4 mt-12 lg:mt-0">
+            <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center mr-3">
+              <Church className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-xl font-bold text-gray-800 dark:text-white">ChurchFlow</h1>
           </div>
-          <h1 className="text-xl font-bold text-gray-800 dark:text-white">ChurchFlow</h1>
-        </div>
         
         {/* Navigation Menu */}
         <ul className="space-y-2 font-medium">
@@ -116,5 +160,6 @@ export default function Sidebar({ currentPath }: SidebarProps) {
         </div>
       </div>
     </aside>
+    </>
   );
 }
