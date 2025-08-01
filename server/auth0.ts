@@ -54,7 +54,7 @@ export function getSession() {
     saveUninitialized: true,
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       maxAge: sessionTtl,
       sameSite: "lax",
     },
