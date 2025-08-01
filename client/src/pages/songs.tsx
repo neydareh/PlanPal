@@ -221,7 +221,7 @@ export default function Songs() {
                 const thumbnail = song.youtubeUrl ? getYouTubeThumbnail(song.youtubeUrl) : null;
                 
                 return (
-                  <Card key={song.id} className="glass-card hover-lift">
+                  <Card key={song.id} className="glass-card">
                     <CardContent className="p-6">
                       {/* Song Header */}
                       <div className="flex items-start justify-between mb-4">

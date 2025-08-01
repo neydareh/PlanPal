@@ -75,7 +75,7 @@ export default function Home() {
         <main className="p-6">
           {/* Analytics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="glass-card hover-lift">
+            <Card className="glass-card">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="p-3 rounded-full bg-primary-100 dark:bg-primary-900/30">
@@ -95,7 +95,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="glass-card hover-lift">
+            <Card className="glass-card">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="p-3 rounded-full bg-accent-100 dark:bg-accent-900/30">
@@ -115,7 +115,7 @@ export default function Home() {
             </Card>
 
             {user.role === 'admin' && (
-              <Card className="glass-card hover-lift">
+              <Card className="glass-card">
                 <CardContent className="p-6">
                   <div className="flex items-center">
                     <div className="p-3 rounded-full bg-secondary-100 dark:bg-secondary-900/30">
@@ -133,7 +133,7 @@ export default function Home() {
               </Card>
             )}
 
-            <Card className="glass-card hover-lift">
+            <Card className="glass-card">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="p-3 rounded-full bg-orange-100 dark:bg-orange-900/30">
@@ -217,7 +217,7 @@ export default function Home() {
                 ) : (
                   <div className="space-y-4">
                     {upcomingEvents.slice(0, 3).map((event) => (
-                      <div key={event.id} className="flex items-center p-4 bg-white dark:bg-gray-700 rounded-lg border-l-4 border-primary-500 hover-lift">
+                      <div key={event.id} className="flex items-center p-4 bg-white dark:bg-gray-700 rounded-lg border-l-4 border-primary-500 ">
                         <div className="flex-shrink-0">
                           <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
                             <Church className="w-5 h-5 text-primary-600 dark:text-primary-400" />

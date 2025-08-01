@@ -177,28 +177,13 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
   }
 
-  /* Hover lift effect */
-  .hover-lift {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
-
-  .dark .hover-lift:hover {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Calendar day hover effect */
+  /* Calendar day effect */
   .calendar-day {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .calendar-day:hover {
     background: rgba(99, 102, 241, 0.1);
-    transform: scale(1.02);
   }
 
   .dark .calendar-day:hover {
@@ -214,14 +199,7 @@
     background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
   }
 
-  /* Scale hover effect */
-  .hover-scale {
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
 
-  .hover-scale:hover {
-    transform: scale(1.02);
-  }
 }
 
 @layer utilities {

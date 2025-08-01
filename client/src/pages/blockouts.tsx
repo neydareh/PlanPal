@@ -348,7 +348,7 @@ export default function Blockouts() {
                 const isFuture = new Date() < startDate;
                 
                 return (
-                  <Card key={blockout.id} className="glass-card hover-lift">
+                  <Card key={blockout.id} className="glass-card">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
