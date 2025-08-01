@@ -172,6 +172,8 @@ export default function Home() {
                     </Button>
                   </Link>
                   
+                  <div className="my-2"></div>
+                  
                   <Link href="/blockouts">
                     <Button className="w-full justify-between bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700">
                       <span className="flex items-center">
