@@ -10,7 +10,13 @@ import AddSongModal from "@/components/AddSongModal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Search, Plus, Play, ExternalLink, Edit, Trash2 } from "lucide-react";
 import type { Song } from "@shared/schema";
@@ -40,7 +46,7 @@ export default function Songs() {
 
   // Check admin access
   useEffect(() => {
-    if (user && user.role !== 'admin') {
+    if (user && user.role !== "admin") {
       toast({
         title: "Access Denied",
         description: "Admin access required for song management.",
@@ -52,7 +58,7 @@ export default function Songs() {
   // Fetch songs
   const { data: songs = [], error: songsError } = useQuery<Song[]>({
     queryKey: ["/api/songs", searchQuery, keyFilter],
-    enabled: isAuthenticated && user?.role === 'admin',
+    enabled: isAuthenticated && user?.role === "admin",
     retry: false,
   });
 
@@ -106,7 +112,7 @@ export default function Songs() {
     return <div className="min-h-screen bg-gray-50 dark:bg-gray-900" />;
   }
 
-  if (user.role !== 'admin') {
+  if (user.role !== "admin") {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Sidebar currentPath="/songs" />
@@ -130,30 +136,48 @@ export default function Songs() {
   }
 
   const getYouTubeVideoId = (url: string) => {
-    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+    const regex =
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
     const match = url.match(regex);
     return match ? match[1] : null;
   };
 
   const getYouTubeThumbnail = (url: string) => {
     const videoId = getYouTubeVideoId(url);
-    return videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null;
+    return videoId
+      ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+      : null;
   };
 
-  const musicKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const musicKeys = [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B",
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar currentPath="/songs" />
-      
+
       <div className="lg:ml-64">
         <TopNavBar title="Song Library" />
-        
+
         <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Song Library</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Song Library
+              </h2>
               <Button
                 onClick={() => setIsAddSongModalOpen(true)}
                 className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
@@ -179,9 +203,10 @@ export default function Songs() {
                   <SelectValue placeholder="All Keys" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Keys</SelectItem>
-                  {musicKeys.map(key => (
-                    <SelectItem key={key} value={key}>{key}</SelectItem>
+                  {musicKeys.map((key) => (
+                    <SelectItem key={key} value={key}>
+                      {key}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -196,13 +221,14 @@ export default function Songs() {
                   <Search className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  {searchQuery || keyFilter ? 'No songs match your filters' : 'No songs yet'}
+                  {searchQuery || keyFilter
+                    ? "No songs match your filters"
+                    : "No songs yet"}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  {searchQuery || keyFilter 
-                    ? 'Try adjusting your search criteria.'
-                    : 'Start building your song library by adding your first song.'
-                  }
+                  {searchQuery || keyFilter
+                    ? "Try adjusting your search criteria."
+                    : "Start building your song library by adding your first song."}
                 </p>
                 {!searchQuery && !keyFilter && (
                   <Button
@@ -218,8 +244,10 @@ export default function Songs() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-4 lg:p-6">
               {songs.map((song) => {
-                const thumbnail = song.youtubeUrl ? getYouTubeThumbnail(song.youtubeUrl) : null;
-                
+                const thumbnail = song.youtubeUrl
+                  ? getYouTubeThumbnail(song.youtubeUrl)
+                  : null;
+
                 return (
                   <Card key={song.id} className="glass-card">
                     <CardContent className="p-4 lg:p-6">
@@ -230,7 +258,9 @@ export default function Songs() {
                             {song.title}
                           </h3>
                           {song.artist && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{song.artist}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {song.artist}
+                            </p>
                           )}
                         </div>
                         <div className="flex items-center space-x-2">
@@ -263,7 +293,10 @@ export default function Songs() {
                               <Button
                                 size="sm"
                                 className="w-12 h-12 bg-red-600 hover:bg-red-700 rounded-full"
-                                onClick={() => song.youtubeUrl && window.open(song.youtubeUrl, '_blank')}
+                                onClick={() =>
+                                  song.youtubeUrl &&
+                                  window.open(song.youtubeUrl, "_blank")
+                                }
                               >
                                 <Play className="w-4 h-4 ml-1 text-white" />
                               </Button>
@@ -275,7 +308,10 @@ export default function Songs() {
                       {/* Song Info */}
                       <div className="space-y-2 mb-4">
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          Added {song.createdAt ? new Date(song.createdAt).toLocaleDateString() : 'Unknown date'}
+                          Added{" "}
+                          {song.createdAt
+                            ? new Date(song.createdAt).toLocaleDateString()
+                            : "Unknown date"}
                         </div>
                       </div>
 
@@ -286,7 +322,10 @@ export default function Songs() {
                             variant="outline"
                             size="sm"
                             className="flex-1"
-                            onClick={() => song.youtubeUrl && window.open(song.youtubeUrl, '_blank')}
+                            onClick={() =>
+                              song.youtubeUrl &&
+                              window.open(song.youtubeUrl, "_blank")
+                            }
                           >
                             <ExternalLink className="w-4 h-4 mr-2" />
                             View

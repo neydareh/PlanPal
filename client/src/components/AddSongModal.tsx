@@ -3,11 +3,22 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertSongSchema } from "@shared/schema";
@@ -15,7 +26,11 @@ import type { InsertSong } from "@shared/schema";
 import { z } from "zod";
 
 const songFormSchema = insertSongSchema.extend({
-  youtubeUrl: z.string().url("Please enter a valid YouTube URL").optional().or(z.literal("")),
+  youtubeUrl: z
+    .string()
+    .url("Please enter a valid YouTube URL")
+    .optional()
+    .or(z.literal("")),
 });
 
 type SongFormData = z.infer<typeof songFormSchema>;
@@ -39,6 +54,7 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
       key: "",
       youtubeUrl: "",
     },
+    mode: "onChange",
   });
 
   // Create song mutation
@@ -92,9 +108,22 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
     form.reset();
   };
 
-  const musicKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const musicKeys = [
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B",
+  ].filter(Boolean); // Remove any falsy values
 
-  if (user?.role !== 'admin') {
+  if (user?.role !== "admin") {
     return null;
   }
 
@@ -136,17 +165,20 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
 
           <div>
             <Label htmlFor="key">Key</Label>
-            <Select 
-              value={form.watch("key") || ""} 
-              onValueChange={(value) => form.setValue("key", value)}
+            <Select
+              value={form.watch("key") || ""}
+              onValueChange={(value) => {
+                form.setValue("key", value === "" ? "" : value);
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select key (optional)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No key specified</SelectItem>
-                {musicKeys.map(key => (
-                  <SelectItem key={key} value={key}>{key}</SelectItem>
+                {musicKeys.map((key) => (
+                  <SelectItem key={key} value={key}>
+                    {key}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -175,10 +207,7 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              disabled={createSongMutation.isPending}
-            >
+            <Button type="submit" disabled={createSongMutation.isPending}>
               {createSongMutation.isPending ? "Adding..." : "Add Song"}
             </Button>
           </div>
