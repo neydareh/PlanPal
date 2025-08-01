@@ -1,84 +1,54 @@
-import {
-  users,
-  events,
-  songs,
-  blockouts,
-  eventSongs,
-  type User,
-  type UpsertUser,
-  type Event,
-  type InsertEvent,
-  type Song,
-  type InsertSong,
-  type Blockout,
-  type InsertBlockout,
-  type EventSong,
-  type InsertEventSong,
-} from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, lte, desc, asc, sql } from "drizzle-orm";
+import { users, events, songs, blockouts, eventSongs } from "@shared/schema";
+import type {
+  UpsertUser,
+  User,
+  Event,
+  InsertEvent,
+  Song,
+  InsertSong,
+  Blockout,
+  InsertBlockout,
+  EventSong,
+  InsertEventSong,
+} from "@shared/schema";
+import { eq, asc, and, sql } from "drizzle-orm";
 
-// Interface for storage operations
-export interface IStorage {
-  // User operations (mandatory for Replit Auth)
-  getUser(id: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
-  
-  // Event operations
-  getEvents(): Promise<Event[]>;
-  getEvent(id: string): Promise<Event | undefined>;
-  createEvent(event: InsertEvent): Promise<Event>;
-  updateEvent(id: string, event: Partial<InsertEvent>): Promise<Event>;
-  deleteEvent(id: string): Promise<void>;
-  getEventsByDateRange(startDate: Date, endDate: Date): Promise<Event[]>;
-  
-  // Song operations
-  getSongs(): Promise<Song[]>;
-  getSong(id: string): Promise<Song | undefined>;
-  createSong(song: InsertSong): Promise<Song>;
-  updateSong(id: string, song: Partial<InsertSong>): Promise<Song>;
-  deleteSong(id: string): Promise<void>;
-  searchSongs(query?: string, key?: string): Promise<Song[]>;
-  
-  // Blockout operations
-  getBlockouts(): Promise<Blockout[]>;
-  getBlockoutsByUser(userId: string): Promise<Blockout[]>;
-  getBlockoutsByDateRange(startDate: Date, endDate: Date): Promise<Blockout[]>;
-  createBlockout(blockout: InsertBlockout): Promise<Blockout>;
-  updateBlockout(id: string, blockout: Partial<InsertBlockout>): Promise<Blockout>;
-  deleteBlockout(id: string): Promise<void>;
-  
-  // Event-Song operations
-  getEventSongs(eventId: string): Promise<(EventSong & { song: Song })[]>;
-  addSongToEvent(eventSong: InsertEventSong): Promise<EventSong>;
-  removeSongFromEvent(eventId: string, songId: string): Promise<void>;
-}
+export class Storage {
+  async getUsers(): Promise<User[]> {
+    return await db.select().from(users).orderBy(asc(users.firstName));
+  }
 
-export class DatabaseStorage implements IStorage {
-  // User operations (mandatory for Replit Auth)
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
     return user;
   }
 
-  // Event operations
+  async createUser(user: UpsertUser): Promise<User> {
+    const [newUser] = await db.insert(users).values(user).returning();
+    return newUser;
+  }
+
+  async updateUser(id: string, user: Partial<UpsertUser>): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ ...user, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  }
+
   async getEvents(): Promise<Event[]> {
-    return await db.select().from(events).orderBy(desc(events.date));
+    return await db.select().from(events).orderBy(asc(events.date));
   }
 
   async getEvent(id: string): Promise<Event | undefined> {
@@ -104,15 +74,6 @@ export class DatabaseStorage implements IStorage {
     await db.delete(events).where(eq(events.id, id));
   }
 
-  async getEventsByDateRange(startDate: Date, endDate: Date): Promise<Event[]> {
-    return await db
-      .select()
-      .from(events)
-      .where(and(gte(events.date, startDate), lte(events.date, endDate)))
-      .orderBy(asc(events.date));
-  }
-
-  // Song operations
   async getSongs(): Promise<Song[]> {
     return await db.select().from(songs).orderBy(asc(songs.title));
   }
@@ -141,59 +102,52 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchSongs(query?: string, key?: string): Promise<Song[]> {
-    let queryBuilder = db.select().from(songs);
-    
-    // Add filters based on parameters
     const conditions = [];
+
     if (query) {
       conditions.push(
-        // SQL function for case-insensitive search
         sql`LOWER(${songs.title}) LIKE LOWER('%' || ${query} || '%') OR LOWER(${songs.artist}) LIKE LOWER('%' || ${query} || '%')`
       );
     }
     if (key) {
       conditions.push(eq(songs.key, key));
     }
-    
+
     if (conditions.length > 0) {
-      queryBuilder = queryBuilder.where(and(...conditions));
+      return await db
+        .select()
+        .from(songs)
+        .where(and(...conditions))
+        .orderBy(asc(songs.title));
     }
-    
-    return await queryBuilder.orderBy(asc(songs.title));
+
+    return await db.select().from(songs).orderBy(asc(songs.title));
   }
 
-  // Blockout operations
   async getBlockouts(): Promise<Blockout[]> {
-    return await db.select().from(blockouts).orderBy(desc(blockouts.startDate));
+    return await db.select().from(blockouts).orderBy(asc(blockouts.startDate));
   }
 
-  async getBlockoutsByUser(userId: string): Promise<Blockout[]> {
-    return await db
+  async getBlockout(id: string): Promise<Blockout | undefined> {
+    const [blockout] = await db
       .select()
       .from(blockouts)
-      .where(eq(blockouts.userId, userId))
-      .orderBy(desc(blockouts.startDate));
-  }
-
-  async getBlockoutsByDateRange(startDate: Date, endDate: Date): Promise<Blockout[]> {
-    return await db
-      .select()
-      .from(blockouts)
-      .where(
-        and(
-          lte(blockouts.startDate, endDate),
-          gte(blockouts.endDate, startDate)
-        )
-      )
-      .orderBy(asc(blockouts.startDate));
+      .where(eq(blockouts.id, id));
+    return blockout;
   }
 
   async createBlockout(blockout: InsertBlockout): Promise<Blockout> {
-    const [newBlockout] = await db.insert(blockouts).values(blockout).returning();
+    const [newBlockout] = await db
+      .insert(blockouts)
+      .values(blockout)
+      .returning();
     return newBlockout;
   }
 
-  async updateBlockout(id: string, blockout: Partial<InsertBlockout>): Promise<Blockout> {
+  async updateBlockout(
+    id: string,
+    blockout: Partial<InsertBlockout>
+  ): Promise<Blockout> {
     const [updatedBlockout] = await db
       .update(blockouts)
       .set({ ...blockout, updatedAt: new Date() })
@@ -206,33 +160,28 @@ export class DatabaseStorage implements IStorage {
     await db.delete(blockouts).where(eq(blockouts.id, id));
   }
 
-  // Event-Song operations
-  async getEventSongs(eventId: string): Promise<(EventSong & { song: Song })[]> {
+  async getEventSongs(eventId: string): Promise<EventSong[]> {
     return await db
-      .select({
-        id: eventSongs.id,
-        eventId: eventSongs.eventId,
-        songId: eventSongs.songId,
-        order: eventSongs.order,
-        createdAt: eventSongs.createdAt,
-        song: songs,
-      })
+      .select()
       .from(eventSongs)
-      .innerJoin(songs, eq(eventSongs.songId, songs.id))
-      .where(eq(eventSongs.eventId, eventId))
-      .orderBy(asc(eventSongs.order));
+      .where(eq(eventSongs.eventId, eventId));
   }
 
-  async addSongToEvent(eventSong: InsertEventSong): Promise<EventSong> {
-    const [newEventSong] = await db.insert(eventSongs).values(eventSong).returning();
+  async addEventSong(eventSong: InsertEventSong): Promise<EventSong> {
+    const [newEventSong] = await db
+      .insert(eventSongs)
+      .values(eventSong)
+      .returning();
     return newEventSong;
   }
 
-  async removeSongFromEvent(eventId: string, songId: string): Promise<void> {
+  async removeEventSong(eventId: string, songId: string): Promise<void> {
     await db
       .delete(eventSongs)
-      .where(and(eq(eventSongs.eventId, eventId), eq(eventSongs.songId, songId)));
+      .where(
+        and(eq(eventSongs.eventId, eventId), eq(eventSongs.songId, songId))
+      );
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new Storage();
