@@ -17,7 +17,8 @@ export const CreateSongSchema = z.object({
   title: z.string().min(1).max(100),
   artist: z.string().min(1).max(100),
   key: z.string().max(10),
-  tempo: z.number().min(20).max(300),
+  tempo: z.number().min(20).max(300).optional(),
+  youtubeUrl: z.string().url().optional(),
 });
 
 export const UpdateSongSchema = CreateSongSchema.partial();

@@ -23,8 +23,7 @@ export interface IUserService {
 }
 
 export interface ISongService {
-  getSongs(): Promise<Song[]>;
-  getSong(id: string): Promise<Song | null>;
+  getSongs(page?: number, limit?: number): Promise<PaginatedResult<Song>>;
   createSong(songData: Omit<Song, 'id' | 'createdAt' | 'updatedAt'>): Promise<Song>;
   updateSong(id: string, songData: Partial<Song>): Promise<Song>;
   deleteSong(id: string): Promise<void>;

@@ -24,8 +24,9 @@ export interface Song {
   title: string;
   artist: string;
   key: string;
-  tempo: number;
+  tempo?: number;
   createdBy: string;
+  youtubeUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
