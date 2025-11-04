@@ -234,14 +234,6 @@ const options: swaggerJsdoc.Options = {
           summary: 'Get current user',
           tags: ['Users'],
           security: [{ BearerAuth: [] }],
-          requestBody: {
-            required: true,
-            content: {
-              'application/json': {
-                schema: { $ref: '#/components/schemas/GetCurrentUser' }
-              }
-            }
-          },
           responses: {
             200: {
               description: 'Current user details',
@@ -440,12 +432,6 @@ const options: swaggerJsdoc.Options = {
           properties: {
             name: { type: 'string' },
             role: { type: 'string', enum: ['admin', 'user'] }
-          }
-        },
-        GetCurrentUser: {
-          type: 'object',
-          properties: {
-            email: { type: 'string', format: 'email' }
           }
         }
       },

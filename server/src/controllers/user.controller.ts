@@ -47,7 +47,6 @@ export class UserController {
       // // get user email from auth0
       // const management = authService.getManagementClient();
       // const response = await management.users.get({ id: sessionUser.sub });
-
       const user = await this.userService.getUserByEmail(req.body.email);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
