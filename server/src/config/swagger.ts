@@ -314,7 +314,7 @@ const options: swaggerJsdoc.Options = {
           }
         }
       },
-      '/readiness': {
+      '/health/readiness': {
         get: {
           summary: 'Service readiness status',
           tags: ['Health'],
