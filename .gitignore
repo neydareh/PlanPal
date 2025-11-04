@@ -9,3 +9,12 @@ yarn.lock
 package-lock.json
 .env
 .env.local
+
+
+# add .github
+.github
+
+# exclude log files
+*.log
+
+launch.json
