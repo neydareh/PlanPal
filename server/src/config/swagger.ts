@@ -229,11 +229,19 @@ const options: swaggerJsdoc.Options = {
           }
         }
       },
-      '/users/me': {
+      '/users/current': {
         get: {
           summary: 'Get current user',
           tags: ['Users'],
           security: [{ BearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/GetCurrentUser' }
+              }
+            }
+          },
           responses: {
             200: {
               description: 'Current user details',
@@ -276,7 +284,7 @@ const options: swaggerJsdoc.Options = {
             required: true,
             content: {
               'application/json': {
-                schema: { $ref: '#/components/schemas/UserInput' }
+                schema: { $ref: '#/components/schemas/UpdateUser' }
               }
             }
           },
@@ -427,13 +435,19 @@ const options: swaggerJsdoc.Options = {
             updatedAt: { type: 'string', format: 'date-time' }
           }
         },
-        UserInput: {
+        UpdateUser: {
           type: 'object',
           properties: {
             name: { type: 'string' },
             role: { type: 'string', enum: ['admin', 'user'] }
           }
         },
+        GetCurrentUser: {
+          type: 'object',
+          properties: {
+            email: { type: 'string', format: 'email' }
+          }
+        }
       },
     },
   },
