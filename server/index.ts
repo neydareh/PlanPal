@@ -45,10 +45,10 @@ app.get("/token", async (req, res) => {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         grant_type: "authorization_code",
-        client_id: process.env.AUTH0_CLIENT_ID!,
-        client_secret: process.env.AUTH0_CLIENT_SECRET!,
+        client_id: config.auth0.clientId,
+        client_secret: config.auth0.clientSecret,
         code: req.query.code,
-        redirect_uri: `${process.env.BASE_URL}/token`,
+        redirect_uri: `${config.auth0.baseUrl}/token`,
       }),
     }
   );
