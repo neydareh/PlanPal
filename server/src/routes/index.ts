@@ -6,6 +6,7 @@ import { healthRoutes } from "./health.routes";
 import { eventRoutes } from "./event.routes";
 import { userRoutes } from "./user.routes";
 import { songRoutes } from "./song.routes";
+import { profileRoutes } from "./profile.routes";
 
 export function registerRoutes(app: Express) {
   // Apply rate limiting to all API routes
@@ -18,6 +19,7 @@ export function registerRoutes(app: Express) {
   app.use("/api", authenticateUser);
 
   // API routes with authentication
+  app.use("/api/profile", profileRoutes);
   app.use("/api/events", eventRoutes);
   app.use("/api/users", userRoutes);
   app.use("/api/songs", songRoutes);

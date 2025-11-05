@@ -70,20 +70,6 @@ app.get("/logout", async (_, res) => {
   );
 });
 
-app.get("/profile", async (req, res) => {
-  // get user from auth0 management api call
-
-  const management = new Auth0ManagementClient({
-    domain: config.auth0.domain,
-    clientId: config.auth0Management.clientId,
-    clientSecret: config.auth0Management.clientSecret,
-    scope: "read:users",
-  });
-
-  
-  // res.json(req.user);
-});
-
 // Register all routes (including auth routes)
 registerRoutes(app);
 
