@@ -24,4 +24,6 @@ export function registerRoutes(app: Express) {
   // Service-to-service API routes (requires API key)
   app.use("/api/v1/events", apiKeyAuth(), eventRoutes);
   app.use("/api/v1/users", apiKeyAuth(), userRoutes);
+  app.use("/api/v1/songs", apiKeyAuth(),songRoutes);
+
 }

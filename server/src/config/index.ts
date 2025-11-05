@@ -6,9 +6,6 @@ export const config = {
     clientSecret: process.env.AUTH0_CLIENT_SECRET!,
     audience: process.env.AUTH0_AUDIENCE!,
     baseUrl: process.env.BASE_URL,
-    redirectUrl: `${process.env.BASE_URL}/auth/callback`,
-    grantType: "authorization_code",
-    scope: "openid profile email"
   },
   auth0Management: {
     clientId: process.env.AUTH0_M2M_CLIENT_ID!,
