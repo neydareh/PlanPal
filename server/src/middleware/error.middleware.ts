@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
+import { UnauthorizedError } from 'express-oauth2-jwt-bearer';
 import { AppError } from '../utils/errors';
 import LoggerService from '../utils/logger';
 
@@ -20,6 +21,20 @@ export function errorHandler(
       message: error.message,
       code: error.code,
       details: error.details,
+      correlationId: context.correlationId
+    });
+  }
+
+  // Handle OAuth-related auth errors (missing/invalid tokens, etc.)
+  if (error instanceof UnauthorizedError) {
+    const authError = error as UnauthorizedError & { code?: string; headers?: Record<string, string> };
+    if (authError.headers) {
+      res.set(authError.headers);
+    }
+
+    return res.status(authError.status || authError.statusCode || 401).json({
+      message: authError.message,
+      code: authError.code || 'UNAUTHORIZED',
       correlationId: context.correlationId
     });
   }
