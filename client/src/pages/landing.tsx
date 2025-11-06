@@ -98,7 +98,7 @@ export default function Landing() {
                 streamline their ministry operations.
               </p>
               <Button
-                onClick={() => (window.location.href = "/api/login")}
+                onClick={() => (window.location.href = "/login")}
                 className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                 size="lg"
               >
