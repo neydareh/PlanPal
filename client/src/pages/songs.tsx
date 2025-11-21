@@ -27,10 +27,13 @@ export default function Songs() {
   const [isAddSongModalOpen, setIsAddSongModalOpen] = useState(false);
 
   // Fetch songs
-  const { data: songs = [] } = useQuery<Song[]>({
+  // Fetch songs
+  const { data } = useQuery<{ data: Song[] }>({
     queryKey: ["/api/songs", searchQuery, keyFilter],
     retry: false,
   });
+
+  const songs = data?.data || [];
 
   // Delete song mutation
   const deleteSongMutation = useMutation({
