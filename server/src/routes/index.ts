@@ -1,22 +1,19 @@
 import { Express } from "express";
-import { apiLimiter, authLimiter } from "../middleware/rate-limit.middleware";
+import { apiLimiter } from "../middleware/rate-limit.middleware";
 import { apiKeyAuth } from "../middleware/api-key.middleware";
-import authenticateUser from "../middleware/auth.middleware";
 import { healthRoutes } from "./health.routes";
 import { eventRoutes } from "./event.routes";
 import { userRoutes } from "./user.routes";
 import { songRoutes } from "./song.routes";
-import { profileRoutes } from "./profile.routes";
 
 export function registerRoutes(app: Express) {
-  // Apply rate limiting to all API routes and Authenticated API routes
-  app.use("/api", apiLimiter, authenticateUser);
+  // Apply rate limiting to all API routes
+  app.use("/api", apiLimiter);
 
   // Public routes
   app.use("/api/health", healthRoutes);
 
-  // API routes with authentication
-  app.use("/api/profile", authLimiter, profileRoutes);
+  // API routes
   app.use("/api/events", eventRoutes);
   app.use("/api/users", userRoutes);
   app.use("/api/songs", songRoutes);

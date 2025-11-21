@@ -1,15 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
-import type { User } from "@shared/schema";
+import { User } from "@shared/schema";
 
-export function useAuth() {
-  const { data: user, isLoading } = useQuery<User>({
-    queryKey: ["/api/auth/user"],
-    retry: false,
-  });
+const guestUser: User = {
+  id: "guest-user",
+  email: "guest@planpal.app",
+  firstName: "Admin",
+  lastName: "User",
+  role: "admin",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  profileImageUrl: null,
+};
 
-  return {
-    user,
-    isLoading,
-    isAuthenticated: !!user,
-  };
-}
+export const useAuth = () => ({
+  user: guestUser,
+  isLoading: false,
+  isAuthenticated: true,
+});

@@ -16,13 +16,6 @@ export class EventController {
 
   async createEvent(req: Request & { user?: unknown }, res: Response) {
     try {
-      const sessionUser = (req as any).user;
-      
-      // Check if user is authenticated
-      if (!sessionUser || !sessionUser.sub) {
-        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
-      }
-
       // Validate input using the schema
       const validationResult = CreateEventSchema.safeParse(req.body);
       if (!validationResult.success) {
@@ -34,7 +27,7 @@ export class EventController {
 
       const event = await this.eventService.createEvent({
         ...validationResult.data,
-        createdBy: sessionUser.sub,
+        createdBy: validationResult.data.createdBy,
       });
       
       res.status(201).json(event);

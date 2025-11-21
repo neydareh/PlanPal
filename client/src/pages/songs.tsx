@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
@@ -23,42 +21,14 @@ import type { Song } from "@shared/schema";
 
 export default function Songs() {
   const { toast } = useToast();
-  const { user, isLoading, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [keyFilter, setKeyFilter] = useState("");
   const [isAddSongModalOpen, setIsAddSongModalOpen] = useState(false);
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
-
-  // Check admin access
-  useEffect(() => {
-    if (user && user.role !== "admin") {
-      toast({
-        title: "Access Denied",
-        description: "Admin access required for song management.",
-        variant: "destructive",
-      });
-    }
-  }, [user, toast]);
-
   // Fetch songs
-  const { data: songs = [], error: songsError } = useQuery<Song[]>({
+  const { data: songs = [] } = useQuery<Song[]>({
     queryKey: ["/api/songs", searchQuery, keyFilter],
-    enabled: isAuthenticated && user?.role === "admin",
     retry: false,
   });
 
@@ -74,18 +44,7 @@ export default function Songs() {
         description: "Song deleted successfully!",
       });
     },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 500);
-        return;
-      }
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to delete song. Please try again.",
@@ -93,47 +52,6 @@ export default function Songs() {
       });
     },
   });
-
-  // Handle errors
-  useEffect(() => {
-    if (songsError && isUnauthorizedError(songsError as Error)) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 500);
-    }
-  }, [songsError, toast]);
-
-  if (!isAuthenticated || !user) {
-    return <div className="min-h-screen bg-gray-50 dark:bg-gray-900" />;
-  }
-
-  if (user.role !== "admin") {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Sidebar currentPath="/songs" />
-        <div className="ml-64">
-          <TopNavBar title="Song Library" />
-          <main className="p-4 lg:p-6">
-            <Card className="glass-card">
-              <CardContent className="p-8 text-center">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  Admin Access Required
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  You need admin privileges to access the song library.
-                </p>
-              </CardContent>
-            </Card>
-          </main>
-        </div>
-      </div>
-    );
-  }
 
   const getYouTubeVideoId = (url: string) => {
     const regex =

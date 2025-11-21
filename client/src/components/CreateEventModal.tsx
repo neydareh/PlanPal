@@ -2,9 +2,13 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +34,10 @@ interface CreateEventModalProps {
   onClose: () => void;
 }
 
-export default function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
+export default function CreateEventModal({
+  isOpen,
+  onClose,
+}: CreateEventModalProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -51,16 +58,20 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
   // Fetch songs for selection
   const { data: songs = [] } = useQuery<Song[]>({
     queryKey: ["/api/songs"],
-    enabled: isOpen && user?.role === 'admin',
+    enabled: isOpen,
     retry: false,
   });
+
+  console.log('songs => ', songs);
 
   // Fetch blockouts to show team availability
   const { data: blockouts = [] } = useQuery<Blockout[]>({
     queryKey: ["/api/blockouts", "all", "true"],
-    enabled: isOpen && user?.role === 'admin',
+    enabled: isOpen,
     retry: false,
   });
+
+  console.log('blockouts => ', blockouts);
 
   // Create event mutation
   const createEventMutation = useMutation({
@@ -88,18 +99,7 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
       });
       handleClose();
     },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 500);
-        return;
-      }
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to create event. Please try again.",
@@ -110,7 +110,7 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
 
   const onSubmit = (data: EventFormData) => {
     const eventDateTime = new Date(`${data.date}T${data.time}`);
-    
+
     const eventData: InsertEvent = {
       title: data.title,
       description: data.description || null,
@@ -128,9 +128,9 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
   };
 
   const handleSongToggle = (songId: string) => {
-    setSelectedSongs(prev =>
+    setSelectedSongs((prev) =>
       prev.includes(songId)
-        ? prev.filter(id => id !== songId)
+        ? prev.filter((id) => id !== songId)
         : [...prev, songId]
     );
   };
@@ -140,7 +140,7 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
   const getBlockoutsForDate = (dateStr: string) => {
     if (!dateStr) return [];
     const date = new Date(dateStr);
-    return blockouts.filter(blockout => {
+    return blockouts.filter((blockout) => {
       const start = new Date(blockout.startDate);
       const end = new Date(blockout.endDate);
       return date >= start && date <= end;
@@ -148,10 +148,6 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
   };
 
   const dateBlockouts = getBlockoutsForDate(selectedDate);
-
-  if (user?.role !== 'admin') {
-    return null;
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -178,11 +174,7 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="date">Date</Label>
-              <Input
-                id="date"
-                type="date"
-                {...form.register("date")}
-              />
+              <Input id="date" type="date" {...form.register("date")} />
               {form.formState.errors.date && (
                 <p className="text-sm text-red-600 mt-1">
                   {form.formState.errors.date.message}
@@ -192,11 +184,7 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
 
             <div>
               <Label htmlFor="time">Time</Label>
-              <Input
-                id="time"
-                type="time"
-                {...form.register("time")}
-              />
+              <Input id="time" type="time" {...form.register("time")} />
               {form.formState.errors.time && (
                 <p className="text-sm text-red-600 mt-1">
                   {form.formState.errors.time.message}
@@ -221,7 +209,8 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                 {dateBlockouts.length === 0 ? (
                   <p className="text-sm text-green-600 dark:text-green-400">
-                    No blockouts found for this date - all team members appear available!
+                    No blockouts found for this date - all team members appear
+                    available!
                   </p>
                 ) : (
                   <div className="space-y-2">
@@ -229,7 +218,10 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
                       The following team members have blockouts for this date:
                     </p>
                     {dateBlockouts.map((blockout) => (
-                      <div key={blockout.id} className="flex items-center justify-between text-sm">
+                      <div
+                        key={blockout.id}
+                        className="flex items-center justify-between text-sm"
+                      >
                         <span className="text-gray-900 dark:text-white">
                           Team Member (ID: {blockout.userId})
                         </span>
@@ -252,7 +244,10 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
                 </p>
               ) : (
                 songs.map((song) => (
-                  <div key={song.id} className="flex items-center space-x-3 py-2">
+                  <div
+                    key={song.id}
+                    className="flex items-center space-x-3 py-2"
+                  >
                     <Checkbox
                       id={song.id}
                       checked={selectedSongs.includes(song.id)}
@@ -264,8 +259,8 @@ export default function CreateEventModal({ isOpen, onClose }: CreateEventModalPr
                           {song.title}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {song.artist ? `${song.artist} • ` : ''}
-                          {song.key ? `Key: ${song.key}` : 'No key specified'}
+                          {song.artist ? `${song.artist} • ` : ""}
+                          {song.key ? `Key: ${song.key}` : "No key specified"}
                         </p>
                       </label>
                     </div>

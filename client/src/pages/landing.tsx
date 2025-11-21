@@ -98,11 +98,11 @@ export default function Landing() {
                 streamline their ministry operations.
               </p>
               <Button
-                onClick={() => (window.location.href = "/login")}
+                onClick={() => (window.location.href = "/")}
                 className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                 size="lg"
               >
-                Sign In with Auth0
+                Enter App
               </Button>
             </CardContent>
           </Card>

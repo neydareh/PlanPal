@@ -1,9 +1,6 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
-import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
 import CreateEventModal from "@/components/CreateEventModal";
@@ -14,26 +11,9 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import type { Event, Blockout } from "@shared/schema";
 
 export default function Calendar() {
-  const { toast } = useToast();
-  const { user, isLoading, isAuthenticated } = useAuth();
-  const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
 
   // Calculate calendar dates
   const year = currentDate.getFullYear();
@@ -46,36 +26,16 @@ export default function Calendar() {
   endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()));
 
   // Fetch events for current month
-  const { data: events = [], error: eventsError } = useQuery<Event[]>({
+  const { data: events = [] } = useQuery<Event[]>({
     queryKey: ["/api/events", startDate.toISOString(), endDate.toISOString()],
-    enabled: isAuthenticated,
     retry: false,
   });
 
   // Fetch blockouts for current month
-  const { data: blockouts = [], error: blockoutsError } = useQuery<Blockout[]>({
+  const { data: blockouts = [] } = useQuery<Blockout[]>({
     queryKey: ["/api/blockouts", startDate.toISOString(), endDate.toISOString(), "all"],
-    enabled: isAuthenticated,
     retry: false,
   });
-
-  // Handle errors
-  useEffect(() => {
-    if (eventsError && isUnauthorizedError(eventsError as Error)) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 500);
-    }
-  }, [eventsError, toast]);
-
-  if (!isAuthenticated || !user) {
-    return <div className="min-h-screen bg-gray-50 dark:bg-gray-900" />;
-  }
 
   // Generate calendar days
   const calendarDays = [];

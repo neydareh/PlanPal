@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
@@ -71,18 +70,7 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
       });
       handleClose();
     },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 500);
-        return;
-      }
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to add song. Please try again.",
@@ -122,10 +110,6 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
     "A#",
     "B",
   ].filter(Boolean); // Remove any falsy values
-
-  if (user?.role !== "admin") {
-    return null;
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

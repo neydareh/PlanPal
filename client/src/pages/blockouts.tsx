@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
@@ -29,30 +28,14 @@ type BlockoutFormData = z.infer<typeof blockoutFormSchema>;
 
 export default function Blockouts() {
   const { toast } = useToast();
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingBlockout, setEditingBlockout] = useState<Blockout | null>(null);
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
-
   // Fetch user's blockouts
-  const { data: blockouts = [], error: blockoutsError } = useQuery<Blockout[]>({
+  const { data: blockouts = [] } = useQuery<Blockout[]>({
     queryKey: ["/api/blockouts"],
-    enabled: isAuthenticated,
     retry: false,
   });
 
@@ -81,18 +64,7 @@ export default function Blockouts() {
       setIsCreateModalOpen(false);
       form.reset();
     },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 500);
-        return;
-      }
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to create blockout. Please try again.",
@@ -116,18 +88,7 @@ export default function Blockouts() {
       setEditingBlockout(null);
       form.reset();
     },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 500);
-        return;
-      }
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to update blockout. Please try again.",
@@ -148,18 +109,7 @@ export default function Blockouts() {
         description: "Blockout deleted successfully!",
       });
     },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 500);
-        return;
-      }
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to delete blockout. Please try again.",
@@ -167,20 +117,6 @@ export default function Blockouts() {
       });
     },
   });
-
-  // Handle errors
-  useEffect(() => {
-    if (blockoutsError && isUnauthorizedError(blockoutsError as Error)) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 500);
-    }
-  }, [blockoutsError, toast]);
 
   const onSubmit = (data: BlockoutFormData) => {
     const blockoutData: InsertBlockout = {
@@ -212,10 +148,6 @@ export default function Blockouts() {
     setEditingBlockout(null);
     form.reset();
   };
-
-  if (!isAuthenticated || !user) {
-    return <div className="min-h-screen bg-gray-50 dark:bg-gray-900" />;
-  }
 
   // Sort blockouts by start date
   const sortedBlockouts = [...blockouts].sort((a, b) => 

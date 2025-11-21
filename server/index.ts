@@ -27,7 +27,7 @@ app.get("/login", async (_, res) => {
   const payload = {
     response_type: "code",
     client_id: config.auth0.clientId,
-    redirect_uri: `${config.auth0.baseUrl}/token`,
+    redirect_uri: `${config.auth0.baseUrl}/`,
     scope: "openid email",
     audience: config.auth0.audience,
   };
@@ -37,28 +37,6 @@ app.get("/login", async (_, res) => {
   res.redirect(redirectUrl);
 });
 
-app.get("/token", async (req, res) => {
-  const response = await fetch(
-    `https://${process.env.AUTH0_DOMAIN}/oauth/token`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        grant_type: "authorization_code",
-        client_id: config.auth0.clientId,
-        client_secret: config.auth0.clientSecret,
-        code: req.query.code,
-        redirect_uri: `${config.auth0.baseUrl}/token`,
-      }),
-    }
-  );
-  const tokens = await response.json();
-  res.json({
-    access_token: tokens.access_token,
-    token_type: "Bearer",
-    expires_in: tokens.expires_in,
-  });
-});
 
 app.get("/logout", async (_, res) => {
   res.redirect(
