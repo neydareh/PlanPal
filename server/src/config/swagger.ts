@@ -341,6 +341,95 @@ const options: swaggerJsdoc.Options = {
             }
           }
         }
+      },
+      '/blockouts': {
+        get: {
+          summary: 'List blockouts',
+          tags: ['Blockouts'],
+          security: [{ BearerAuth: [] }, { ApiKeyAuth: [] }],
+          parameters: [
+            { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+            { in: 'query', name: 'limit', schema: { type: 'integer', default: 10, maximum: 100 } }
+          ],
+          responses: {
+            200: {
+              description: 'List of blockouts',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: { type: 'array', items: { $ref: '#/components/schemas/Blockout' } },
+                      meta: { $ref: '#/components/schemas/PaginationMeta' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        post: {
+          summary: 'Create blockout',
+          tags: ['Blockouts'],
+          security: [{ BearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/BlockoutInput' }
+              }
+            }
+          },
+          responses: {
+            201: {
+              description: 'Blockout created',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Blockout' }
+                }
+              }
+            }
+          }
+        }
+      },
+      '/blockouts/{id}': {
+        get: {
+          summary: 'Get blockout',
+          tags: ['Blockouts'],
+          security: [{ BearerAuth: [] }],
+          parameters: [
+            { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
+          ],
+          responses: {
+            200: {
+              description: 'Blockout details',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Blockout' }
+                }
+              }
+            },
+            404: {
+              description: 'Blockout not found',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Error' }
+                }
+              }
+            }
+          }
+        },
+        delete: {
+          summary: 'Delete blockout',
+          tags: ['Blockouts'],
+          security: [{ BearerAuth: [] }],
+          parameters: [
+            { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
+          ],
+          responses: {
+            204: { description: 'Blockout deleted' }
+          }
+        }
       }
     },
     components: {
@@ -432,6 +521,28 @@ const options: swaggerJsdoc.Options = {
           properties: {
             name: { type: 'string' },
             role: { type: 'string', enum: ['admin', 'user'] }
+          }
+        },
+        Blockout: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            userId: { type: 'string' },
+            startDate: { type: 'string', format: 'date-time' },
+            endDate: { type: 'string', format: 'date-time' },
+            reason: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' }
+          }
+        },
+        BlockoutInput: {
+          type: 'object',
+          required: ['userId', 'startDate', 'endDate'],
+          properties: {
+            userId: { type: 'string' },
+            startDate: { type: 'string', format: 'date-time' },
+            endDate: { type: 'string', format: 'date-time' },
+            reason: { type: 'string' }
           }
         }
       },
