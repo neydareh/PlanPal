@@ -56,21 +56,23 @@ export default function CreateEventModal({
   });
 
   // Fetch songs for selection
-  const { data: songs = [] } = useQuery<Song[]>({
+  const { data: songsData } = useQuery<{ data: Song[] }>({
     queryKey: ["/api/songs"],
     enabled: isOpen,
     retry: false,
   });
 
+  const songs = songsData?.data || [];
   console.log('songs => ', songs);
 
   // Fetch blockouts to show team availability
-  const { data: blockouts = [] } = useQuery<Blockout[]>({
+  const { data: blockoutsData } = useQuery<{ data: Blockout[] }>({
     queryKey: ["/api/blockouts", "all", "true"],
     enabled: isOpen,
     retry: false,
   });
 
+  const blockouts = blockoutsData?.data || [];
   console.log('blockouts => ', blockouts);
 
   // Create event mutation

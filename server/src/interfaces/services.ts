@@ -1,5 +1,5 @@
 import { User, Event, Song } from './models';
-import { CreateEventDTO, UpdateEventDTO } from './dto';
+import { CreateEventDTO, UpdateEventDTO, CreateBlockoutDTO } from './dto';
 import { PaginatedResult } from '../utils/pagination';
 
 export interface IAuthService {
@@ -27,4 +27,10 @@ export interface ISongService {
   createSong(songData: Omit<Song, 'id' | 'createdAt' | 'updatedAt'>): Promise<Song>;
   updateSong(id: string, songData: Partial<Song>): Promise<Song>;
   deleteSong(id: string): Promise<void>;
+}
+
+export interface IBlockoutService {
+  getBlockouts(page?: number, limit?: number): Promise<PaginatedResult<any>>; // Using any for now as Blockout model import might be tricky without circular deps or moving things
+  createBlockout(blockoutData: CreateBlockoutDTO): Promise<any>;
+  deleteBlockout(id: string): Promise<void>;
 }

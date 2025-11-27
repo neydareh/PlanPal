@@ -34,3 +34,16 @@ export const UpdateUserSchema = z.object({
 });
 
 export type UpdateUserDTO = z.infer<typeof UpdateUserSchema>;
+
+// Blockout DTOs
+export const CreateBlockoutSchema = z.object({
+  userId: z.string().uuid(),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+  reason: z.string().max(500).optional(),
+});
+
+export const UpdateBlockoutSchema = CreateBlockoutSchema.partial();
+
+export type CreateBlockoutDTO = z.infer<typeof CreateBlockoutSchema>;
+export type UpdateBlockoutDTO = z.infer<typeof UpdateBlockoutSchema>;

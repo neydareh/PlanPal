@@ -36,3 +36,13 @@ export interface EventSong {
   songId: string;
   order: number;
 }
+
+export interface Blockout {
+  id: string;
+  userId: string;
+  startDate: Date;
+  endDate: Date;
+  reason: string | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}

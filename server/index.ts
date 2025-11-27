@@ -109,3 +109,5 @@ if (app.get("env") === "development") {
     console.log(`Server running on port ${port}`);
   });
 }
+
+console.log("Server updated and restarted");

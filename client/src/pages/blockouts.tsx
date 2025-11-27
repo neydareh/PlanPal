@@ -34,7 +34,7 @@ export default function Blockouts() {
   const [editingBlockout, setEditingBlockout] = useState<Blockout | null>(null);
 
   // Fetch user's blockouts
-  const { data: blockouts = [] } = useQuery<Blockout[]>({
+  const { data: blockoutData = [] } = useQuery<{ data: Blockout[]}>({
     queryKey: ["/api/blockouts"],
     retry: false,
   });
@@ -48,6 +48,7 @@ export default function Blockouts() {
       reason: "",
     },
   });
+  const blockouts = blockoutData?.data || [];
 
   // Create blockout mutation
   const createBlockoutMutation = useMutation({

@@ -5,6 +5,7 @@ import { healthRoutes } from "./health.routes";
 import { eventRoutes } from "./event.routes";
 import { userRoutes } from "./user.routes";
 import { songRoutes } from "./song.routes";
+import { blockoutRoutes } from "./blockout.routes";
 
 export function registerRoutes(app: Express) {
   // Apply rate limiting to all API routes
@@ -17,10 +18,12 @@ export function registerRoutes(app: Express) {
   app.use("/api/events", eventRoutes);
   app.use("/api/users", userRoutes);
   app.use("/api/songs", songRoutes);
+  app.use("/api/blockouts", blockoutRoutes);
 
   // Service-to-service API routes (requires API key)
   app.use("/api/v1/events", apiKeyAuth(), eventRoutes);
   app.use("/api/v1/users", apiKeyAuth(), userRoutes);
   app.use("/api/v1/songs", apiKeyAuth(),songRoutes);
+  app.use("/api/v1/blockouts", apiKeyAuth(), blockoutRoutes);
 
 }

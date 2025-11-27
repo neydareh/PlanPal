@@ -28,11 +28,11 @@ export const config = {
   apiKey: process.env.API_KEY,
   authRateLimit: {
     window: 15 * 60 * 1000, // 15 minutes
-    max: 5, // requests per window
+    max: 100, // requests per window
   },
   createAccountRateLimit: {
     window: 24 * 60 * 60 * 1000, // 24 hours
-    max: 3, // requests per window
+    max: 100, // requests per window
   },
   defaultRateLimit: {
     window: 15 * 60 * 1000, // 15 minutes
