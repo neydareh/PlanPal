@@ -5,6 +5,7 @@ export const CreateEventSchema = z.object({
   title: z.string().min(1).max(100),
   description: z.string().max(1000).optional(),
   date: z.string().datetime(),
+  createdBy: z.string().uuid(),
 });
 
 export const UpdateEventSchema = CreateEventSchema.partial();
@@ -19,6 +20,7 @@ export const CreateSongSchema = z.object({
   key: z.string().max(10),
   tempo: z.number().min(20).max(300).optional(),
   youtubeUrl: z.string().url().optional(),
+  createdBy: z.string().uuid(),
 });
 
 export const UpdateSongSchema = CreateSongSchema.partial();

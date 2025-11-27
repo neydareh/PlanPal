@@ -12,6 +12,10 @@ router.get("/", (req, res) => {
   return blockoutController.getBlockouts(req, res);
 });
 
+router.get("/:id", (req, res) => {
+  return blockoutController.getBlockout(req, res);
+});
+
 router.post("/", validateRequest(CreateBlockoutSchema), (req, res) =>
   blockoutController.createBlockout(req, res)
 );

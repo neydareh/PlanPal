@@ -63,17 +63,17 @@ export default function CreateEventModal({
   });
 
   const songs = songsData?.data || [];
-  console.log('songs => ', songs);
+  // console.log('songs => ', songs);
 
   // Fetch blockouts to show team availability
   const { data: blockoutsData } = useQuery<{ data: Blockout[] }>({
-    queryKey: ["/api/blockouts", "all", "true"],
+    queryKey: ["/api/blockouts"],
     enabled: isOpen,
     retry: false,
   });
 
   const blockouts = blockoutsData?.data || [];
-  console.log('blockouts => ', blockouts);
+  // console.log('blockouts => ', blockouts);
 
   // Create event mutation
   const createEventMutation = useMutation({

@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
 import CreateEventModal from "@/components/CreateEventModal";
+import EventDetailsModal from "@/components/EventDetailsModal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
@@ -14,6 +15,8 @@ export default function Calendar() {
   const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [isEventDetailsModalOpen, setIsEventDetailsModalOpen] = useState(false);
 
   // Calculate calendar dates
   const year = currentDate.getFullYear();
@@ -111,6 +114,10 @@ export default function Calendar() {
                 blockouts={blockouts}
                 user={user}
                 onCreateEventClick={() => setIsCreateEventModalOpen(true)}
+                onEventClick={(eventId) => {
+                  setSelectedEventId(eventId);
+                  setIsEventDetailsModalOpen(true);
+                }}
               />
 
               {/* Legend */}
@@ -127,12 +134,12 @@ export default function Calendar() {
                     Blockouts
                   </span>
                 </div>
-                <div className="flex items-center space-x-2">
+                {/* <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 border-2 border-primary-500 rounded"></div>
                   <span className="text-gray-600 dark:text-gray-400">
                     Today
                   </span>
-                </div>
+                </div> */}
               </div>
             </CardContent>
           </Card>
@@ -142,6 +149,15 @@ export default function Calendar() {
       <CreateEventModal
         isOpen={isCreateEventModalOpen}
         onClose={() => setIsCreateEventModalOpen(false)}
+      />
+
+      <EventDetailsModal
+        isOpen={isEventDetailsModalOpen}
+        onClose={() => {
+          setIsEventDetailsModalOpen(false);
+          setSelectedEventId(null);
+        }}
+        eventId={selectedEventId}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
+import BlockoutDetailsModal from "@/components/BlockoutDetailsModal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,9 +33,11 @@ export default function Blockouts() {
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingBlockout, setEditingBlockout] = useState<Blockout | null>(null);
+  const [selectedBlockoutId, setSelectedBlockoutId] = useState<string | null>(null);
+  const [isBlockoutDetailsModalOpen, setIsBlockoutDetailsModalOpen] = useState(false);
 
   // Fetch user's blockouts
-  const { data: blockoutData = [] } = useQuery<{ data: Blockout[]}>({
+  const { data: blockoutData } = useQuery<{ data: Blockout[] }>({
     queryKey: ["/api/blockouts"],
     retry: false,
   });
@@ -151,17 +154,28 @@ export default function Blockouts() {
   };
 
   // Sort blockouts by start date
-  const sortedBlockouts = [...blockouts].sort((a, b) => 
+  const sortedBlockouts = [...blockouts].sort((a, b) =>
     new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
   );
+
+  console.log('form values', form.register('startDate'));
+
+  const getFormattedDate = (date: Date) => {
+    // return string in format Nov 26, 2025
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar currentPath="/blockouts" />
-      
+
       <div className="lg:ml-64">
         <TopNavBar title="My Blockouts" />
-        
+
         <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
           {/* Header */}
           <div className="mb-6">
@@ -188,7 +202,7 @@ export default function Blockouts() {
                       {editingBlockout ? 'Edit Blockout' : 'Create New Blockout'}
                     </DialogTitle>
                   </DialogHeader>
-                  
+
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <div>
                       <Label htmlFor="startDate">Start Date</Label>
@@ -203,7 +217,7 @@ export default function Blockouts() {
                         </p>
                       )}
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="endDate">End Date</Label>
                       <Input
@@ -217,7 +231,7 @@ export default function Blockouts() {
                         </p>
                       )}
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="reason">Reason (Optional)</Label>
                       <Textarea
@@ -231,13 +245,13 @@ export default function Blockouts() {
                         </p>
                       )}
                     </div>
-                    
+
                     <div className="flex justify-end space-x-2 pt-4">
                       <Button type="button" variant="outline" onClick={handleCloseModal}>
                         Cancel
                       </Button>
-                      <Button 
-                        type="submit" 
+                      <Button
+                        type="submit"
                         disabled={createBlockoutMutation.isPending || updateBlockoutMutation.isPending}
                       >
                         {editingBlockout ? 'Update' : 'Create'} Blockout
@@ -279,37 +293,47 @@ export default function Blockouts() {
                 const isActive = new Date() >= startDate && new Date() <= endDate;
                 const isPast = new Date() > endDate;
                 const isFuture = new Date() < startDate;
-                
+
                 return (
-                  <Card key={blockout.id} className="glass-card">
+                  <Card
+                    key={blockout.id}
+                    className="glass-card cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => {
+                      setSelectedBlockoutId(blockout.id);
+                      setIsBlockoutDetailsModalOpen(true);
+                    }}
+                  >
                     <CardContent className="p-4 lg:p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                              {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
+                              {getFormattedDate(startDate)} to {getFormattedDate(endDate)}
                             </h3>
                             <Badge variant={isActive ? "destructive" : isPast ? "secondary" : "default"}>
                               {isActive ? "Active" : isPast ? "Past" : "Upcoming"}
                             </Badge>
                           </div>
-                          
+
                           {blockout.reason && (
                             <p className="text-gray-600 dark:text-gray-400 mb-2">
                               {blockout.reason}
                             </p>
                           )}
-                          
+
                           <p className="text-sm text-gray-500 dark:text-gray-400">
                             Created {blockout.createdAt ? new Date(blockout.createdAt).toLocaleDateString() : 'Unknown date'}
                           </p>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleEdit(blockout)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(blockout);
+                            }}
                             disabled={isPast}
                           >
                             <Edit className="w-4 h-4" />
@@ -317,7 +341,10 @@ export default function Blockouts() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => deleteBlockoutMutation.mutate(blockout.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteBlockoutMutation.mutate(blockout.id);
+                            }}
                             disabled={deleteBlockoutMutation.isPending}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -332,6 +359,15 @@ export default function Blockouts() {
           )}
         </main>
       </div>
+
+      <BlockoutDetailsModal
+        isOpen={isBlockoutDetailsModalOpen}
+        onClose={() => {
+          setIsBlockoutDetailsModalOpen(false);
+          setSelectedBlockoutId(null);
+        }}
+        blockoutId={selectedBlockoutId}
+      />
     </div>
   );
 }

@@ -45,7 +45,7 @@ async function seedEventAndBlockout() {
     // 3. Create Blockout for Olakunle on Nov 23, 2025
     // Blockout for the whole day or specific time? Let's do whole day for visibility
     const blockoutStart = new Date("2025-11-23T00:00:00");
-    const blockoutEnd = new Date("2025-11-23T23:59:59");
+    const blockoutEnd = new Date("2025-11-30T23:59:59");
 
     const [newBlockout] = await db
       .insert(blockouts)

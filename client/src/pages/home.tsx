@@ -68,14 +68,14 @@ export default function Home() {
           <main className="p-4 lg:p-6 pt-20 lg:pt-6">
             {/* Analytics Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-4 lg:p-6 mb-6 lg:mb-6">
-              <TotalEventsCard
+              {/* <TotalEventsCard
                 events={events}
                 upcomingEvents={upcomingEvents}
-              />
+              /> */}
               <RoleIndicator user={user} />
               {user.role === "admin" && <SongsInLibrary songs={songs} />}
 
-              <EventsForTheWeek upcomingEvents={upcomingEvents} today={today} />
+              {/* <EventsForTheWeek upcomingEvents={upcomingEvents} today={today} /> */}
             </div>
 
             {/* Quick Actions and Upcoming Events */}

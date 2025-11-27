@@ -17,6 +17,18 @@ export class BlockoutController {
     }
   }
 
+  async getBlockout(req: Request, res: Response) {
+    try {
+      const blockout = await this.blockoutService.getBlockout(req.params.id);
+      if (!blockout) {
+        return res.status(404).json({ message: "Blockout not found" });
+      }
+      res.json(blockout);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch blockout" });
+    }
+  }
+
   async createBlockout(req: Request, res: Response) {
     try {
       // Validate input using the schema

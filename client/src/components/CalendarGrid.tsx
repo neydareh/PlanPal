@@ -8,11 +8,13 @@ export const CalendarGrid = ({
   blockouts,
   user,
   onCreateEventClick,
+  onEventClick,
 }: {
   events: Event[];
   blockouts: Blockout[];
   user: User;
   onCreateEventClick: () => void;
+  onEventClick?: (eventId: string) => void;
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<"month" | "week">("month");
@@ -36,24 +38,26 @@ export const CalendarGrid = ({
   const startDate =
     viewMode === "month"
       ? (() => {
-          const start = new Date(firstDay);
-          start.setDate(start.getDate() - firstDay.getDay());
-          return start;
-        })()
+        const start = new Date(firstDay);
+        start.setDate(start.getDate() - firstDay.getDay());
+        return start;
+      })()
       : weekStart;
 
   const endDate =
     viewMode === "month"
       ? (() => {
-          const end = new Date(lastDay);
-          end.setDate(end.getDate() + (6 - lastDay.getDay()));
-          return end;
-        })()
+        const end = new Date(lastDay);
+        end.setDate(end.getDate() + (6 - lastDay.getDay()));
+        return end;
+      })()
       : weekEnd;
 
   // Generate calendar days
   const calendarDays = [];
   const current = new Date(startDate);
+
+  // Generate calendar days
   while (current <= endDate) {
     calendarDays.push(new Date(current));
     current.setDate(current.getDate() + 1);
@@ -117,16 +121,18 @@ export const CalendarGrid = ({
 
   return (
     <>
+      {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div className="flex items-center gap-2 sm:gap-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             {viewMode === "month"
               ? `${monthNames[month]} ${year}`
-              : `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()} - ${
-                  monthNames[weekEnd.getMonth()]
-                } ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`}
+              : `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()} - ${monthNames[weekEnd.getMonth()]
+              } ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`}
           </h2>
         </div>
+
+        {/* Button Group */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
 
           <Button
@@ -187,77 +193,79 @@ export const CalendarGrid = ({
 
       <div className="overflow-x-auto">
         <div className="grid grid-cols-7 gap-1 mb-4 w-full">
-        {/* Days of week header */}
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div
-            key={day}
-            className="p-3 text-center text-sm font-medium text-gray-500 dark:text-gray-400"
-          >
-            {day}
-          </div>
-        ))}
-
-        {/* Calendar days */}
-        {calendarDays.map((date, index) => {
-          const dayEvents = getEventsForDate(date);
-          const dayBlockouts = getBlockoutsForDate(date);
-          const isCurrentMonthDay = isCurrentMonth(date);
-          const isTodayDay = isToday(date);
-          const dayKey = todayKey(date);
-
-          return (
+          {/* Days of week header */}
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div
-              key={dayKey}
-              className={`h-24 p-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-all duration-200 hover:scale-102 hover:shadow-md ${
-                isCurrentMonthDay
-                  ? "bg-white dark:bg-gray-700"
-                  : "bg-gray-50 dark:bg-gray-800"
-              } ${isTodayDay ? "ring-2 ring-primary-500" : ""} ${
-                dayBlockouts.length > 0 ? "bg-red-50 dark:bg-red-900/20" : ""
-              }`}
+              key={day}
+              className="p-3 text-center text-sm font-medium text-gray-500 dark:text-gray-400"
             >
+              {day}
+            </div>
+          ))}
+
+          {/* Calendar days */}
+          {calendarDays.map((date, index) => {
+            const dayEvents = getEventsForDate(date);
+            const dayBlockouts = getBlockoutsForDate(date);
+            const isCurrentMonthDay = isCurrentMonth(date);
+            const isTodayDay = isToday(date);
+            const dayKey = todayKey(date);
+
+            return (
               <div
-                className={`text-sm font-medium ${
-                  isCurrentMonthDay
+                key={dayKey}
+                className={`min-h-[5.5rem] sm:h-24 p-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-all duration-200 hover:scale-102 hover:shadow-md flex flex-col 
+                  ${isCurrentMonthDay ? "bg-white dark:bg-gray-700" : "bg-gray-50 dark:bg-gray-800"}
+                  ${isTodayDay ? "ring-2 ring-primary-500" : ""}
+                  ${dayBlockouts.length > 0 ? "bg-red-50 dark:bg-red-900/20" : ""}
+                  `}
+              >
+                {/* Date */}
+                <div
+                  className={`text-sm font-medium ${isCurrentMonthDay
                     ? "text-gray-900 dark:text-white"
                     : "text-gray-400 dark:text-gray-600"
-                } ${
-                  isTodayDay
-                    ? "text-primary-600 dark:text-primary-400 font-bold"
-                    : ""
-                }`}
-              >
-                {date.getDate()}
+                    } ${isTodayDay
+                      ? "text-primary-600 dark:text-primary-400 font-bold"
+                      : ""
+                    }`}
+                >
+                  {date.getDate()}
+                </div>
+
+                {/* Events */}
+                <div className="mt-1 space-y-1">
+                  {dayEvents.slice(0, 2).map((event) => (
+                    <div
+                      key={event.id}
+                      className="text-xs bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-1 py-0.5 rounded truncate cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-800/40 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEventClick?.(event.id);
+                      }}
+                    >
+                      {event.title}
+                    </div>
+                  ))}
+
+                  {/* {dayBlockouts.slice(0, 1).map((blockout) => (
+                    <div
+                      key={blockout.id}
+                      className="text-xs bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 px-1 py-0.5 rounded truncate"
+                    >
+                      Blockout
+                    </div>
+                  ))} */}
+
+                  {dayEvents.length > 2 && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      +{dayEvents.length - 2} more
+                    </div>
+                  )}
+                </div>
               </div>
-
-              <div className="mt-1 space-y-1">
-                {dayEvents.slice(0, 2).map((event) => (
-                  <div
-                    key={event.id}
-                    className="text-xs bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-1 py-0.5 rounded truncate"
-                  >
-                    {event.title}
-                  </div>
-                ))}
-
-                {dayBlockouts.slice(0, 1).map((blockout) => (
-                  <div
-                    key={blockout.id}
-                    className="text-xs bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 px-1 py-0.5 rounded truncate"
-                  >
-                    Blockout
-                  </div>
-                ))}
-
-                {dayEvents.length > 2 && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    +{dayEvents.length - 2} more
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </div>
       </div>
     </>

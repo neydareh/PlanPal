@@ -119,6 +119,37 @@ router.get("/", (req, res) => {
 
 /**
  * @swagger
+ * /events/{id}:
+ *   get:
+ *     summary: Get an event by ID
+ *     description: Retrieve a single event by its ID. Requires authentication.
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The event ID
+ *     responses:
+ *       200:
+ *         description: Event details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Event'
+ *       404:
+ *         description: Event not found
+ *       401:
+ *         description: Not authenticated
+ */
+router.get("/:id", (req, res) => {
+  return eventController.getEvent(req, res);
+});
+
+/**
+ * @swagger
  * /events:
  *   post:
  *     summary: Create a new event

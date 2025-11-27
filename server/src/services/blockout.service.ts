@@ -43,6 +43,27 @@ export class BlockoutService implements IBlockoutService {
     return paginatedResult;
   }
 
+  async getBlockout(id: string): Promise<Blockout | null> {
+    const cacheKey = `blockout:${id}`;
+
+    // Try to get from cache
+    const cached = await CacheService.get<Blockout>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const result = await db.query.blockouts.findFirst({
+      where: eq(blockouts.id, id),
+    });
+
+    if (result) {
+      // Cache the result
+      await CacheService.set(cacheKey, result, 300); // Cache for 5 minutes
+    }
+
+    return result as Blockout | null;
+  }
+
   async createBlockout(
     blockoutData: CreateBlockoutDTO
   ): Promise<Blockout> {
