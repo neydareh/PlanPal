@@ -40,7 +40,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   useEffect(() => {
     const root = document.documentElement;
-    console.log('root => ', root);
     if (theme === "dark") {
       root.classList.add("dark");
     } else {

@@ -10,6 +10,8 @@ import Home from "@/pages/home";
 import Calendar from "@/pages/calendar";
 import Songs from "@/pages/songs";
 import Blockouts from "@/pages/blockouts";
+import { useAuth } from "@/hooks/useAuth";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 function App() {
   return (
@@ -17,17 +19,29 @@ function App() {
       <ThemeProvider>
         <TooltipProvider>
           <Toaster />
-          <Switch>
-            <Route path="/" component={Home} />
-            <Route path="/calendar" component={Calendar} />
-            <Route path="/songs" component={Songs} />
-            <Route path="/blockouts" component={Blockouts} />
-            <Route path="/landing" component={Landing} />
-            <Route component={NotFound} />
-          </Switch>
+          <AppContent />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
+  );
+}
+
+function AppContent() {
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return <LoadingSpinner fullScreen />;
+  }
+
+  return (
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route path="/calendar" component={Calendar} />
+      <Route path="/songs" component={Songs} />
+      <Route path="/blockouts" component={Blockouts} />
+      <Route path="/landing" component={Landing} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 

@@ -20,6 +20,7 @@ import TotalEventsCard from "@/components/TotalEventsCard";
 import RoleIndicator from "@/components/RoleIndicator";
 import SongsInLibrary from "@/components/SongsInLibrary";
 import EventsForTheWeek from "@/components/EventsForTheWeek";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function Home() {
   const { isLoading, user } = useAuth();
@@ -61,9 +62,7 @@ export default function Home() {
 
         {/* render loading state */}
         {isLoading || isLoadingEvents || isLoadingSongs ? (
-          <div className="p-4lg:p-6 pt-20 lg:pt-6">
-            <p>Loading...</p>
-          </div>
+          <LoadingSpinner fullScreen />
         ) : (
           <main className="p-4 lg:p-6 pt-20 lg:pt-6">
             {/* Analytics Cards */}
