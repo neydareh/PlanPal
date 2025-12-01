@@ -24,10 +24,22 @@ export default {
         primary: {
           DEFAULT: "var(--primary)",
           foreground: "var(--primary-foreground)",
+          50: "var(--primary-50)",
+          100: "var(--primary-100)",
+          500: "var(--primary-500)",
+          600: "var(--primary-600)",
+          700: "var(--primary-700)",
+          900: "var(--primary-900)",
         },
         secondary: {
           DEFAULT: "var(--secondary)",
           foreground: "var(--secondary-foreground)",
+          50: "var(--secondary-50)",
+          100: "var(--secondary-100)",
+          500: "var(--secondary-500)",
+          600: "var(--secondary-600)",
+          700: "var(--secondary-700)",
+          900: "var(--secondary-900)",
         },
         muted: {
           DEFAULT: "var(--muted)",
@@ -36,6 +48,12 @@ export default {
         accent: {
           DEFAULT: "var(--accent)",
           foreground: "var(--accent-foreground)",
+          50: "var(--accent-50)",
+          100: "var(--accent-100)",
+          500: "var(--accent-500)",
+          600: "var(--accent-600)",
+          700: "var(--accent-700)",
+          900: "var(--accent-900)",
         },
         destructive: {
           DEFAULT: "var(--destructive)",

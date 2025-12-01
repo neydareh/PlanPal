@@ -38,19 +38,19 @@ export const CalendarGrid = ({
   const startDate =
     viewMode === "month"
       ? (() => {
-        const start = new Date(firstDay);
-        start.setDate(start.getDate() - firstDay.getDay());
-        return start;
-      })()
+          const start = new Date(firstDay);
+          start.setDate(start.getDate() - firstDay.getDay());
+          return start;
+        })()
       : weekStart;
 
   const endDate =
     viewMode === "month"
       ? (() => {
-        const end = new Date(lastDay);
-        end.setDate(end.getDate() + (6 - lastDay.getDay()));
-        return end;
-      })()
+          const end = new Date(lastDay);
+          end.setDate(end.getDate() + (6 - lastDay.getDay()));
+          return end;
+        })()
       : weekEnd;
 
   // Generate calendar days
@@ -127,19 +127,21 @@ export const CalendarGrid = ({
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             {viewMode === "month"
               ? `${monthNames[month]} ${year}`
-              : `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()} - ${monthNames[weekEnd.getMonth()]
-              } ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`}
+              : `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()} - ${
+                  monthNames[weekEnd.getMonth()]
+                } ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`}
           </h2>
         </div>
 
         {/* Button Group */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-
           <Button
             variant="outline"
             size="sm"
             className="flex-1 sm:flex-none"
-            onClick={() => setCurrentDate(new Date())}
+            onClick={() => {
+              setCurrentDate(new Date());
+            }}
           >
             Today
           </Button>
@@ -148,7 +150,9 @@ export const CalendarGrid = ({
             variant={viewMode === "week" ? "default" : "outline"}
             size="sm"
             className="flex-1 sm:flex-none"
-            onClick={() => setViewMode("week")}
+            onClick={() => {
+              setViewMode("week");
+            }}
           >
             Week
           </Button>
@@ -157,7 +161,9 @@ export const CalendarGrid = ({
             variant={viewMode === "month" ? "default" : "outline"}
             size="sm"
             className="flex-1 sm:flex-none"
-            onClick={() => setViewMode("month")}
+            onClick={() => {
+              setViewMode("month");
+            }}
           >
             Month
           </Button>
@@ -165,7 +171,9 @@ export const CalendarGrid = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigateMonth("prev")}
+            onClick={() => {
+              navigateMonth("prev");
+            }}
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -173,7 +181,9 @@ export const CalendarGrid = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigateMonth("next")}
+            onClick={() => {
+              navigateMonth("next");
+            }}
           >
             <ChevronRight className="w-4 h-4" />
           </Button>
@@ -187,7 +197,6 @@ export const CalendarGrid = ({
               Create Event
             </Button>
           )}
-
         </div>
       </div>
 
@@ -204,7 +213,7 @@ export const CalendarGrid = ({
           ))}
 
           {/* Calendar days */}
-          {calendarDays.map((date, index) => {
+          {calendarDays.map((date) => {
             const dayEvents = getEventsForDate(date);
             const dayBlockouts = getBlockoutsForDate(date);
             const isCurrentMonthDay = isCurrentMonth(date);
@@ -215,20 +224,30 @@ export const CalendarGrid = ({
               <div
                 key={dayKey}
                 className={`min-h-[5.5rem] sm:h-24 p-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-all duration-200 hover:scale-102 hover:shadow-md flex flex-col 
-                  ${isCurrentMonthDay ? "bg-white dark:bg-gray-700" : "bg-gray-50 dark:bg-gray-800"}
+                  ${
+                    isCurrentMonthDay
+                      ? "bg-white dark:bg-gray-700"
+                      : "bg-gray-50 dark:bg-gray-800"
+                  }
                   ${isTodayDay ? "ring-2 ring-primary-500" : ""}
-                  ${dayBlockouts.length > 0 ? "bg-red-50 dark:bg-red-900/20" : ""}
+                  ${
+                    dayBlockouts.length > 0
+                      ? "bg-red-50 dark:bg-red-900/20"
+                      : ""
+                  }
                   `}
               >
                 {/* Date */}
                 <div
-                  className={`text-sm font-medium ${isCurrentMonthDay
-                    ? "text-gray-900 dark:text-white"
-                    : "text-gray-400 dark:text-gray-600"
-                    } ${isTodayDay
+                  className={`text-sm font-medium ${
+                    isCurrentMonthDay
+                      ? "text-gray-900 dark:text-white"
+                      : "text-gray-400 dark:text-gray-600"
+                  } ${
+                    isTodayDay
                       ? "text-primary-600 dark:text-primary-400 font-bold"
                       : ""
-                    }`}
+                  }`}
                 >
                   {date.getDate()}
                 </div>
@@ -238,7 +257,7 @@ export const CalendarGrid = ({
                   {dayEvents.slice(0, 2).map((event) => (
                     <div
                       key={event.id}
-                      className="text-xs bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-1 py-0.5 rounded truncate cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-800/40 transition-colors"
+                      className="text-xs bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-2 py-1 truncate cursor-pointer transition-all duration-200 hover:bg-primary/80 dark:hover:bg-primary/70 hover:text-white dark:hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-primary/50 hover:z-10 hover:font-semibold hover:ring-2 hover:ring-primary dark:hover:ring-primary"
                       onClick={(e) => {
                         e.stopPropagation();
                         onEventClick?.(event.id);

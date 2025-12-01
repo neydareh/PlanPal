@@ -64,14 +64,6 @@
   --orange-600: hsl(31, 91%, 46%);
   --orange-400: hsl(31, 91%, 56%);
   --orange-900: hsl(31, 91%, 18%);
-
-  --blue-100: hsl(214, 95%, 88%);
-  --blue-600: hsl(214, 95%, 46%);
-  --blue-900: hsl(214, 95%, 18%);
-
-  --yellow-100: hsl(54, 91%, 88%);
-  --yellow-600: hsl(54, 91%, 46%);
-  --yellow-900: hsl(54, 91%, 18%);
 }
 
 .dark {
@@ -136,14 +128,6 @@
   --orange-600: hsl(31, 91%, 46%);
   --orange-400: hsl(31, 91%, 56%);
   --orange-900: hsl(31, 91%, 8%);
-
-  --blue-100: hsl(214, 95%, 18%);
-  --blue-600: hsl(214, 95%, 46%);
-  --blue-900: hsl(214, 95%, 8%);
-
-  --yellow-100: hsl(54, 91%, 18%);
-  --yellow-600: hsl(54, 91%, 46%);
-  --yellow-900: hsl(54, 91%, 8%);
 }
 
 @layer base {
@@ -177,32 +161,6 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
   }
 
-  /* Calendar day effect */
-  .calendar-day {
-    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 120px;
-  }
-
-  .calendar-day:hover {
-    background: rgba(99, 102, 241, 0.1);
-  }
-
-  .dark .calendar-day:hover {
-    background: rgba(99, 102, 241, 0.2);
-  }
-
-  /* Mobile responsive calendar */
-  @media (max-width: 768px) {
-    .calendar-day {
-      min-height: 80px;
-      font-size: 0.875rem;
-    }
-    
-    .calendar-grid {
-      gap: 1px;
-    }
-  }
-
   /* Mobile optimizations */
   @media (max-width: 640px) {
     .glass-card {
@@ -226,85 +184,12 @@
       font-size: 1.25rem;
       line-height: 1.75rem;
     }
-    
-    /* Improved spacing for mobile cards */
-    .mobile-card {
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    
-    /* Stack elements vertically on mobile */
-    .mobile-stack {
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-  }
-
-  /* Gradient backgrounds */
-  .gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  }
-
-  .dark-gradient-bg {
-    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-  }
-
-
-}
-
-@layer utilities {
-  /* Animation utilities */
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
-  }
-
-  .animate-bounce-gentle {
-    animation: bounceGentle 2s infinite;
-  }
-
-  /* Custom backdrop blur */
-  .backdrop-blur-xs {
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
   }
 }
 
-/* Keyframe animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
 
-@keyframes bounceGentle {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
-  }
-}
+
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {

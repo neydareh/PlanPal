@@ -188,7 +188,7 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="destructive" onClick={handleClose}>
               Cancel
             </Button>
             <Button type="submit" disabled={createSongMutation.isPending}>

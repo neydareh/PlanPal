@@ -61,9 +61,7 @@ export default function CreateEventModal({
     enabled: isOpen,
     retry: false,
   });
-
   const songs = songsData?.data || [];
-  // console.log('songs => ', songs);
 
   // Fetch blockouts to show team availability
   const { data: blockoutsData } = useQuery<{ data: Blockout[] }>({
@@ -71,17 +69,18 @@ export default function CreateEventModal({
     enabled: isOpen,
     retry: false,
   });
-
   const blockouts = blockoutsData?.data || [];
-  // console.log('blockouts => ', blockouts);
 
   // Create event mutation
   const createEventMutation = useMutation({
     mutationFn: async (data: InsertEvent) => {
+      console.log("Creating event:", data);
       const response = await apiRequest("POST", "/api/events", data);
       return response.json();
     },
     onSuccess: async (event) => {
+      console.log("Event created successfully:", event);
+
       // Add selected songs to the event
       if (selectedSongs.length > 0) {
         await Promise.all(
@@ -95,10 +94,12 @@ export default function CreateEventModal({
       }
 
       queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+
       toast({
         title: "Success",
         description: "Event created successfully!",
       });
+
       handleClose();
     },
     onError: () => {
@@ -111,6 +112,7 @@ export default function CreateEventModal({
   });
 
   const onSubmit = (data: EventFormData) => {
+    console.log("Form data:", data);
     const eventDateTime = new Date(`${data.date}T${data.time}`);
 
     const eventData: InsertEvent = {
@@ -153,12 +155,16 @@ export default function CreateEventModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-screen overflow-y-auto">
+      <DialogContent
+        className="max-w-2xl max-h-screen overflow-y-auto"
+        aria-describedby="create-event-modal"
+      >
         <DialogHeader>
           <DialogTitle>Create New Event</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Event title */}
           <div>
             <Label htmlFor="title">Event Title</Label>
             <Input
@@ -173,6 +179,7 @@ export default function CreateEventModal({
             )}
           </div>
 
+          {/* Event date and time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="date">Date</Label>
@@ -195,6 +202,7 @@ export default function CreateEventModal({
             </div>
           </div>
 
+          {/* Event description */}
           <div>
             <Label htmlFor="description">Description</Label>
             <Textarea
@@ -280,7 +288,7 @@ export default function CreateEventModal({
             >
               {createEventMutation.isPending ? "Creating..." : "Create Event"}
             </Button>
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="destructive" onClick={handleClose}>
               Cancel
             </Button>
           </div>

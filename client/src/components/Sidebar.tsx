@@ -6,7 +6,6 @@ import {
   Calendar,
   CalendarX,
   Music,
-  Plus,
   Settings,
   X,
   Menu,
@@ -36,7 +35,9 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     };
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const navItems = [
@@ -73,7 +74,9 @@ export default function Sidebar({ currentPath }: SidebarProps) {
         variant="ghost"
         size="sm"
         className="fixed top-4 left-4 z-50 lg:hidden bg-white dark:bg-gray-800 shadow-lg"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+        }}
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </Button>
@@ -82,7 +85,9 @@ export default function Sidebar({ currentPath }: SidebarProps) {
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setIsOpen(false)}
+          onClick={() => {
+            setIsOpen(false);
+          }}
         />
       )}
 
@@ -118,13 +123,19 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                 <li key={item.href}>
                   <Link href={item.href}>
                     <div
-                      className={`flex items-center p-2 rounded-lg group transition-colors cursor-pointer ${
+                      className={`flex items-center p-2 rounded-lg group transition-all duration-200 cursor-pointer relative ${
                         isActive
-                          ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20"
-                          : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                          ? "text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 font-semibold shadow-sm border-l-4 border-primary-600 dark:border-primary-400 pl-3"
+                          : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-l-4 border-transparent"
                       }`}
                     >
-                      <Icon className="w-5 h-5" />
+                      <Icon
+                        className={`w-5 h-5 ${
+                          isActive
+                            ? "text-primary-600 dark:text-primary-400"
+                            : ""
+                        }`}
+                      />
                       <span className="ml-3">{item.label}</span>
                       {item.adminOnly && (
                         <Badge variant="secondary" className="ml-auto text-xs">

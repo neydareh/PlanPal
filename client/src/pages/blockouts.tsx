@@ -11,18 +11,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Plus, Trash2, Edit } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CalendarDays, Plus, Edit } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertBlockoutSchema } from "@shared/schema";
-import type { Blockout, InsertBlockout } from "@shared/schema";
+import type { Blockout, InsertBlockout, User } from "@shared/schema";
 import { z } from "zod";
 
 const blockoutFormSchema = insertBlockoutSchema.extend({
   startDate: z.string(),
   endDate: z.string(),
+  userId: z.string().optional(),
 });
 
 type BlockoutFormData = z.infer<typeof blockoutFormSchema>;
@@ -32,13 +46,22 @@ export default function Blockouts() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingBlockout, setEditingBlockout] = useState<Blockout | null>(null);
-  const [selectedBlockoutId, setSelectedBlockoutId] = useState<string | null>(null);
-  const [isBlockoutDetailsModalOpen, setIsBlockoutDetailsModalOpen] = useState(false);
+  const [editingBlockout, setEditingBlockout] = useState<Blockout>();
+  const [selectedBlockoutId, setSelectedBlockoutId] = useState<string | null>(
+    null
+  );
+  const [isBlockoutDetailsModalOpen, setIsBlockoutDetailsModalOpen] =
+    useState(false);
 
   // Fetch user's blockouts
   const { data: blockoutData } = useQuery<{ data: Blockout[] }>({
     queryKey: ["/api/blockouts"],
+    retry: false,
+  });
+
+  // Fetch users
+  const { data: userData } = useQuery<User[]>({
+    queryKey: ["/api/users"],
     retry: false,
   });
 
@@ -51,7 +74,9 @@ export default function Blockouts() {
       reason: "",
     },
   });
-  const blockouts = blockoutData?.data || [];
+
+  // Get blockouts
+  const blockouts = blockoutData?.data ?? [];
 
   // Create blockout mutation
   const createBlockoutMutation = useMutation({
@@ -60,7 +85,7 @@ export default function Blockouts() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
       toast({
         title: "Success",
         description: "Blockout created successfully!",
@@ -79,17 +104,23 @@ export default function Blockouts() {
 
   // Update blockout mutation
   const updateBlockoutMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<InsertBlockout> }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<InsertBlockout>;
+    }) => {
       const response = await apiRequest("PUT", `/api/blockouts/${id}`, data);
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
       toast({
         title: "Success",
         description: "Blockout updated successfully!",
       });
-      setEditingBlockout(null);
+      setEditingBlockout(undefined);
       form.reset();
     },
     onError: () => {
@@ -107,7 +138,7 @@ export default function Blockouts() {
       await apiRequest("DELETE", `/api/blockouts/${blockoutId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
       toast({
         title: "Success",
         description: "Blockout deleted successfully!",
@@ -127,11 +158,14 @@ export default function Blockouts() {
       startDate: new Date(data.startDate),
       endDate: new Date(data.endDate),
       reason: data.reason,
-      userId: user!.id,
+      userId: data.userId || user!.id,
     };
 
     if (editingBlockout) {
-      updateBlockoutMutation.mutate({ id: editingBlockout.id, data: blockoutData });
+      updateBlockoutMutation.mutate({
+        id: editingBlockout.id,
+        data: blockoutData,
+      });
     } else {
       createBlockoutMutation.mutate(blockoutData);
     }
@@ -140,33 +174,38 @@ export default function Blockouts() {
   const handleEdit = (blockout: Blockout) => {
     setEditingBlockout(blockout);
     form.reset({
-      startDate: new Date(blockout.startDate).toISOString().split('T')[0],
-      endDate: new Date(blockout.endDate).toISOString().split('T')[0],
+      startDate: new Date(blockout.startDate).toISOString().split("T")[0],
+      endDate: new Date(blockout.endDate).toISOString().split("T")[0],
       reason: blockout.reason || "",
+      userId: blockout.userId,
     });
     setIsCreateModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsCreateModalOpen(false);
-    setEditingBlockout(null);
+    setEditingBlockout(undefined);
     form.reset();
   };
 
   // Sort blockouts by start date
-  const sortedBlockouts = [...blockouts].sort((a, b) =>
-    new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+  const sortedBlockouts = [...blockouts].sort(
+    (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
   );
-
-  console.log('form values', form.register('startDate'));
 
   const getFormattedDate = (date: Date) => {
     // return string in format Nov 26, 2025
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
+  };
+
+  // get user name from userId
+  const getUserFullName = (id: string) => {
+    const user = userData!.find((user) => user.id === id);
+    return `${user?.firstName} ${user?.lastName}`;
   };
 
   return (
@@ -176,12 +215,14 @@ export default function Blockouts() {
       <div className="lg:ml-64">
         <TopNavBar title="My Blockouts" />
 
-        <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
+        <main className="p-4 lg:p-4 pt-20 lg:pt-6">
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Blockouts</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  My Blockouts
+                </h2>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">
                   Manage your unavailable dates
                 </p>
@@ -189,7 +230,7 @@ export default function Blockouts() {
               <Dialog open={isCreateModalOpen} onOpenChange={handleCloseModal}>
                 <DialogTrigger asChild>
                   <Button
-                    onClick={() => setIsCreateModalOpen(true)}
+                    onClick={() => { setIsCreateModalOpen(true); }}
                     className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -199,11 +240,42 @@ export default function Blockouts() {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>
-                      {editingBlockout ? 'Edit Blockout' : 'Create New Blockout'}
+                      {editingBlockout
+                        ? "Edit Blockout"
+                        : "Create New Blockout"}
                     </DialogTitle>
                   </DialogHeader>
 
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  {/* Form */}
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-4"
+                  >
+                    {user?.role === "admin" && (
+                      <div>
+                        <Label htmlFor="userId">User</Label>
+                        <Select
+                          onValueChange={(value) =>
+                            form.setValue("userId", value)
+                          }
+                          defaultValue={form.getValues("userId") || user?.id}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a user" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {userData?.map((user) => (
+                              <SelectItem
+                                key={user.id}
+                                value={user.id.toString()}
+                              >
+                                {user.firstName} {user.lastName} ({user.email})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                     <div>
                       <Label htmlFor="startDate">Start Date</Label>
                       <Input
@@ -247,14 +319,21 @@ export default function Blockouts() {
                     </div>
 
                     <div className="flex justify-end space-x-2 pt-4">
-                      <Button type="button" variant="outline" onClick={handleCloseModal}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleCloseModal}
+                      >
                         Cancel
                       </Button>
                       <Button
                         type="submit"
-                        disabled={createBlockoutMutation.isPending || updateBlockoutMutation.isPending}
+                        disabled={
+                          createBlockoutMutation.isPending ||
+                          updateBlockoutMutation.isPending
+                        }
                       >
-                        {editingBlockout ? 'Update' : 'Create'} Blockout
+                        {editingBlockout ? "Update" : "Create"} Blockout
                       </Button>
                     </div>
                   </form>
@@ -277,7 +356,7 @@ export default function Blockouts() {
                   Add blockouts for dates when you're unavailable to serve.
                 </p>
                 <Button
-                  onClick={() => setIsCreateModalOpen(true)}
+                  onClick={() => { setIsCreateModalOpen(true); }}
                   className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -290,9 +369,10 @@ export default function Blockouts() {
               {sortedBlockouts.map((blockout) => {
                 const startDate = new Date(blockout.startDate);
                 const endDate = new Date(blockout.endDate);
-                const isActive = new Date() >= startDate && new Date() <= endDate;
+                const isActive =
+                  new Date() >= startDate && new Date() <= endDate;
                 const isPast = new Date() > endDate;
-                const isFuture = new Date() < startDate;
+                // const isFuture = new Date() < startDate;
 
                 return (
                   <Card
@@ -308,22 +388,36 @@ export default function Blockouts() {
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                              {getFormattedDate(startDate)} to {getFormattedDate(endDate)}
+                              {getFormattedDate(startDate)} to{" "}
+                              {getFormattedDate(endDate)}
                             </h3>
-                            <Badge variant={isActive ? "destructive" : isPast ? "secondary" : "default"}>
-                              {isActive ? "Active" : isPast ? "Past" : "Upcoming"}
+                            <Badge
+                              variant={
+                                isActive
+                                  ? "destructive"
+                                  : isPast
+                                  ? "secondary"
+                                  : "default"
+                              }
+                            >
+                              {isActive
+                                ? "Active"
+                                : isPast
+                                ? "Past"
+                                : "Upcoming"}
                             </Badge>
                           </div>
 
-                          {blockout.reason && (
-                            <p className="text-gray-600 dark:text-gray-400 mb-2">
-                              {blockout.reason}
+                          {blockout.userId && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                              Created by {getUserFullName(blockout.userId)} on{" "}
+                              {blockout.createdAt
+                                ? new Date(
+                                    blockout.createdAt
+                                  ).toLocaleDateString()
+                                : "Unknown date"}
                             </p>
                           )}
-
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Created {blockout.createdAt ? new Date(blockout.createdAt).toLocaleDateString() : 'Unknown date'}
-                          </p>
                         </div>
 
                         <div className="flex items-center space-x-2">
@@ -337,17 +431,6 @@ export default function Blockouts() {
                             disabled={isPast}
                           >
                             <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteBlockoutMutation.mutate(blockout.id);
-                            }}
-                            disabled={deleteBlockoutMutation.isPending}
-                          >
-                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>

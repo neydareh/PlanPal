@@ -245,7 +245,6 @@ export default function BlockoutDetailsModal({
             {/* Action Buttons */}
             <div className="flex items-center space-x-3 pt-4 border-t border-gray-200 dark:border-gray-600">
               <Button
-                variant="outline"
                 onClick={handleDelete}
                 disabled={deleteBlockoutMutation.isPending}
                 className="flex-1"
@@ -253,7 +252,7 @@ export default function BlockoutDetailsModal({
                 <Trash2 className="w-4 h-4 mr-2" />
                 {deleteBlockoutMutation.isPending ? "Deleting..." : "Delete Blockout"}
               </Button>
-              <Button variant="outline" onClick={onClose} className="flex-1">
+              <Button variant="ghost" onClick={onClose} className="flex-1">
                 Close
               </Button>
             </div>

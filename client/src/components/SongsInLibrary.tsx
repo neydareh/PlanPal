@@ -1,4 +1,4 @@
-import { Song, songs } from "@shared/schema";
+import { Song } from "@shared/schema";
 import { Music } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 

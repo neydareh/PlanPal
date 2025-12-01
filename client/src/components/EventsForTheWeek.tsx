@@ -2,7 +2,13 @@ import { Clock } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import type { Event } from "@shared/schema";
 
-const EventsForTheWeek = ({ upcomingEvents, today }: { upcomingEvents: Event[], today: Date }) => {
+const EventsForTheWeek = ({
+  upcomingEvents,
+  today,
+}: {
+  upcomingEvents: Event[];
+  today: Date;
+}) => {
   return (
     <Card className="glass-card">
       <CardContent className="p-4 lg:p-6">
