@@ -201,7 +201,7 @@ export const CalendarGrid = ({
       </div>
 
       <div className="overflow-x-auto">
-        <div className="grid grid-cols-7 gap-1 mb-4 w-full">
+        <div className="grid grid-cols-7 gap-1 mb-4 w-full p-1">
           {/* Days of week header */}
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div
