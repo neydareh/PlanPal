@@ -2,6 +2,7 @@ import { Blockout, Event, User } from "@shared/schema";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { format } from "date-fns";
 
 import { DayEventsModal } from "./DayEventsModal";
 
@@ -213,12 +214,16 @@ export const CalendarGrid = ({
       </div>
 
       <div className="overflow-x-auto">
-        <div className="grid grid-cols-7 gap-1 mb-4 w-full p-1">
+        <div
+          className={`grid gap-1 mb-4 w-full p-1 ${viewMode === "week" ? "grid-cols-1 sm:grid-cols-7" : "grid-cols-7"
+            }`}
+        >
           {/* Days of week header */}
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div
               key={day}
-              className="p-3 text-center text-sm font-medium text-gray-500 dark:text-gray-400"
+              className={`p-3 text-center text-sm font-medium text-gray-500 dark:text-gray-400 ${viewMode === "week" ? "hidden sm:block" : ""
+                }`}
             >
               {day}
             </div>
@@ -257,6 +262,9 @@ export const CalendarGrid = ({
                       : ""
                     }`}
                 >
+                  <span className={viewMode === "week" ? "inline sm:hidden mr-1" : "hidden"}>
+                    {format(date, "EEE")}
+                  </span>
                   {date.getDate()}
                 </div>
 
