@@ -16,8 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Play, ExternalLink, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, Play, ExternalLink, Trash2 } from "lucide-react";
 import type { Song } from "@shared/schema";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function Songs() {
   const { toast } = useToast();
@@ -28,7 +29,7 @@ export default function Songs() {
 
   // Fetch songs
   // Fetch songs
-  const { data } = useQuery<{ data: Song[] }>({
+  const { data, isLoading } = useQuery<{ data: Song[] }>({
     queryKey: ["/api/songs", searchQuery, keyFilter],
     retry: false,
   });
@@ -92,174 +93,178 @@ export default function Songs() {
       <div className="lg:ml-64">
         <TopNavBar title="Song Library" />
 
-        <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
-          {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Song Library
-              </h2>
-              <Button
-                onClick={() => setIsAddSongModalOpen(true)}
-                className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add New Song
-              </Button>
-            </div>
-
-            {/* Search and Filter Bar */}
-            <div className="mt-4 flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                <Input
-                  placeholder="Search songs..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
+            {/* Header */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Song Library
+                </h2>
+                <Button
+                  onClick={() => setIsAddSongModalOpen(true)}
+                  className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add New Song
+                </Button>
               </div>
-              <Select value={keyFilter} onValueChange={setKeyFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="All Keys" />
-                </SelectTrigger>
-                <SelectContent>
-                  {musicKeys.map((key) => (
-                    <SelectItem key={key} value={key}>
-                      {key}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
-          {/* Songs Grid */}
-          {songs.length === 0 ? (
-            <Card className="glass-card">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+              {/* Search and Filter Bar */}
+              <div className="mt-4 flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="Search songs..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  {searchQuery || keyFilter
-                    ? "No songs match your filters"
-                    : "No songs yet"}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  {searchQuery || keyFilter
-                    ? "Try adjusting your search criteria."
-                    : "Start building your song library by adding your first song."}
-                </p>
-                {!searchQuery && !keyFilter && (
-                  <Button
-                    onClick={() => setIsAddSongModalOpen(true)}
-                    className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Your First Song
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-4 lg:p-6">
-              {songs.map((song) => {
-                const thumbnail = song.youtubeUrl
-                  ? getYouTubeThumbnail(song.youtubeUrl)
-                  : null;
+                <Select value={keyFilter} onValueChange={setKeyFilter}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder="All Keys" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {musicKeys.map((key) => (
+                      <SelectItem key={key} value={key}>
+                        {key}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-                return (
-                  <Card key={song.id} className="glass-card">
-                    <CardContent className="p-4 lg:p-6">
-                      {/* Song Header */}
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                            {song.title}
-                          </h3>
-                          {song.artist && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {song.artist}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          {song.key && (
-                            <Badge variant="secondary">{song.key}</Badge>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteSongMutation.mutate(song.id)}
-                            disabled={deleteSongMutation.isPending}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
+            {/* Songs Grid */}
+            {songs.length === 0 ? (
+              <Card className="glass-card">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    {searchQuery || keyFilter
+                      ? "No songs match your filters"
+                      : "No songs yet"}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    {searchQuery || keyFilter
+                      ? "Try adjusting your search criteria."
+                      : "Start building your song library by adding your first song."}
+                  </p>
+                  {!searchQuery && !keyFilter && (
+                    <Button
+                      onClick={() => setIsAddSongModalOpen(true)}
+                      className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Your First Song
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-4 lg:p-6">
+                {songs.map((song) => {
+                  const thumbnail = song.youtubeUrl
+                    ? getYouTubeThumbnail(song.youtubeUrl)
+                    : null;
 
-                      {/* YouTube Thumbnail */}
-                      {song.youtubeUrl && (
-                        <div className="mb-4">
-                          <div className="relative aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-                            {thumbnail && (
-                              <img
-                                src={thumbnail}
-                                alt={`${song.title} thumbnail`}
-                                className="w-full h-full object-cover"
-                              />
+                  return (
+                    <Card key={song.id} className="glass-card">
+                      <CardContent className="p-4 lg:p-6">
+                        {/* Song Header */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                              {song.title}
+                            </h3>
+                            {song.artist && (
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {song.artist}
+                              </p>
                             )}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Button
-                                size="sm"
-                                className="w-12 h-12 bg-red-600 hover:bg-red-700 rounded-full"
-                                onClick={() =>
-                                  song.youtubeUrl &&
-                                  window.open(song.youtubeUrl, "_blank")
-                                }
-                              >
-                                <Play className="w-4 h-4 ml-1 text-white" />
-                              </Button>
-                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            {song.key && (
+                              <Badge variant="secondary">{song.key}</Badge>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteSongMutation.mutate(song.id)}
+                              disabled={deleteSongMutation.isPending}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
-                      )}
 
-                      {/* Song Info */}
-                      <div className="space-y-2 mb-4">
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          Added{" "}
-                          {song.createdAt
-                            ? new Date(song.createdAt).toLocaleDateString()
-                            : "Unknown date"}
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center space-x-2">
+                        {/* YouTube Thumbnail */}
                         {song.youtubeUrl && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                            onClick={() =>
-                              song.youtubeUrl &&
-                              window.open(song.youtubeUrl, "_blank")
-                            }
-                          >
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            View
-                          </Button>
+                          <div className="mb-4">
+                            <div className="relative aspect-video bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                              {thumbnail && (
+                                <img
+                                  src={thumbnail}
+                                  alt={`${song.title} thumbnail`}
+                                  className="w-full h-full object-cover"
+                                />
+                              )}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Button
+                                  size="sm"
+                                  className="w-12 h-12 bg-red-600 hover:bg-red-700 rounded-full"
+                                  onClick={() =>
+                                    song.youtubeUrl &&
+                                    window.open(song.youtubeUrl, "_blank")
+                                  }
+                                >
+                                  <Play className="w-4 h-4 ml-1 text-white" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
                         )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </main>
+
+                        {/* Song Info */}
+                        <div className="space-y-2 mb-4">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            Added{" "}
+                            {song.createdAt
+                              ? new Date(song.createdAt).toLocaleDateString()
+                              : "Unknown date"}
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center space-x-2">
+                          {song.youtubeUrl && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() =>
+                                song.youtubeUrl &&
+                                window.open(song.youtubeUrl, "_blank")
+                              }
+                            >
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              View
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </main>
+        )}
       </div>
 
       <AddSongModal

@@ -16,10 +16,10 @@ import {
 import { Link } from "wouter";
 import type { Event, Song } from "@shared/schema";
 import { useEffect, useState } from "react";
-import TotalEventsCard from "@/components/TotalEventsCard";
+// import TotalEventsCard from "@/components/TotalEventsCard";
 import RoleIndicator from "@/components/RoleIndicator";
 import SongsInLibrary from "@/components/SongsInLibrary";
-import EventsForTheWeek from "@/components/EventsForTheWeek";
+// import EventsForTheWeek from "@/components/EventsForTheWeek";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function Home() {
@@ -61,8 +61,8 @@ export default function Home() {
         <TopNavBar title="Dashboard" />
 
         {/* render loading state */}
-        {isLoading || isLoadingEvents || isLoadingSongs ? (
-          <LoadingSpinner fullScreen />
+        {isLoading && isLoadingEvents && isLoadingSongs ? (
+          <LoadingSpinner />
         ) : (
           <main className="p-4 lg:p-6 pt-20 lg:pt-6">
             {/* Analytics Cards */}

@@ -16,7 +16,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,7 +31,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertBlockoutSchema } from "@shared/schema";
 import type { Blockout, InsertBlockout, User } from "@shared/schema";
 import { z } from "zod";
-import { useUser } from "@/hooks/useUser";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { BlockoutUserDisplay } from "@/components/BlockoutUserDisplay";
 
@@ -210,9 +208,6 @@ export default function Blockouts() {
     });
   };
 
-  console.log("blockouts loading", isBlockoutLoading && isUserLoading);
-
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar currentPath="/blockouts" />
@@ -221,7 +216,7 @@ export default function Blockouts() {
         <TopNavBar title="My Blockouts" />
 
         {isBlockoutLoading && isUserLoading ?
-          <LoadingSpinner fullScreen /> :
+          <LoadingSpinner /> :
           <main className="p-4 lg:p-4 pt-20 lg:pt-6">
             {/* Header */}
             <div className="mb-6">
@@ -238,18 +233,22 @@ export default function Blockouts() {
                   </p>
                 </div>
                 {/* Add Blockout Button */}
-                <Dialog open={isCreateModalOpen} onOpenChange={handleCloseModal}>
-                  <DialogTrigger asChild>
-                    <Button
-                      onClick={() => {
-                        setIsCreateModalOpen(true);
-                      }}
-                      className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Blockout
-                    </Button>
-                  </DialogTrigger>
+                <Button
+                  onClick={() => {
+                    setIsCreateModalOpen(true);
+                  }}
+                  className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Blockout
+                </Button>
+
+                <Dialog
+                  open={isCreateModalOpen}
+                  onOpenChange={(open) => {
+                    if (!open) handleCloseModal();
+                  }}
+                >
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>

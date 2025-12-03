@@ -21,7 +21,10 @@ import { insertEventSchema } from "@shared/schema";
 import type { Song, InsertEvent, Blockout } from "@shared/schema";
 import { z } from "zod";
 
-const eventFormSchema = insertEventSchema.extend({
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+const eventFormSchema = insertEventSchema.omit({ createdBy: true }).extend({
   date: z.string(),
   time: z.string(),
   songIds: z.array(z.string()).optional(),
@@ -61,7 +64,7 @@ export default function CreateEventModal({
     enabled: isOpen,
     retry: false,
   });
-  const songs = songsData?.data || [];
+  const songs = songsData?.data ?? [];
 
   // Fetch blockouts to show team availability
   const { data: blockoutsData } = useQuery<{ data: Blockout[] }>({
@@ -69,7 +72,7 @@ export default function CreateEventModal({
     enabled: isOpen,
     retry: false,
   });
-  const blockouts = blockoutsData?.data || [];
+  const blockouts = blockoutsData?.data ?? [];
 
   // Create event mutation
   const createEventMutation = useMutation({
@@ -93,7 +96,7 @@ export default function CreateEventModal({
         );
       }
 
-      queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/events"] });
 
       toast({
         title: "Success",
@@ -102,7 +105,13 @@ export default function CreateEventModal({
 
       handleClose();
     },
-    onError: () => {
+    onError: (err) => {
+      console.log("error => ", err);
+      // set form errors
+      // form.setError("root", {
+      //   type: "manual",
+      //   message: "Failed to create event. Please try again.",
+      // });
       toast({
         title: "Error",
         description: "Failed to create event. Please try again.",
@@ -112,14 +121,13 @@ export default function CreateEventModal({
   });
 
   const onSubmit = (data: EventFormData) => {
-    console.log("Form data:", data);
     const eventDateTime = new Date(`${data.date}T${data.time}`);
 
     const eventData: InsertEvent = {
       title: data.title,
       description: data.description || null,
       date: eventDateTime,
-      createdBy: user!.id,
+      createdBy: user?.id,
     };
 
     createEventMutation.mutate(eventData);
@@ -164,6 +172,18 @@ export default function CreateEventModal({
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* {Object.keys(form.formState.errors).length > 0 && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>
+                Please fix the errors below before submitting.
+                {form.formState.errors.root && (
+                  <div className="mt-1">{form.formState.errors.root.message}</div>
+                )}
+              </AlertDescription>
+            </Alert>
+          )} */}
           {/* Event title */}
           <div>
             <Label htmlFor="title">Event Title</Label>
@@ -261,7 +281,9 @@ export default function CreateEventModal({
                     <Checkbox
                       id={song.id}
                       checked={selectedSongs.includes(song.id)}
-                      onCheckedChange={() => handleSongToggle(song.id)}
+                      onCheckedChange={() => {
+                        handleSongToggle(song.id);
+                      }}
                     />
                     <div className="flex-1">
                       <label htmlFor={song.id} className="cursor-pointer">

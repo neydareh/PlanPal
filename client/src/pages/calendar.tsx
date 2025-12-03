@@ -19,84 +19,25 @@ export default function Calendar() {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isEventDetailsModalOpen, setIsEventDetailsModalOpen] = useState(false);
 
-  // Calculate calendar dates
-  // const year = currentDate.getFullYear();
-  // const month = currentDate.getMonth();
-  // const firstDay = new Date(year, month, 1);
-  // const lastDay = new Date(year, month + 1, 0);
-  // const startDate = new Date(firstDay);
-  // startDate.setDate(startDate.getDate() - firstDay.getDay());
-  // const endDate = new Date(lastDay);
-  // endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()));
-
   // Fetch events for current month
-  const { data: eventsData, isLoading: isLoadingEvents } = useQuery<{ data: Event[] }>({
+  const { data: eventsData, isLoading: isLoadingEvents } = useQuery<{
+    data: Event[];
+  }>({
     queryKey: ["/api/events"],
     retry: false,
   });
 
-  const events = eventsData?.data || [];
+  const events = eventsData?.data ?? [];
 
   // Fetch blockouts for current month
-  const { data: blockoutsData, isLoading: isLoadingBlockouts } = useQuery<{ data: Blockout[] }>({
+  const { data: blockoutsData, isLoading: isLoadingBlockouts } = useQuery<{
+    data: Blockout[];
+  }>({
     queryKey: ["/api/blockouts"],
     retry: false,
   });
 
-  const blockouts = blockoutsData?.data || [];
-
-  // Generate calendar days
-  // const calendarDays = [];
-  // const current = new Date(startDate);
-  // while (current <= endDate) {
-  //   calendarDays.push(new Date(current));
-  //   current.setDate(current.getDate() + 1);
-  // }
-
-  // Helper functions
-  // const isCurrentMonth = (date: Date) => date.getMonth() === month;
-  // const isToday = (date: Date) => {
-  //   const today = new Date();
-  //   return date.toDateString() === today.toDateString();
-  // };
-
-  // const getEventsForDate = (date: Date) => {
-  //   return events.filter((event) => {
-  //     const eventDate = new Date(event.date);
-  //     return eventDate.toDateString() === date.toDateString();
-  //   });
-  // };
-
-  // const getBlockoutsForDate = (date: Date) => {
-  //   return blockouts.filter((blockout) => {
-  //     const start = new Date(blockout.startDate);
-  //     const end = new Date(blockout.endDate);
-  //     return date >= start && date <= end;
-  //   });
-  // };
-
-  // const navigateMonth = (direction: "prev" | "next") => {
-  //   setCurrentDate((prev) => {
-  //     const newDate = new Date(prev);
-  //     newDate.setMonth(newDate.getMonth() + (direction === "next" ? 1 : -1));
-  //     return newDate;
-  //   });
-  // };
-
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const blockouts = blockoutsData?.data ?? [];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -106,16 +47,18 @@ export default function Calendar() {
         <TopNavBar title="Calendar" />
 
         {isLoadingEvents && isLoadingBlockouts ? (
-          <LoadingSpinner fullScreen />
+          <LoadingSpinner />
         ) : (
-          <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
+          <main className="p-4 lg:p-6 pt-20 lg:pt-6">
             <Card className="glass-card">
               <CardContent className="p-4 lg:p-6">
                 <CalendarGrid
                   events={events}
                   blockouts={blockouts}
                   user={user}
-                  onCreateEventClick={() => setIsCreateEventModalOpen(true)}
+                  onCreateEventClick={() => {
+                    setIsCreateEventModalOpen(true);
+                  }}
                   onEventClick={(eventId) => {
                     setSelectedEventId(eventId);
                     setIsEventDetailsModalOpen(true);
@@ -136,12 +79,6 @@ export default function Calendar() {
                       Blockouts
                     </span>
                   </div>
-                  {/* <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 border-2 border-primary-500 rounded"></div>
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Today
-                  </span>
-                </div> */}
                 </div>
               </CardContent>
             </Card>
@@ -151,7 +88,9 @@ export default function Calendar() {
 
       <CreateEventModal
         isOpen={isCreateEventModalOpen}
-        onClose={() => setIsCreateEventModalOpen(false)}
+        onClose={() => {
+          setIsCreateEventModalOpen(false);
+        }}
       />
 
       <EventDetailsModal

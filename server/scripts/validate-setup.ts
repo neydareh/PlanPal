@@ -77,7 +77,11 @@ async function validateSetup() {
 
   // Check rate limiting configuration
   console.log(chalk.blue("\n🔒 Checking rate limiting configuration:"));
-  if (config.rateLimit && config.rateLimit.window && config.rateLimit.max) {
+  if (
+    config.defaultRateLimit &&
+    config.defaultRateLimit.window &&
+    config.defaultRateLimit.max
+  ) {
     console.log(chalk.green("✅ Rate limiting is configured"));
   } else {
     console.error(chalk.red("❌ Rate limiting configuration is missing"));

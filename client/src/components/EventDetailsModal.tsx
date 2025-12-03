@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Music, Users, Trash2 } from "lucide-react";
 import type { Event, Song, Blockout } from "@shared/schema";
+import { UserDisplay } from "@/components/UserDisplay";
 
 interface EventDetailsModalProps {
   isOpen: boolean;
@@ -85,11 +86,11 @@ export default function EventDetailsModal({
   // Filter blockouts for the event date
   const eventDateBlockouts = event?.date
     ? allBlockouts.filter((blockout) => {
-        const eventDate = new Date(event.date);
-        const start = new Date(blockout.startDate);
-        const end = new Date(blockout.endDate);
-        return eventDate >= start && eventDate <= end;
-      })
+      const eventDate = new Date(event.date);
+      const start = new Date(blockout.startDate);
+      const end = new Date(blockout.endDate);
+      return eventDate >= start && eventDate <= end;
+    })
     : [];
 
   // Delete event mutation
@@ -269,7 +270,7 @@ export default function EventDetailsModal({
                         className="flex items-center justify-between text-sm"
                       >
                         <span className="text-gray-900 dark:text-white">
-                          Team Member (ID: {blockout.userId.substring(0, 8)}...)
+                          <UserDisplay userId={blockout.userId} />
                         </span>
                         <Badge variant="destructive">Blocked</Badge>
                       </div>
