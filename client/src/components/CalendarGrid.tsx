@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
+import { DayEventsModal } from "./DayEventsModal";
+
 export const CalendarGrid = ({
   events,
   blockouts,
@@ -18,6 +20,9 @@ export const CalendarGrid = ({
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<"month" | "week">("month");
+  const [selectedDateForModal, setSelectedDateForModal] = useState<Date | null>(
+    null
+  );
 
   const getWeekStart = (date: Date) => {
     const start = new Date(date);
@@ -38,19 +43,19 @@ export const CalendarGrid = ({
   const startDate =
     viewMode === "month"
       ? (() => {
-          const start = new Date(firstDay);
-          start.setDate(start.getDate() - firstDay.getDay());
-          return start;
-        })()
+        const start = new Date(firstDay);
+        start.setDate(start.getDate() - firstDay.getDay());
+        return start;
+      })()
       : weekStart;
 
   const endDate =
     viewMode === "month"
       ? (() => {
-          const end = new Date(lastDay);
-          end.setDate(end.getDate() + (6 - lastDay.getDay()));
-          return end;
-        })()
+        const end = new Date(lastDay);
+        end.setDate(end.getDate() + (6 - lastDay.getDay()));
+        return end;
+      })()
       : weekEnd;
 
   // Generate calendar days
@@ -121,15 +126,22 @@ export const CalendarGrid = ({
 
   return (
     <>
+      <DayEventsModal
+        isOpen={!!selectedDateForModal}
+        onClose={() => setSelectedDateForModal(null)}
+        date={selectedDateForModal}
+        events={selectedDateForModal ? getEventsForDate(selectedDateForModal) : []}
+        onEventClick={(eventId) => onEventClick?.(eventId)}
+      />
+
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div className="flex items-center gap-2 sm:gap-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             {viewMode === "month"
               ? `${monthNames[month]} ${year}`
-              : `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()} - ${
-                  monthNames[weekEnd.getMonth()]
-                } ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`}
+              : `${monthNames[weekStart.getMonth()]} ${weekStart.getDate()} - ${monthNames[weekEnd.getMonth()]
+              } ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`}
           </h2>
         </div>
 
@@ -223,41 +235,37 @@ export const CalendarGrid = ({
             return (
               <div
                 key={dayKey}
-                className={`min-h-[5.5rem] sm:h-24 p-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-all duration-200 hover:scale-102 hover:shadow-md flex flex-col 
-                  ${
-                    isCurrentMonthDay
-                      ? "bg-white dark:bg-gray-700"
-                      : "bg-gray-50 dark:bg-gray-800"
+                className={`min-h-[7rem] p-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-all duration-200 hover:shadow-md flex flex-col 
+                  ${isCurrentMonthDay
+                    ? "bg-white dark:bg-gray-700"
+                    : "bg-gray-50 dark:bg-gray-800"
                   }
                   ${isTodayDay ? "ring-2 ring-primary-500" : ""}
-                  ${
-                    dayBlockouts.length > 0
-                      ? "bg-red-50 dark:bg-red-900/20"
-                      : ""
+                  ${dayBlockouts.length > 0
+                    ? "bg-red-50 dark:bg-red-900/20"
+                    : ""
                   }
                   `}
               >
                 {/* Date */}
                 <div
-                  className={`text-sm font-medium ${
-                    isCurrentMonthDay
+                  className={`text-sm font-medium mb-1 ${isCurrentMonthDay
                       ? "text-gray-900 dark:text-white"
                       : "text-gray-400 dark:text-gray-600"
-                  } ${
-                    isTodayDay
+                    } ${isTodayDay
                       ? "text-primary-600 dark:text-primary-400 font-bold"
                       : ""
-                  }`}
+                    }`}
                 >
                   {date.getDate()}
                 </div>
 
                 {/* Events */}
-                <div className="mt-1 space-y-1">
+                <div className="space-y-1 flex-1">
                   {dayEvents.slice(0, 2).map((event) => (
                     <div
                       key={event.id}
-                      className="text-xs bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-2 py-1 truncate cursor-pointer transition-all duration-200 hover:bg-primary/80 dark:hover:bg-primary/70 hover:text-white dark:hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-primary/50 hover:z-10 hover:font-semibold hover:ring-2 hover:ring-primary dark:hover:ring-primary"
+                      className="text-xs bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-2 py-1 rounded truncate cursor-pointer transition-all duration-200 hover:bg-primary/80 dark:hover:bg-primary/70 hover:text-white dark:hover:text-white"
                       onClick={(e) => {
                         e.stopPropagation();
                         onEventClick?.(event.id);
@@ -277,7 +285,13 @@ export const CalendarGrid = ({
                   ))} */}
 
                   {dayEvents.length > 2 && (
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div
+                      className="text-xs font-medium text-primary-600 dark:text-primary-400 cursor-pointer hover:text-primary-700 dark:hover:text-primary-300 hover:underline mt-1 px-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedDateForModal(date);
+                      }}
+                    >
                       +{dayEvents.length - 2} more
                     </div>
                   )}
