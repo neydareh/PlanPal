@@ -87,4 +87,22 @@ export class EventController {
       res.status(500).json({ message: "Failed to fetch event songs" });
     }
   }
+
+  async addEventSong(req: Request, res: Response) {
+    try {
+      const { songId, order } = req.body;
+      if (!songId) {
+        return res.status(400).json({ message: "Song ID is required" });
+      }
+
+      const eventSong = await this.eventService.addEventSong(
+        req.params.id,
+        songId,
+        order
+      );
+      res.status(201).json(eventSong);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to add song to event" });
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import { eq, sql } from "drizzle-orm";
-import { events } from "server/shared/schema";
+import { events, eventSongs } from "server/shared/schema";
 import { Event } from "../interfaces/models";
 import { IEventService } from "../interfaces/services";
 import { CreateEventDTO, UpdateEventDTO } from "../interfaces/dto";
@@ -120,5 +120,17 @@ export class EventService implements IEventService {
       ...eventSong.song,
       order: eventSong.order,
     }));
+  }
+
+  async addEventSong(eventId: string, songId: string, order: string) {
+    const [eventSong] = await db
+      .insert(eventSongs)
+      .values({
+        eventId,
+        songId,
+        order,
+      })
+      .returning();
+    return eventSong;
   }
 }

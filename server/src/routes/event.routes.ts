@@ -183,6 +183,50 @@ router.get("/:id/songs", (req, res) => {
 
 /**
  * @swagger
+ * /events/{id}/songs:
+ *   post:
+ *     summary: Add a song to an event
+ *     description: Add a song to an event with an optional order. Requires authentication.
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The event ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - songId
+ *             properties:
+ *               songId:
+ *                 type: string
+ *                 description: The ID of the song to add
+ *               order:
+ *                 type: string
+ *                 description: The order of the song in the event
+ *     responses:
+ *       201:
+ *         description: Song added successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Not authenticated
+ *       404:
+ *         description: Event or song not found
+ */
+router.post("/:id/songs", (req, res) => {
+  return eventController.addEventSong(req, res);
+});
+
+/**
+ * @swagger
  * /events:
  *   post:
  *     summary: Create a new event
