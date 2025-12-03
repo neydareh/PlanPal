@@ -150,6 +150,39 @@ router.get("/:id", (req, res) => {
 
 /**
  * @swagger
+ * /events/{id}/songs:
+ *   get:
+ *     summary: Get songs for an event
+ *     description: Retrieve all songs associated with an event. Requires authentication.
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The event ID
+ *     responses:
+ *       200:
+ *         description: List of songs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Song'
+ *       404:
+ *         description: Event not found
+ *       401:
+ *         description: Not authenticated
+ */
+router.get("/:id/songs", (req, res) => {
+  return eventController.getEventSongs(req, res);
+});
+
+/**
+ * @swagger
  * /events:
  *   post:
  *     summary: Create a new event

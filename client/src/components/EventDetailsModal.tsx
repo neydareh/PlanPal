@@ -20,13 +20,8 @@ interface EventDetailsModalProps {
   eventId: string | null;
 }
 
-interface EventWithSongs extends Event {
-  songs?: Array<{
-    id: string;
-    songId: string;
-    order: string;
-    song: Song;
-  }>;
+interface EventSongDetails extends Song {
+  order: string | null;
 }
 
 export default function EventDetailsModal({
@@ -39,7 +34,7 @@ export default function EventDetailsModal({
   const queryClient = useQueryClient();
 
   // Fetch event details
-  const { data: event, isLoading: eventLoading } = useQuery<EventWithSongs>({
+  const { data: event, isLoading: eventLoading } = useQuery<Event>({
     queryKey: ["/api/events", eventId],
     queryFn: async () => {
       if (!eventId) return null;
@@ -51,20 +46,16 @@ export default function EventDetailsModal({
   });
 
   // Fetch event songs
-  const { data: eventSongsData } = useQuery<{
-    data: Array<{ id: string; songId: string; order: string; song: Song }>;
-  }>({
+  const { data: eventSongs = [] } = useQuery<EventSongDetails[]>({
     queryKey: ["/api/events", eventId, "songs"],
     queryFn: async () => {
-      if (!eventId) return { data: [] };
+      if (!eventId) return [];
       const response = await apiRequest("GET", `/api/events/${eventId}/songs`);
       return response.json();
     },
     enabled: isOpen && !!eventId,
     retry: false,
   });
-
-  const eventSongs = eventSongsData?.data ?? [];
 
   // Fetch blockouts for the event date
   const { data: blockoutsData } = useQuery<{ data: Blockout[] }>({
@@ -218,10 +209,10 @@ export default function EventDetailsModal({
               ) : (
                 <div className="space-y-2">
                   {eventSongs
-                    .sort((a, b) => parseInt(a.order) - parseInt(b.order))
-                    .map((eventSong, index) => (
+                    .sort((a, b) => parseInt(a.order ?? "0") - parseInt(b.order ?? "0"))
+                    .map((song, index) => (
                       <div
-                        key={eventSong.id}
+                        key={song.id}
                         className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                       >
                         <Badge variant="secondary" className="text-xs">
@@ -229,14 +220,14 @@ export default function EventDetailsModal({
                         </Badge>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            {eventSong.song.title}
+                            {song.title}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {eventSong.song.artist
-                              ? `${eventSong.song.artist} • `
+                            {song.artist
+                              ? `${song.artist} • `
                               : ""}
-                            {eventSong.song.key
-                              ? `Key: ${eventSong.song.key}`
+                            {song.key
+                              ? `Key: ${song.key}`
                               : "No key specified"}
                           </p>
                         </div>

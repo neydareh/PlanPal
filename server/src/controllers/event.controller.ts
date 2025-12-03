@@ -33,7 +33,7 @@ export class EventController {
       if (!validationResult.success) {
         return res.status(400).json({
           message: "Invalid input",
-          errors: validationResult.error.errors
+          errors: validationResult.error.errors,
         });
       }
 
@@ -41,7 +41,7 @@ export class EventController {
         ...validationResult.data,
         createdBy: validationResult.data.createdBy,
       });
-      
+
       res.status(201).json(event);
     } catch (error) {
       // Handle specific error types
@@ -60,7 +60,10 @@ export class EventController {
 
   async updateEvent(req: Request, res: Response) {
     try {
-      const event = await this.eventService.updateEvent(req.params.id, req.body);
+      const event = await this.eventService.updateEvent(
+        req.params.id,
+        req.body
+      );
       res.json(event);
     } catch (error) {
       res.status(500).json({ message: "Failed to update event" });
@@ -73,6 +76,15 @@ export class EventController {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete event" });
+    }
+  }
+
+  async getEventSongs(req: Request, res: Response) {
+    try {
+      const songs = await this.eventService.getEventSongs(req.params.id);
+      res.json(songs);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch event songs" });
     }
   }
 }

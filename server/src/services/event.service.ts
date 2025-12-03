@@ -100,4 +100,25 @@ export class EventService implements IEventService {
   async deleteEvent(id: string): Promise<void> {
     await db.delete(events).where(eq(events.id, id));
   }
+
+  async getEventSongs(id: string) {
+    const result = await db.query.events.findFirst({
+      where: eq(events.id, id),
+      with: {
+        eventSongs: {
+          with: {
+            song: true,
+          },
+          orderBy: (eventSongs, { asc }) => [asc(eventSongs.order)],
+        },
+      },
+    });
+
+    if (!result) return [];
+
+    return result.eventSongs.map((eventSong) => ({
+      ...eventSong.song,
+      order: eventSong.order,
+    }));
+  }
 }
