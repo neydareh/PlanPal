@@ -57,7 +57,7 @@ export default function BlockoutDetailsModal({
       await apiRequest("DELETE", `/api/blockouts/${blockoutId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
       toast({
         title: "Success",
         description: "Blockout deleted successfully!",

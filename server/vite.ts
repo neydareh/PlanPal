@@ -4,7 +4,7 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../vite.config";
 
-export async function setupVite(app: Express, server: any) {
+export async function setupVite(app: Express, server: unknown) {
   const vite = await createViteServer({
     ...viteConfig,
     configFile: false,

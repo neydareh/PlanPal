@@ -36,7 +36,7 @@ const AuthStateProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-const AuthProvider = ({ children, ...auth0Props }: { children: ReactNode }) => {
+const AuthProvider = ({ children, ...auth0Props }: Auth0ProviderOptions & { children: ReactNode }) => {
   return (
     <Auth0Provider {...auth0Props}>
       <AuthStateProvider>{children}</AuthStateProvider>

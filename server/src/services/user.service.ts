@@ -18,7 +18,9 @@ export class UserService implements IUserService {
     return result as User | null;
   }
 
-  async createUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
+  async createUser(
+    userData: Omit<User, "id" | "createdAt" | "updatedAt">
+  ): Promise<User> {
     const [user] = await db
       .insert(users)
       .values({
@@ -26,14 +28,14 @@ export class UserService implements IUserService {
         firstName: userData.firstName,
         lastName: userData.lastName,
         profileImageUrl: userData.profileImageUrl,
-        role: userData.role || 'user',
+        role: userData.role || "user",
       })
       .returning();
     return user as User;
   }
 
   async updateUser(id: string, userData: UpdateUserDTO): Promise<User> {
-    const updateData: any = {
+    const updateData = {
       ...userData,
       updatedAt: new Date(),
     };

@@ -50,16 +50,16 @@ async function validateSetup() {
   }
 
   // Check Redis connection
-  console.log(chalk.blue("\n📍 Checking Redis connection:"));
-  try {
-    await redisClient.ping();
-    console.log(chalk.green("✅ Redis connection successful"));
-  } catch (error: any) {
-    console.error(
-      chalk.red("❌ Redis connection failed:"),
-      error?.message || "Unknown error"
-    );
-  }
+  // console.log(chalk.blue("\n📍 Checking Redis connection:"));
+  // try {
+  //   await redisClient.ping();
+  //   console.log(chalk.green("✅ Redis connection successful"));
+  // } catch (error: any) {
+  //   console.error(
+  //     chalk.red("❌ Redis connection failed:"),
+  //     error?.message || "Unknown error"
+  //   );
+  // }
 
   // Check API documentation
   console.log(chalk.blue("\n📚 Checking API documentation:"));

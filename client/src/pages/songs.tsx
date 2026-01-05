@@ -34,7 +34,7 @@ export default function Songs() {
     retry: false,
   });
 
-  const songs = data?.data || [];
+  const songs = data?.data ?? [];
 
   // Delete song mutation
   const deleteSongMutation = useMutation({
@@ -42,7 +42,7 @@ export default function Songs() {
       await apiRequest("DELETE", `/api/songs/${songId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/songs"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/songs"] });
       toast({
         title: "Success",
         description: "Song deleted successfully!",
@@ -269,7 +269,7 @@ export default function Songs() {
 
       <AddSongModal
         isOpen={isAddSongModalOpen}
-        onClose={() => setIsAddSongModalOpen(false)}
+        onClose={() => { setIsAddSongModalOpen(false); }}
       />
     </div>
   );

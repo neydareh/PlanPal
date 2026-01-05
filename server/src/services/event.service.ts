@@ -12,13 +12,13 @@ export class EventService implements IEventService {
     page: number = 1,
     limit: number = 10
   ): Promise<PaginatedResult<Event>> {
-    const cacheKey = `events:page:${page}:limit:${limit}`;
+    // const cacheKey = `events:page:${page}:limit:${limit}`;
 
-    // Try to get from cache
-    const cached = await CacheService.get<PaginatedResult<Event>>(cacheKey);
-    if (cached) {
-      return cached;
-    }
+    // // Try to get from cache
+    // const cached = await CacheService.get<PaginatedResult<Event>>(cacheKey);
+    // if (cached) {
+    //   return cached;
+    // }
 
     // Get total count
     const countResult = await db.select({ count: sql`count(*)` }).from(events);
@@ -38,7 +38,7 @@ export class EventService implements IEventService {
     });
 
     // Cache the results
-    await CacheService.set(cacheKey, paginatedResult, 300); // Cache for 5 minutes
+    // await CacheService.set(cacheKey, paginatedResult, 300); // Cache for 5 minutes
 
     return paginatedResult;
   }
@@ -47,10 +47,10 @@ export class EventService implements IEventService {
     const cacheKey = `event:${id}`;
 
     // Try to get from cache
-    const cached = await CacheService.get<Event>(cacheKey);
-    if (cached) {
-      return cached;
-    }
+    // const cached = await CacheService.get<Event>(cacheKey);
+    // if (cached) {
+    //   return cached;
+    // }
 
     const result = await db.query.events.findFirst({
       where: eq(events.id, id),
@@ -58,7 +58,7 @@ export class EventService implements IEventService {
 
     if (result) {
       // Cache the result
-      await CacheService.set(cacheKey, result, 300); // Cache for 5 minutes
+      // await CacheService.set(cacheKey, result, 300); // Cache for 5 minutes
     }
 
     return result as Event | null;
@@ -71,7 +71,7 @@ export class EventService implements IEventService {
       .insert(events)
       .values({
         title: eventData.title,
-        description: eventData.description || null,
+        description: eventData.description ?? null,
         date: new Date(eventData.date),
         createdBy: eventData.createdBy,
       })
@@ -80,14 +80,12 @@ export class EventService implements IEventService {
   }
 
   async updateEvent(id: string, eventData: UpdateEventDTO): Promise<Event> {
-    const updateData: any = {
-      ...eventData,
+    const { date, ...rest } = eventData;
+    const updateData = {
+      ...rest,
       updatedAt: new Date(),
+      ...(date ? { date: new Date(date) } : {}),
     };
-
-    if (eventData.date) {
-      updateData.date = new Date(eventData.date);
-    }
 
     const [event] = await db
       .update(events)

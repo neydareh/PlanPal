@@ -97,7 +97,7 @@ const server = createServer(app);
 
 if (app.get("env") === "development") {
   setupVite(app, server).then(() => {
-    const port = parseInt(process.env.PORT || "5002", 10);
+    const port = parseInt(process.env.PORT ?? "5002", 10);
     server.listen(port, "0.0.0.0", () => {
       console.log(`Server running on port ${port}`);
     });

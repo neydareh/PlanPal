@@ -63,7 +63,7 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/songs"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/songs"] });
       toast({
         title: "Success",
         description: "Song added successfully!",
@@ -85,7 +85,7 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
       artist: data.artist || null,
       key: data.key || null,
       youtubeUrl: data.youtubeUrl || null,
-      createdBy: user!.id,
+      createdBy: user?.id,
     };
 
     createSongMutation.mutate(songData);

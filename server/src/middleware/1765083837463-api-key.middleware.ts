@@ -36,7 +36,7 @@ export function apiKeyAuth(options: ApiKeyAuthOptions = defaultOptions) {
       }
 
       // Attach API key info to request for later use
-      (req as unknown).apiKey = {
+      (req).apiKey = {
         key: apiKey,
         // Add other relevant information like:
         // - Associated client/service name

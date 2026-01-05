@@ -21,13 +21,14 @@ import RoleIndicator from "@/components/RoleIndicator";
 import SongsInLibrary from "@/components/SongsInLibrary";
 // import EventsForTheWeek from "@/components/EventsForTheWeek";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { PaginatedResult } from "@server/utils/pagination";
 
 export default function Home() {
   const { isLoading, user } = useAuth();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
 
   // Fetch dashboard data
-  const { isLoading: isLoadingEvents, data: events = [] } = useQuery<Event[]>({
+  const { isLoading: isLoadingEvents, data: events } = useQuery<PaginatedResult<Event>>({
     queryKey: ["/api/events"],
     retry: false,
   });
@@ -41,17 +42,16 @@ export default function Home() {
   const today = new Date();
   const thisWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
+
   // Set upcoming events
   useEffect(() => {
-    if (!isLoadingEvents && events.length > 0) {
-      setUpcomingEvents(
-        events.filter(
-          (event) =>
-            new Date(event.date) >= today && new Date(event.date) <= thisWeek
-        )
+    if (!isLoadingEvents && events && events.data.length > 0) {
+      const filteredEvents = events.data.filter(
+        (event) => new Date(event.date) >= today && new Date(event.date) <= thisWeek
       );
+      setUpcomingEvents(filteredEvents);
     }
-  }, [isLoadingEvents, events, today, thisWeek]);
+  }, [events]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
