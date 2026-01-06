@@ -1,5 +1,5 @@
 import { Users } from "lucide-react";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent } from "@planpal/ui";
 import { User } from "@shared/schema";
 
 const RoleIndicator = ({ user }: { user: User }) => {

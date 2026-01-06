@@ -2,9 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button, Badge, Card, CardContent } from "@planpal/ui";
+
 import {
   Calendar,
   Music,
@@ -16,10 +15,8 @@ import {
 import { Link } from "wouter";
 import type { Event, Song } from "@shared/schema";
 import { useEffect, useState } from "react";
-// import TotalEventsCard from "@/components/TotalEventsCard";
 import RoleIndicator from "@/components/RoleIndicator";
 import SongsInLibrary from "@/components/SongsInLibrary";
-// import EventsForTheWeek from "@/components/EventsForTheWeek";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { PaginatedResult } from "@server/utils/pagination";
 

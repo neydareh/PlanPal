@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
 import AddSongModal from "@/components/AddSongModal";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
+  useToast,
+  Button,
+  Badge,
+  Card,
+  CardContent,
   Select,
+  Input,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+} from "@planpal/ui";
 import { Search, Plus, Play, ExternalLink, Trash2 } from "lucide-react";
 import type { Song } from "@shared/schema";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -27,8 +28,6 @@ export default function Songs() {
   const [keyFilter, setKeyFilter] = useState("");
   const [isAddSongModalOpen, setIsAddSongModalOpen] = useState(false);
 
-  // Fetch songs
-  // Fetch songs
   const { data, isLoading } = useQuery<{ data: Song[] }>({
     queryKey: ["/api/songs", searchQuery, keyFilter],
     retry: false,
@@ -36,7 +35,6 @@ export default function Songs() {
 
   const songs = data?.data ?? [];
 
-  // Delete song mutation
   const deleteSongMutation = useMutation({
     mutationFn: async (songId: string) => {
       await apiRequest("DELETE", `/api/songs/${songId}`);

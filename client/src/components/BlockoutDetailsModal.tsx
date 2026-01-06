@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@planpal/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from "@planpal/ui";
+import { Button } from "@planpal/ui";
+import { Badge } from "@planpal/ui";
 import { Calendar, Clock, Trash2, User } from "lucide-react";
 import type { Blockout, User as UserType } from "@shared/schema";
 

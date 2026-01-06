@@ -1,5 +1,5 @@
 import { Calendar } from "lucide-react";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent } from "@planpal/ui";
 import type { Event } from "@shared/schema";
 
 const TotalEventsCard = ({

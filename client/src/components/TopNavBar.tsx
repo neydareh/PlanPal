@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@planpal/ui";
+import { Input } from "@planpal/ui";
 import { Search, Bell, Moon, Sun } from "lucide-react";
 
 interface TopNavBarProps {
@@ -35,7 +35,7 @@ export default function TopNavBar({ title }: TopNavBarProps) {
             </div>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2 lg:space-x-4">
           {/* Search Bar */}
           <div className="relative hidden lg:block">
@@ -46,7 +46,7 @@ export default function TopNavBar({ title }: TopNavBarProps) {
               placeholder="Search..."
             />
           </div>
-          
+
           {/* Dark Mode Toggle */}
           <Button
             variant="ghost"
@@ -60,7 +60,7 @@ export default function TopNavBar({ title }: TopNavBarProps) {
               <Moon className="w-4 h-4" />
             )}
           </Button>
-          
+
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="p-2 relative hidden sm:flex">
             <Bell className="w-4 h-4" />

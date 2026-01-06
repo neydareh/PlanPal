@@ -1,28 +1,26 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@planpal/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+} from "@planpal/ui";
+import { Button } from "@planpal/ui";
+import { Input } from "@planpal/ui";
+import { Label } from "@planpal/ui";
+import { Textarea } from "@planpal/ui";
+import { Checkbox } from "@planpal/ui";
+import { Badge } from "@planpal/ui";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertEventSchema } from "@shared/schema";
 import type { Song, InsertEvent, Blockout } from "@shared/schema";
 import { z } from "zod";
 
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const eventFormSchema = insertEventSchema.omit({ createdBy: true }).extend({
   date: z.string(),
