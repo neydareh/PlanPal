@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
   Badge,
-} from "@planpal/ui";
+} from "@neydareh/ui";
 import { CalendarDays, Plus, Edit } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -1,6 +1,6 @@
 import { Song } from "@shared/schema";
 import { Music } from "lucide-react";
-import { Card, CardContent } from "@planpal/ui";
+import { Card, CardContent } from "@neydareh/ui";
 
 const SongsInLibrary = ({ songs }: { songs: Song[] }) => {
   return (

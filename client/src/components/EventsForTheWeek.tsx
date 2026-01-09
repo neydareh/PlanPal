@@ -1,5 +1,5 @@
 import { Clock } from "lucide-react";
-import { Card, CardContent } from "@planpal/ui";
+import { Card, CardContent } from "@neydareh/ui";
 import type { Event } from "@shared/schema";
 
 const EventsForTheWeek = ({

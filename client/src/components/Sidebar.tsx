@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
-import { Badge } from "@planpal/ui";
-import { Button } from "@planpal/ui";
+import { Badge } from "@neydareh/ui";
+import { Button } from "@neydareh/ui";
 import {
   Church,
   Calendar,

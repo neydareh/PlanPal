@@ -5,7 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
 import CreateEventModal from "@/components/CreateEventModal";
 import EventDetailsModal from "@/components/EventDetailsModal";
-import { Card, CardContent } from "@planpal/ui";
+import { Card, CardContent } from "@neydareh/ui";
 import type { Event, Blockout } from "@shared/schema";
 import { CalendarGrid } from "@/components/CalendarGrid";
 import LoadingSpinner from "@/components/LoadingSpinner";

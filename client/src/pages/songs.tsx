@@ -16,7 +16,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@planpal/ui";
+} from "@neydareh/ui";
 import { Search, Plus, Play, ExternalLink, Trash2 } from "lucide-react";
 import type { Song } from "@shared/schema";
 import LoadingSpinner from "@/components/LoadingSpinner";

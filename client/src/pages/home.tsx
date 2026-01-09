@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
-import { Button, Badge, Card, CardContent } from "@planpal/ui";
+import { Button, Badge, Card, CardContent } from "@neydareh/ui";
 
 import {
   Calendar,

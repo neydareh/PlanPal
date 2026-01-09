@@ -1,6 +1,6 @@
 import { Blockout, Event, User } from "@shared/schema";
 import { useState } from "react";
-import { Button } from "@planpal/ui";
+import { Button } from "@neydareh/ui";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { format } from "date-fns";
 

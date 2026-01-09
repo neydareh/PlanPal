@@ -1,20 +1,20 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@planpal/ui";
+import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@planpal/ui";
-import { Button } from "@planpal/ui";
-import { Input } from "@planpal/ui";
-import { Label } from "@planpal/ui";
-import { Textarea } from "@planpal/ui";
-import { Checkbox } from "@planpal/ui";
-import { Badge } from "@planpal/ui";
+} from "@neydareh/ui";
+import { Button } from "@neydareh/ui";
+import { Input } from "@neydareh/ui";
+import { Label } from "@neydareh/ui";
+import { Textarea } from "@neydareh/ui";
+import { Checkbox } from "@neydareh/ui";
+import { Badge } from "@neydareh/ui";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertEventSchema } from "@shared/schema";

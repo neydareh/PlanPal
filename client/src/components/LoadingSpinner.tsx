@@ -1,5 +1,5 @@
 
-import { cn } from "@planpal/ui";
+import { cn } from "@neydareh/ui";
 
 interface LoadingSpinnerProps {
   className?: string;

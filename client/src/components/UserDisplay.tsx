@@ -1,5 +1,5 @@
 import { useUser } from "@/hooks/useUser";
-import { cn } from "@planpal/ui";
+import { cn } from "@neydareh/ui";
 
 interface UserDisplayProps {
   userId: string;

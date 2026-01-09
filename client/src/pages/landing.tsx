@@ -1,4 +1,4 @@
-import { Button, Card, CardContent } from "@planpal/ui";
+import { Button, Card, CardContent } from "@neydareh/ui";
 import { Church, Calendar, Music, Users } from "lucide-react";
 
 export default function Landing() {

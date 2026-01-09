@@ -1,23 +1,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@planpal/ui";
+import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@planpal/ui";
-import { Button } from "@planpal/ui";
-import { Input } from "@planpal/ui";
-import { Label } from "@planpal/ui";
+} from "@neydareh/ui";
+import { Button } from "@neydareh/ui";
+import { Input } from "@neydareh/ui";
+import { Label } from "@neydareh/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@planpal/ui";
+} from "@neydareh/ui";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertSongSchema } from "@shared/schema";

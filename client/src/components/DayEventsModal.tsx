@@ -3,7 +3,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@planpal/ui";
+} from "@neydareh/ui";
 import { Event } from "@shared/schema";
 import { format } from "date-fns";
 import { Clock } from "lucide-react";
