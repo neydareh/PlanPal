@@ -85,4 +85,4 @@ async function seed() {
   process.exit(0);
 }
 
-void seed();
+seed();

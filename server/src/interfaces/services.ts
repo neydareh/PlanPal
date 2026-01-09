@@ -3,8 +3,8 @@ import { CreateEventDTO, UpdateEventDTO, CreateBlockoutDTO } from "./dto";
 import { PaginatedResult } from "../utils/pagination";
 
 export interface IAuthService {
-  verifyToken(token: string): Promise<unknown>;
-  getManagementClient(): unknown;
+  verifyToken(token: string): Promise<any>;
+  getManagementClient(): any;
 }
 
 export interface IEventService {
@@ -40,6 +40,6 @@ export interface IBlockoutService {
     page?: number,
     limit?: number
   ): Promise<PaginatedResult<unknown>>; // Using any for now as Blockout model import might be tricky without circular deps or moving things
-  createBlockout(blockoutData: CreateBlockoutDTO): Promise<unknown>;
+  createBlockout(blockoutData: CreateBlockoutDTO): Promise<any>;
   deleteBlockout(id: string): Promise<void>;
 }

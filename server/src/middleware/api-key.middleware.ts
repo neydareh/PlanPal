@@ -12,8 +12,8 @@ const defaultOptions: ApiKeyAuthOptions = {
 };
 
 export function apiKeyAuth(options: ApiKeyAuthOptions = defaultOptions) {
-  const headerName = options.header ?? defaultOptions.header;
-  const queryParam = options.query ?? defaultOptions.query;
+  const headerName = options.header || defaultOptions.header;
+  const queryParam = options.query || defaultOptions.query;
 
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -36,7 +36,7 @@ export function apiKeyAuth(options: ApiKeyAuthOptions = defaultOptions) {
       }
 
       // Attach API key info to request for later use
-      (req as unknown).apiKey = {
+      (req as any).apiKey = {
         key: apiKey,
         // Add other relevant information like:
         // - Associated client/service name

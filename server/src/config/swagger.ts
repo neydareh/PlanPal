@@ -1,5 +1,5 @@
 import swaggerJsdoc from 'swagger-jsdoc';
-const version = process.env.npm_package_version ?? '1.0.0';
+const version = process.env.npm_package_version || '1.0.0';
 
 const options: swaggerJsdoc.Options = {
   definition: {

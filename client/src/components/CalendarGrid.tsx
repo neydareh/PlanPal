@@ -129,7 +129,7 @@ export const CalendarGrid = ({
     <>
       <DayEventsModal
         isOpen={!!selectedDateForModal}
-        onClose={() => { setSelectedDateForModal(null); }}
+        onClose={() => setSelectedDateForModal(null)}
         date={selectedDateForModal}
         events={selectedDateForModal ? getEventsForDate(selectedDateForModal) : []}
         onEventClick={(eventId) => onEventClick?.(eventId)}

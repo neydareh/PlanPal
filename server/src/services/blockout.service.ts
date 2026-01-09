@@ -73,7 +73,7 @@ export class BlockoutService implements IBlockoutService {
         userId: blockoutData.userId,
         startDate: new Date(blockoutData.startDate),
         endDate: new Date(blockoutData.endDate),
-        reason: blockoutData.reason ?? null,
+        reason: blockoutData.reason || null,
       })
       .returning();
     return blockout as Blockout;

@@ -164,7 +164,7 @@ export default function Blockouts() {
       startDate: new Date(data.startDate),
       endDate: new Date(data.endDate),
       reason: data.reason,
-      userId: data.userId || user?.id,
+      userId: data.userId || user!.id,
     };
 
     if (editingBlockout) {

@@ -27,7 +27,7 @@ export class CacheService {
 
   static async set(
     key: string,
-    value: any,
+    value: unknown,
     ttlSeconds?: number
   ): Promise<void> {
     try {

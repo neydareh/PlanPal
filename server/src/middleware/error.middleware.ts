@@ -35,7 +35,7 @@ export function errorHandler(
     return res.status(authError.status || authError.statusCode || 401).json({
       message: authError.message || '401 Unauthorized Error',
       code: authError.code || 'UNAUTHORIZED',
-      correlationId: context.correlationId ?? 'no-correlation-id'
+      correlationId: context.correlationId || 'no-correlation-id'
     });
   }
 
