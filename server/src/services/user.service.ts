@@ -28,7 +28,7 @@ export class UserService implements IUserService {
         firstName: userData.firstName,
         lastName: userData.lastName,
         profileImageUrl: userData.profileImageUrl,
-        role: userData.role || "user",
+        role: userData.role,
       })
       .returning();
     return user as User;
