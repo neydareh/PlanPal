@@ -21,5 +21,5 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 export interface ErrorResponse {
   message: string;
   code: string;
-  details?: any;
+  details?: unknown;
 }

@@ -1,28 +1,26 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+} from "@neydareh/ui";
+import { Button } from "@neydareh/ui";
+import { Input } from "@neydareh/ui";
+import { Label } from "@neydareh/ui";
+import { Textarea } from "@neydareh/ui";
+import { Checkbox } from "@neydareh/ui";
+import { Badge } from "@neydareh/ui";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertEventSchema } from "@shared/schema";
 import type { Song, InsertEvent, Blockout } from "@shared/schema";
 import { z } from "zod";
 
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const eventFormSchema = insertEventSchema.omit({ createdBy: true }).extend({
   date: z.string(),

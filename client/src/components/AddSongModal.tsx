@@ -1,23 +1,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@neydareh/ui";
+import { Button } from "@neydareh/ui";
+import { Input } from "@neydareh/ui";
+import { Label } from "@neydareh/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@neydareh/ui";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertSongSchema } from "@shared/schema";
@@ -63,7 +63,7 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/songs"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/songs"] });
       toast({
         title: "Success",
         description: "Song added successfully!",
@@ -85,7 +85,7 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
       artist: data.artist || null,
       key: data.key || null,
       youtubeUrl: data.youtubeUrl || null,
-      createdBy: user!.id,
+      createdBy: user?.id,
     };
 
     createSongMutation.mutate(songData);

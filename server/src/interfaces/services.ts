@@ -11,6 +11,10 @@ export interface IEventData {
   eventData: CreateEventDTO & { createdBy: string };
 }
 
+export interface IEventData {
+  eventData: CreateEventDTO & { createdBy: string };
+}
+
 export interface IEventService {
   getEvents(page?: number, limit?: number): Promise<PaginatedResult<Event>>;
   getEvent(id: string): Promise<Event | null>;

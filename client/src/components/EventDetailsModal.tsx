@@ -1,15 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from "@neydareh/ui";
+import { Button } from "@neydareh/ui";
+import { Badge } from "@neydareh/ui";
 import { Calendar, Clock, Music, Users, Trash2 } from "lucide-react";
 import type { Event, Song, Blockout } from "@shared/schema";
 import { UserDisplay } from "@/components/UserDisplay";

@@ -20,7 +20,7 @@ const AuthStateProvider = ({ children }: { children: ReactNode }) => {
     useAuth0();
 
   if (!user) {
-    return
+    return;
   }
 
   const getToken = async () => {
@@ -41,9 +41,9 @@ const AuthStateProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-interface IAuthProviderProps { 
-  children: ReactNode ;
-  auth0Props: Auth0ProviderOptions ;
+interface IAuthProviderProps {
+  children: ReactNode;
+  auth0Props: Auth0ProviderOptions;
 }
 
 const AuthProvider = ({ children, auth0Props }: IAuthProviderProps) => {

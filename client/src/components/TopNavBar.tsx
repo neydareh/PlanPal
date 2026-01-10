@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@neydareh/ui";
+import { Input } from "@neydareh/ui";
 import { Search, Bell, Moon, Sun } from "lucide-react";
 
 interface TopNavBarProps {
@@ -23,7 +23,7 @@ export default function TopNavBar({ title }: TopNavBarProps) {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 lg:px-6 py-4 lg:static fixed top-0 left-0 right-0 z-30">
+    <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 lg:px-6 py-4 lg:!static fixed top-0 left-0 right-0 z-30">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <h2 className="text-xl lg:text-2xl font-bold text-gray-800 dark:text-white ml-12 lg:ml-0">{title}</h2>
@@ -35,7 +35,7 @@ export default function TopNavBar({ title }: TopNavBarProps) {
             </div>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2 lg:space-x-4">
           {/* Search Bar */}
           <div className="relative hidden lg:block">
@@ -46,7 +46,7 @@ export default function TopNavBar({ title }: TopNavBarProps) {
               placeholder="Search..."
             />
           </div>
-          
+
           {/* Dark Mode Toggle */}
           <Button
             variant="ghost"
@@ -60,7 +60,7 @@ export default function TopNavBar({ title }: TopNavBarProps) {
               <Moon className="w-4 h-4" />
             )}
           </Button>
-          
+
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="p-2 relative hidden sm:flex">
             <Bell className="w-4 h-4" />

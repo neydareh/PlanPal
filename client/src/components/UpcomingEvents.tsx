@@ -2,9 +2,7 @@ import { Link } from "wouter";
 import { Calendar, Church, ChevronDown } from "lucide-react";
 import type { Event } from "@shared/schema";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, Button, Badge } from "@neydareh/ui";
 
 type UpcomingEventsProps = {
   events: Event[];

@@ -14,16 +14,16 @@ export const config = {
   },
   database: {
     url: process.env.DATABASE_URL!,
-    poolSize: parseInt(process.env.DB_POOL_SIZE || "10", 10),
-    idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT || "30000", 10),
+    poolSize: parseInt(process.env.DB_POOL_SIZE ?? "10", 10),
+    idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT ?? "30000", 10),
   },
   session: {
-    secret: process.env.SESSION_SECRET || "your-secret-key",
+    secret: process.env.SESSION_SECRET ?? "your-secret-key",
     ttl: 7 * 24 * 60 * 60 * 1000, // 7 days
   },
   redis: {
-    url: process.env.REDIS_URL || "redis://localhost:6379",
-    ttl: parseInt(process.env.REDIS_TTL || "3600", 10), // 1 hour default
+    url: process.env.REDIS_URL ?? "redis://localhost:6379",
+    ttl: parseInt(process.env.REDIS_TTL ?? "3600", 10), // 1 hour default
   },
   apiKey: process.env.API_KEY,
   authRateLimit: {

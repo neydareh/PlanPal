@@ -66,4 +66,4 @@ async function seedEventAndBlockout() {
   process.exit(0);
 }
 
-seedEventAndBlockout();
+void seedEventAndBlockout();

@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from "@neydareh/ui";
+import { Button } from "@neydareh/ui";
+import { Badge } from "@neydareh/ui";
 import { Calendar, Clock, Trash2, User } from "lucide-react";
 import type { Blockout, User as UserType } from "@shared/schema";
 
@@ -57,7 +57,7 @@ export default function BlockoutDetailsModal({
       await apiRequest("DELETE", `/api/blockouts/${blockoutId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
       toast({
         title: "Success",
         description: "Blockout deleted successfully!",

@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@neydareh/ui";
+import { Button } from "@neydareh/ui";
 import {
   Church,
   Calendar,
@@ -93,9 +93,8 @@ export default function Sidebar({ currentPath }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed left-0 top-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
       >
         <div className="h-full px-3 py-4 overflow-y-auto">
           {/* Logo and Brand */}
@@ -123,18 +122,16 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                 <li key={item.href}>
                   <Link href={item.href}>
                     <div
-                      className={`flex items-center p-2 rounded-lg group transition-all duration-200 cursor-pointer relative ${
-                        isActive
+                      className={`flex items-center p-2 rounded-lg group transition-all duration-200 cursor-pointer relative ${isActive
                           ? "text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 font-semibold shadow-sm border-l-4 border-primary-600 dark:border-primary-400 pl-3"
                           : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-l-4 border-transparent"
-                      }`}
+                        }`}
                     >
                       <Icon
-                        className={`w-5 h-5 ${
-                          isActive
+                        className={`w-5 h-5 ${isActive
                             ? "text-primary-600 dark:text-primary-400"
                             : ""
-                        }`}
+                          }`}
                       />
                       <span className="ml-3">{item.label}</span>
                       {item.adminOnly && (

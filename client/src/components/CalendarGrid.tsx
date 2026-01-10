@@ -1,6 +1,6 @@
 import { Blockout, Event, User } from "@shared/schema";
 import { useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "@neydareh/ui";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { format } from "date-fns";
 
@@ -129,7 +129,7 @@ export const CalendarGrid = ({
     <>
       <DayEventsModal
         isOpen={!!selectedDateForModal}
-        onClose={() => setSelectedDateForModal(null)}
+        onClose={() => { setSelectedDateForModal(null); }}
         date={selectedDateForModal}
         events={selectedDateForModal ? getEventsForDate(selectedDateForModal) : []}
         onEventClick={(eventId) => onEventClick?.(eventId)}
@@ -255,8 +255,8 @@ export const CalendarGrid = ({
                 {/* Date */}
                 <div
                   className={`text-sm font-medium mb-1 ${isCurrentMonthDay
-                      ? "text-gray-900 dark:text-white"
-                      : "text-gray-400 dark:text-gray-600"
+                    ? "text-gray-900 dark:text-white"
+                    : "text-gray-400 dark:text-gray-600"
                     } ${isTodayDay
                       ? "text-primary-600 dark:text-primary-400 font-bold"
                       : ""

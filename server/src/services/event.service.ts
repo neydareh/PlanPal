@@ -71,7 +71,7 @@ export class EventService implements IEventService {
       .insert(events)
       .values({
         title: eventData.title,
-        description: eventData.description || null,
+        description: eventData.description ?? null,
         date: new Date(eventData.date),
         createdBy: eventData.createdBy,
       })

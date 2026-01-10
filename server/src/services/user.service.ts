@@ -18,9 +18,7 @@ export class UserService implements IUserService {
     return result as User | null;
   }
 
-  async createUser(
-    userData: IUserData
-  ): Promise<User> {
+  async createUser(userData: IUserData): Promise<User> {
     const [user] = await db
       .insert(users)
       .values({
