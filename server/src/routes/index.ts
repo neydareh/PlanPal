@@ -18,7 +18,4 @@ export function registerRoutes(app: Express) {
   app.use("/api/users", userRoutes);
   app.use("/api/songs", songRoutes);
   app.use("/api/blockouts", blockoutRoutes);
-
-  // Service-to-service API routes (requires API key)
-
 }

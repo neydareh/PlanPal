@@ -7,7 +7,7 @@ export interface IAuthService {
   getManagementClient(): any;
 }
 
-interface IEventData {
+export interface IEventData {
   eventData: CreateEventDTO & { createdBy: string };
 }
 
@@ -19,36 +19,30 @@ export interface IEventService {
   deleteEvent(id: string): Promise<void>;
 }
 
-interface IUserData {
-  userData: Omit<User, "id" | "createdAt" | "updatedAt">;
-}
+export type IUserData = Omit<User, "id" | "createdAt" | "updatedAt">;
 
 export interface IUserService {
   getUsers(): Promise<User[]>;
   getUser(id: string): Promise<User | null>;
-  createUser(userData: IUserData): Promise<User>;
+  createUser(_userData: IUserData): Promise<User>;
   updateUser(id: string, userData: Partial<User>): Promise<User>;
 }
 
-interface ISongData {
+export interface ISongData {
   songData: Omit<Song, "id" | "createdAt" | "updatedAt">;
 }
 
 export interface ISongService {
   getSongs(page?: number, limit?: number): Promise<PaginatedResult<Song>>;
-  createSong(songData: ISongData): Promise<Song>;
+  createSong(_songData: ISongData): Promise<Song>;
   updateSong(id: string, songData: Partial<Song>): Promise<Song>;
   deleteSong(id: string): Promise<void>;
 }
 
-interface IBlockoutRequest {
-  page?: number;
-  limit?: number;
-}
 export interface IBlockoutService {
   getBlockouts(
-    page?: number,
-    limit?: number
+    _page?: number,
+    _limit?: number
   ): Promise<PaginatedResult<unknown>>; // Using any for now as Blockout model import might be tricky without circular deps or moving things
   createBlockout(blockoutData: CreateBlockoutDTO): Promise<any>;
   deleteBlockout(id: string): Promise<void>;

@@ -4,7 +4,7 @@ import { Blockout } from "../interfaces/models";
 import { IBlockoutService } from "../interfaces/services";
 import { CreateBlockoutDTO } from "../interfaces/dto";
 import { db } from "../db";
-import { CacheService } from "../utils/cache";
+// import { CacheService } from "../utils/cache";
 import { PaginatedResult, paginateResponse } from "../utils/pagination";
 
 export class BlockoutService implements IBlockoutService {
@@ -58,10 +58,10 @@ export class BlockoutService implements IBlockoutService {
       where: eq(blockouts.id, id),
     });
 
-    if (result) {
+    // if (result) {
       // Cache the result
       // await CacheService.set(cacheKey, result, 300); // Cache for 5 minutes
-    }
+    // }
 
     return result as Blockout | null;
   }

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { users } from "server/shared/schema";
 import { User } from "../interfaces/models";
-import { IUserService } from "../interfaces/services";
+import { IUserData, IUserService } from "../interfaces/services";
 import { UpdateUserDTO } from "../interfaces/dto";
 import { db } from "../db";
 
@@ -19,7 +19,7 @@ export class UserService implements IUserService {
   }
 
   async createUser(
-    userData: Omit<User, "id" | "createdAt" | "updatedAt">
+    userData: IUserData
   ): Promise<User> {
     const [user] = await db
       .insert(users)
