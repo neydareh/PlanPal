@@ -237,7 +237,7 @@ export default function Blockouts() {
                   onClick={() => {
                     setIsCreateModalOpen(true);
                   }}
-                  className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                  className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Blockout
@@ -371,7 +371,7 @@ export default function Blockouts() {
                     onClick={() => {
                       setIsCreateModalOpen(true);
                     }}
-                    className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                    className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Your First Blockout

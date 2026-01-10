@@ -1,7 +1,5 @@
 import { Link } from "wouter";
 import { Calendar, CalendarPlus, ArrowRight, Music } from "lucide-react";
-import type { User } from "@shared/schema";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
