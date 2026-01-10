@@ -20,9 +20,9 @@ Authorization: Bearer <your_token>
 
 ### API Key Authentication
 
-Include your API key in the X-API-Key header:
+<!-- Include your API key in the X-API-Key header:
 ```
-X-API-Key: <your_api_key>
+X-API-Key: <your_api_key> -->
 ```
 
 ## Rate Limiting

@@ -13,7 +13,7 @@ import { config } from "@server/config";
 
 const app = express();
 
-// Add compression middleware
+//@ts-expect-error - Add compression middleware
 app.use(compression());
 
 // Body parsing middleware
@@ -37,7 +37,6 @@ app.get("/login", async (_, res) => {
   res.redirect(redirectUrl);
 });
 
-
 app.get("/logout", async (_, res) => {
   res.redirect(
     `https://${config.auth0.domain}/v2/logout?client_id=${
@@ -53,9 +52,11 @@ registerRoutes(app);
 
 // Swagger API Documentation
 if (process.env.NODE_ENV !== "production") {
-  app.use("/api-docs", swaggerUi.serve);
-  app.get(
+  // serve swagger ui
+  app.use(
     "/api-docs",
+    //@ts-expect-error - swaggerUi serve mismatch
+    swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
       explorer: true,
       customSiteTitle: "PlanPal API Documentation",
@@ -97,7 +98,7 @@ const server = createServer(app);
 
 if (app.get("env") === "development") {
   setupVite(app, server).then(() => {
-    const port = parseInt(process.env.PORT || "5002", 10);
+    const port = parseInt(process.env.PORT ?? "5002", 10);
     server.listen(port, "0.0.0.0", () => {
       console.log(`Server running on port ${port}`);
     });

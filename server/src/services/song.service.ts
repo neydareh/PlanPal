@@ -15,10 +15,10 @@ export class SongService implements ISongService {
     const cacheKey = `songs:page:${page}:limit:${limit}`;
 
     // Try to get from cache
-    const cached = await CacheService.get<PaginatedResult<Song>>(cacheKey);
-    if (cached) {
-      return cached;
-    }
+    // const cached = await CacheService.get<PaginatedResult<Song>>(cacheKey);
+    // if (cached) {
+    //   return cached;
+    // }
 
     // Get total count
     const countResult = await db.select({ count: sql`count(*)` }).from(songs);
@@ -38,7 +38,7 @@ export class SongService implements ISongService {
     });
 
     // Cache the results
-    await CacheService.set(cacheKey, paginatedResult, 300); // Cache for 5 minutes
+    // await CacheService.set(cacheKey, paginatedResult, 300); // Cache for 5 minutes
 
     return paginatedResult;
   }
@@ -60,7 +60,7 @@ export class SongService implements ISongService {
   }
 
   async updateSong(id: string, songData: Partial<Song>): Promise<Song> {
-    const updateData: any = {
+    const updateData = {
       ...songData,
       updatedAt: new Date(),
     };
