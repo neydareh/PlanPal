@@ -1,19 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import Sidebar from "@/components/Sidebar";
-import TopNavBar from "@/components/TopNavBar";
-import { Button, Badge, Card, CardContent } from "@neydareh/ui";
+import { Card, CardContent } from "@neydareh/ui";
 
 import { Heart } from "lucide-react";
 import type { Event, Song } from "@shared/schema";
 import { useEffect, useState } from "react";
-import RoleIndicator from "@/components/RoleIndicator";
-import SongsInLibrary from "@/components/SongsInLibrary";
 import QuickActions from "@/components/QuickActions";
 import UpcomingEvents from "@/components/UpcomingEvents";
 // import EventsForTheWeek from "@/components/EventsForTheWeek";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { PaginatedResult } from "@server/utils/pagination";
+import RoleIndicator from "@/components/RoleIndicator";
+import SongsInLibrary from "@/components/SongsInLibrary";
+import TopNavBar from "@/components/TopNavBar";
+import Sidebar from "@/components/Sidebar";
 
 export default function Home() {
   const { isLoading, user } = useAuth();
