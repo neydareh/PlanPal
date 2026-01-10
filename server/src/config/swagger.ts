@@ -439,11 +439,11 @@ const options: swaggerJsdoc.Options = {
           scheme: 'bearer',
           bearerFormat: 'JWT',
         },
-        ApiKeyAuth: {
-          type: 'apiKey',
-          in: 'header',
-          name: 'X-API-Key',
-        },
+        // ApiKeyAuth: {
+        //   type: 'apiKey',
+        //   in: 'header',
+        //   name: 'X-API-Key',
+        // },
       },
       schemas: {
         Error: {
