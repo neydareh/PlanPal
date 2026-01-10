@@ -1,6 +1,6 @@
-import Redis from 'ioredis';
-import { config } from '../config';
-import LoggerService from './logger';
+import Redis from "ioredis";
+import { config } from "../config";
+import LoggerService from "./logger";
 
 export const redisClient = new Redis(config.redis.url, {
   retryStrategy(times: number) {
@@ -10,9 +10,9 @@ export const redisClient = new Redis(config.redis.url, {
   maxRetriesPerRequest: 3,
 });
 
-redisClient.on('error', (error) => {
-  LoggerService.error(error, { context: 'Redis Client' });
-});
+// redisClient.on('error', (error) => {
+//   LoggerService.error(error, { context: 'Redis Client' });
+// });
 
 export class CacheService {
   static async get<T>(key: string): Promise<T | null> {
@@ -20,12 +20,16 @@ export class CacheService {
       const value = await redisClient.get(key);
       return value ? JSON.parse(value) : null;
     } catch (error) {
-      LoggerService.error(error as Error, { context: 'Cache Get', key });
+      LoggerService.error(error as Error, { context: "Cache Get", key });
       return null;
     }
   }
 
-  static async set(key: string, value: any, ttlSeconds?: number): Promise<void> {
+  static async set(
+    key: string,
+    value: unknown,
+    ttlSeconds?: number
+  ): Promise<void> {
     try {
       const serialized = JSON.stringify(value);
       if (ttlSeconds) {
@@ -34,7 +38,7 @@ export class CacheService {
         await redisClient.set(key, serialized);
       }
     } catch (error) {
-      LoggerService.error(error as Error, { context: 'Cache Set', key });
+      LoggerService.error(error as Error, { context: "Cache Set", key });
     }
   }
 
@@ -42,7 +46,7 @@ export class CacheService {
     try {
       await redisClient.del(key);
     } catch (error) {
-      LoggerService.error(error as Error, { context: 'Cache Delete', key });
+      LoggerService.error(error as Error, { context: "Cache Delete", key });
     }
   }
 
@@ -53,7 +57,10 @@ export class CacheService {
         await redisClient.del(...keys);
       }
     } catch (error) {
-      LoggerService.error(error as Error, { context: 'Cache Pattern Delete', pattern });
+      LoggerService.error(error as Error, {
+        context: "Cache Pattern Delete",
+        pattern,
+      });
     }
   }
 }

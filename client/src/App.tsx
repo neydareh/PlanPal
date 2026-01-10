@@ -32,7 +32,7 @@ function AppContent() {
   const { isLoading } = useAuth();
 
   if (isLoading) {
-    return <LoadingSpinner fullScreen />;
+    return <LoadingSpinner />;
   }
 
   return (
