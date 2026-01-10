@@ -3,12 +3,12 @@ import { Church, Calendar, Music, Users } from "lucide-react";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-linear-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
           <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center mr-4">
+            <div className="w-16 h-16 bg-linear-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center mr-4">
               <Church className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
@@ -98,7 +98,7 @@ export default function Landing() {
               </p>
               <Button
                 onClick={() => (window.location.href = "/")}
-                className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                className="w-full bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                 size="lg"
               >
                 Enter App

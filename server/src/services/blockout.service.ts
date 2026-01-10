@@ -4,7 +4,6 @@ import { Blockout } from "../interfaces/models";
 import { IBlockoutService } from "../interfaces/services";
 import { CreateBlockoutDTO } from "../interfaces/dto";
 import { db } from "../db";
-import { CacheService } from "../utils/cache";
 import { PaginatedResult, paginateResponse } from "../utils/pagination";
 
 export class BlockoutService implements IBlockoutService {

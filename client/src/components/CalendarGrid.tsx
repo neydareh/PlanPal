@@ -204,7 +204,7 @@ export const CalendarGrid = ({
           {user.role === "admin" && (
             <Button
               onClick={onCreateEventClick}
-              className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+              className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Event
@@ -240,7 +240,7 @@ export const CalendarGrid = ({
             return (
               <div
                 key={dayKey}
-                className={`min-h-[7rem] p-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-all duration-200 hover:shadow-md flex flex-col 
+                className={`min-h-28 p-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-all duration-200 hover:shadow-md flex flex-col 
                   ${isCurrentMonthDay
                     ? "bg-white dark:bg-gray-700"
                     : "bg-gray-50 dark:bg-gray-800"

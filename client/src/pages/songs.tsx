@@ -94,7 +94,7 @@ export default function Songs() {
         {isLoading ? (
           <LoadingSpinner />
         ) : (
-          <main className="p-4 lg:p-4 lg:p-6 pt-20 lg:pt-6">
+          <main className="p-4 lg:p-4 pt-20 lg:pt-6">
             {/* Header */}
             <div className="mb-6">
               <div className="flex items-center justify-between">
@@ -103,7 +103,7 @@ export default function Songs() {
                 </h2>
                 <Button
                   onClick={() => setIsAddSongModalOpen(true)}
-                  className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                  className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add New Song
@@ -156,7 +156,7 @@ export default function Songs() {
                   {!searchQuery && !keyFilter && (
                     <Button
                       onClick={() => setIsAddSongModalOpen(true)}
-                      className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                      className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Add Your First Song
