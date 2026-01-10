@@ -661,13 +661,9 @@ const SidebarMenuSkeleton = React.forwardRef<
   // Random width between 50 to 90%.
   const width = React.useMemo(() => {
     const cryptoObj = globalThis.crypto
-    if (cryptoObj?.getRandomValues) {
-      const bytes = new Uint32Array(1)
+    const bytes = new Uint32Array(1)
       cryptoObj.getRandomValues(bytes)
       return `${(bytes[0] % 41) + 50}%`
-    }
-
-    return "70%"
   }, [])
 
   return (
