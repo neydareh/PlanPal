@@ -23,6 +23,14 @@ export const sessions = pgTable(
 );
 
 export const userRoleEnum = pgEnum("user_role", ["admin", "user"]);
+export const orgRoleEnum = pgEnum("org_role", ["admin", "member"]);
+export const memberFunctionEnum = pgEnum("member_function", [
+  "vocalist",
+  "bass",
+  "piano",
+  "guitar",
+  "other",
+]);
 
 export const users = pgTable("users", {
   id: varchar("id")
@@ -36,6 +44,73 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const organizations = pgTable("organizations", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  createdBy: varchar("created_by")
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const teams = pgTable("teams", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  orgId: varchar("org_id")
+    .notNull()
+    .references(() => organizations.id),
+  name: varchar("name").notNull(),
+  createdBy: varchar("created_by")
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const orgMemberships = pgTable(
+  "org_memberships",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    orgId: varchar("org_id")
+      .notNull()
+      .references(() => organizations.id),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id),
+    role: orgRoleEnum("role").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [index("IDX_org_memberships_org_user").on(table.orgId, table.userId)]
+);
+
+export const teamMemberships = pgTable(
+  "team_memberships",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    teamId: varchar("team_id")
+      .notNull()
+      .references(() => teams.id),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id),
+    role: orgRoleEnum("role").notNull(),
+    memberFunction: memberFunctionEnum("member_function"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) =>
+    [index("IDX_team_memberships_team_user").on(table.teamId, table.userId)]
+);
 
 export const events = pgTable("events", {
   id: varchar("id")
@@ -98,6 +173,51 @@ export const usersRelations = relations(users, ({ many }) => ({
   events: many(events),
   songs: many(songs),
   blockouts: many(blockouts),
+  orgMemberships: many(orgMemberships),
+  teamMemberships: many(teamMemberships),
+}));
+
+export const organizationsRelations = relations(organizations, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [organizations.createdBy],
+    references: [users.id],
+  }),
+  teams: many(teams),
+  memberships: many(orgMemberships),
+}));
+
+export const teamsRelations = relations(teams, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [teams.orgId],
+    references: [organizations.id],
+  }),
+  createdBy: one(users, {
+    fields: [teams.createdBy],
+    references: [users.id],
+  }),
+  memberships: many(teamMemberships),
+}));
+
+export const orgMembershipsRelations = relations(orgMemberships, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [orgMemberships.orgId],
+    references: [organizations.id],
+  }),
+  user: one(users, {
+    fields: [orgMemberships.userId],
+    references: [users.id],
+  }),
+}));
+
+export const teamMembershipsRelations = relations(teamMemberships, ({ one }) => ({
+  team: one(teams, {
+    fields: [teamMemberships.teamId],
+    references: [teams.id],
+  }),
+  user: one(users, {
+    fields: [teamMemberships.userId],
+    references: [users.id],
+  }),
 }));
 
 export const eventsRelations = relations(events, ({ one, many }) => ({
@@ -157,8 +277,40 @@ export const insertEventSongSchema = createInsertSchema(eventSongs).omit({
   createdAt: true,
 });
 
+export const insertOrganizationSchema = createInsertSchema(organizations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertTeamSchema = createInsertSchema(teams).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertOrgMembershipSchema = createInsertSchema(orgMemberships).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertTeamMembershipSchema = createInsertSchema(teamMemberships).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+export type Organization = typeof organizations.$inferSelect;
+export type InsertOrganization = z.infer<typeof insertOrganizationSchema>;
+export type Team = typeof teams.$inferSelect;
+export type InsertTeam = z.infer<typeof insertTeamSchema>;
+export type OrgMembership = typeof orgMemberships.$inferSelect;
+export type InsertOrgMembership = z.infer<typeof insertOrgMembershipSchema>;
+export type TeamMembership = typeof teamMemberships.$inferSelect;
+export type InsertTeamMembership = z.infer<typeof insertTeamMembershipSchema>;
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = z.infer<typeof insertEventSchema>;
 export type Song = typeof songs.$inferSelect;

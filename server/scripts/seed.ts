@@ -1,7 +1,14 @@
 
 import { db } from "../src/db";
-import { songs, users } from "../shared/schema";
-import { eq } from "drizzle-orm";
+import {
+  orgMemberships,
+  organizations,
+  songs,
+  teamMemberships,
+  teams,
+  users,
+} from "../shared/schema";
+import { and, eq } from "drizzle-orm";
 
 async function seed() {
   console.log("🌱 Starting seed process...");
@@ -28,14 +35,80 @@ async function seed() {
 
     console.log(`Using user ID: ${systemUser.id}`);
 
-    // 2. Check if songs exist
+    // 2. Ensure a default organization and team exist
+    const orgName = "ChurchFlow";
+    let organization = await db.query.organizations.findFirst({
+      where: eq(organizations.name, orgName),
+    });
+
+    if (!organization) {
+      console.log("Creating default organization...");
+      const [newOrg] = await db
+        .insert(organizations)
+        .values({
+          name: orgName,
+          createdBy: systemUser.id,
+        })
+        .returning();
+      organization = newOrg;
+    }
+
+    const teamName = "Worship Team";
+    let team = await db.query.teams.findFirst({
+      where: and(eq(teams.orgId, organization.id), eq(teams.name, teamName)),
+    });
+
+    if (!team) {
+      console.log("Creating default team...");
+      const [newTeam] = await db
+        .insert(teams)
+        .values({
+          name: teamName,
+          orgId: organization.id,
+          createdBy: systemUser.id,
+        })
+        .returning();
+      team = newTeam;
+    }
+
+    const existingOrgMembership = await db.query.orgMemberships.findFirst({
+      where: and(
+        eq(orgMemberships.orgId, organization.id),
+        eq(orgMemberships.userId, systemUser.id)
+      ),
+    });
+
+    if (!existingOrgMembership) {
+      await db.insert(orgMemberships).values({
+        orgId: organization.id,
+        userId: systemUser.id,
+        role: "admin",
+      });
+    }
+
+    const existingTeamMembership = await db.query.teamMemberships.findFirst({
+      where: and(
+        eq(teamMemberships.teamId, team.id),
+        eq(teamMemberships.userId, systemUser.id)
+      ),
+    });
+
+    if (!existingTeamMembership) {
+      await db.insert(teamMemberships).values({
+        teamId: team.id,
+        userId: systemUser.id,
+        role: "admin",
+      });
+    }
+
+    // 3. Check if songs exist
     const existingSongs = await db.select().from(songs);
     if (existingSongs.length > 0) {
-      console.log("Songs already exist. Skipping seed.");
+      console.log("Songs already exist. Skipping song seed.");
       process.exit(0);
     }
 
-    // 3. Insert default songs
+    // 4. Insert default songs
     console.log("Seeding songs...");
     const defaultSongs = [
       {
