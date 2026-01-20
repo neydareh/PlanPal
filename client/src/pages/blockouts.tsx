@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useOrgContext } from "@/hooks/useOrgContext";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
@@ -28,12 +29,13 @@ import { CalendarDays, Plus, Edit } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertBlockoutSchema } from "@shared/schema";
-import type { Blockout, InsertBlockout, User } from "@shared/schema";
+import type { Blockout, InsertBlockout } from "@shared/schema";
 import { z } from "zod";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { BlockoutUserDisplay } from "@/components/BlockoutUserDisplay";
+import { Link } from "wouter";
 
-const blockoutFormSchema = insertBlockoutSchema.extend({
+const blockoutFormSchema = insertBlockoutSchema.omit({ orgId: true }).extend({
   startDate: z.string(),
   endDate: z.string(),
   userId: z.string().optional(),
@@ -45,6 +47,7 @@ export default function Blockouts() {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { orgId } = useOrgContext();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingBlockout, setEditingBlockout] = useState<Blockout>();
   const [selectedBlockoutId, setSelectedBlockoutId] = useState<string | null>(
@@ -57,14 +60,18 @@ export default function Blockouts() {
   const isUserAdmin = useCallback(() => user?.role === "admin", [user]);
 
   // Fetch user's blockouts
-  const { data: blockoutData, isLoading: isBlockoutLoading } = useQuery<{ data: Blockout[] }>({
-    queryKey: ["/api/blockouts"],
+  const { data: blockoutData, isLoading: isBlockoutLoading } = useQuery<{
+    data: Blockout[];
+  }>({
+    queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+    enabled: !!orgId,
     retry: false,
   });
 
   // Fetch users
-  const { data: userData, isLoading: isUserLoading } = useQuery<User[]>({
-    queryKey: ["/api/users"],
+  const { data: memberData, isLoading: isUserLoading } = useQuery<any[]>({
+    queryKey: ["/api/orgs", orgId ?? "", "members"],
+    enabled: !!orgId,
     retry: false,
   });
 
@@ -86,11 +93,20 @@ export default function Blockouts() {
   // Create blockout mutation
   const createBlockoutMutation = useMutation({
     mutationFn: async (data: InsertBlockout) => {
-      const response = await apiRequest("POST", "/api/blockouts", data);
+      if (!orgId) {
+        throw new Error("Organization required");
+      }
+      const response = await apiRequest(
+        "POST",
+        `/api/orgs/${orgId}/blockouts`,
+        data
+      );
       return response.json();
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+      });
       toast({
         title: "Success",
         description: "Blockout created successfully!",
@@ -116,11 +132,20 @@ export default function Blockouts() {
       id: string;
       data: Partial<InsertBlockout>;
     }) => {
-      const response = await apiRequest("PUT", `/api/blockouts/${id}`, data);
+      if (!orgId) {
+        throw new Error("Organization required");
+      }
+      const response = await apiRequest(
+        "PUT",
+        `/api/orgs/${orgId}/blockouts/${id}`,
+        data
+      );
       return response.json();
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+      });
       toast({
         title: "Success",
         description: "Blockout updated successfully!",
@@ -140,10 +165,15 @@ export default function Blockouts() {
   // Delete blockout mutation
   const deleteBlockoutMutation = useMutation({
     mutationFn: async (blockoutId: string) => {
-      await apiRequest("DELETE", `/api/blockouts/${blockoutId}`);
+      if (!orgId) {
+        throw new Error("Organization required");
+      }
+      await apiRequest("DELETE", `/api/orgs/${orgId}/blockouts/${blockoutId}`);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+      });
       toast({
         title: "Success",
         description: "Blockout deleted successfully!",
@@ -209,13 +239,31 @@ export default function Blockouts() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar currentPath="/blockouts" />
+      <Sidebar currentPath={orgId ? `/orgs/${orgId}/blockouts` : "/orgs"} />
 
       <div className="lg:ml-64">
         <TopNavBar title="My Blockouts" />
 
-        {isBlockoutLoading && isUserLoading ?
-          <LoadingSpinner /> :
+        {isBlockoutLoading || isUserLoading ?
+          <LoadingSpinner /> : !orgId ? (
+            <main className="p-4 lg:p-4 pt-20 lg:pt-6">
+              <Card className="glass-card">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Select an organization
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    Choose an organization to view blockouts.
+                  </p>
+                  <Link href="/orgs">
+                    <Button className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700">
+                      Go to Organizations
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </main>
+          ) : (
           <main className="p-4 lg:p-4 pt-20 lg:pt-6">
             {/* Header */}
             <div className="mb-6">
@@ -275,12 +323,16 @@ export default function Blockouts() {
                               <SelectValue placeholder="Select a user" />
                             </SelectTrigger>
                             <SelectContent>
-                              {userData?.map((user) => (
+                              {memberData?.map((member) => (
                                 <SelectItem
-                                  key={user.id}
-                                  value={user.id.toString()}
+                                  key={member.id}
+                                  value={member.userId?.toString() ?? member.id}
                                 >
-                                  {user.firstName} {user.lastName} ({user.email})
+                                  {member.user?.firstName ?? "Member"}{" "}
+                                  {member.user?.lastName ?? ""}{" "}
+                                  {member.user?.email
+                                    ? `(${member.user.email})`
+                                    : ""}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -448,7 +500,7 @@ export default function Blockouts() {
                 })}
               </div>
             )}
-          </main>}
+          </main>)}
       </div>
 
       <BlockoutDetailsModal

@@ -1,8 +1,18 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@neydareh/ui";
-import { Input } from "@neydareh/ui";
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@neydareh/ui";
 import { Search, Bell, Moon, Sun } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useOrgContext } from "@/hooks/useOrgContext";
+import { useLocation } from "wouter";
 
 interface TopNavBarProps {
   title: string;
@@ -10,6 +20,12 @@ interface TopNavBarProps {
 
 export default function TopNavBar({ title }: TopNavBarProps) {
   const { user } = useAuth();
+  const { orgId, setOrgId } = useOrgContext();
+  const [, setLocation] = useLocation();
+  const { data: orgs = [] } = useQuery<{ id: string; name: string }[]>({
+    queryKey: ["/api/orgs"],
+    retry: false,
+  });
   const [isDarkMode, setIsDarkMode] = useState(
     document.documentElement.classList.contains('dark')
   );
@@ -26,7 +42,7 @@ export default function TopNavBar({ title }: TopNavBarProps) {
     <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 lg:px-6 py-4 lg:!static fixed top-0 left-0 right-0 z-30">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h2 className="text-xl lg:text-2xl font-bold text-gray-800 dark:text-white ml-12 lg:ml-0">{title}</h2>
+          {/* <h2 className="text-xl lg:text-2xl font-bold text-gray-800 dark:text-white ml-12 lg:ml-0">{title}</h2> */}
           <div className="hidden lg:block">
             <div className="ml-4 lg:ml-10 flex items-baseline space-x-4">
               <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -37,15 +53,35 @@ export default function TopNavBar({ title }: TopNavBarProps) {
         </div>
 
         <div className="flex items-center space-x-2 lg:space-x-4">
+          {orgs.length > 0 && (
+            <Select
+              value={orgId ?? ""}
+              onValueChange={(value) => {
+                setOrgId(value);
+                void setLocation(`/orgs/${value}/dashboard`);
+              }}
+            >
+              <SelectTrigger className="w-48 hidden lg:flex">
+                <SelectValue placeholder="Select org" />
+              </SelectTrigger>
+              <SelectContent>
+                {orgs.map((org) => (
+                  <SelectItem key={org.id} value={org.id}>
+                    {org.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           {/* Search Bar */}
-          <div className="relative hidden lg:block">
+          {/* <div className="relative hidden lg:block">
             <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
             <Input
               type="text"
               className="pl-10 w-64"
               placeholder="Search..."
             />
-          </div>
+          </div> */}
 
           {/* Dark Mode Toggle */}
           <Button

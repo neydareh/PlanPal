@@ -1,5 +1,6 @@
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import { AsyncLocalStorage } from "node:async_hooks";
 import { config } from '../config';
 import * as schema from "server/shared/schema";
 
@@ -9,7 +10,7 @@ import ws from "ws";
 neonConfig.webSocketConstructor = ws;
 
 // Create a connection pool
-const pool = new Pool({
+export const pool = new Pool({
   connectionString: config.database.url,
   max: config.database.poolSize,
   idleTimeoutMillis: config.database.idleTimeout,
@@ -29,7 +30,33 @@ pool.on('connect', () => {
 });
 
 // Export the drizzle instance
-export const db = drizzle({client: pool, schema});
+const baseDb = drizzle({ client: pool, schema });
+export const db = baseDb;
+
+type PoolClient = Awaited<ReturnType<typeof pool.connect>>;
+
+const dbContext = new AsyncLocalStorage<typeof baseDb>();
+
+export const getDb = () => dbContext.getStore() ?? baseDb;
+
+export const withDbClient = async <T>(
+  client: PoolClient,
+  callback: () => Promise<T>
+) => {
+  const scopedDb = drizzle({ client, schema });
+  return dbContext.run(scopedDb, callback);
+};
+
+export const withPoolClient = async <T>(
+  callback: (client: PoolClient) => Promise<T>
+): Promise<T> => {
+  const client = await pool.connect();
+  try {
+    return await callback(client);
+  } finally {
+    client.release();
+  }
+};
 
 // Utility function to get a client from the pool
 export async function withTransaction<T>(

@@ -11,6 +11,7 @@ import { Button } from "@neydareh/ui";
 import { Badge } from "@neydareh/ui";
 import { Calendar, Clock, Trash2, User } from "lucide-react";
 import type { Blockout, User as UserType } from "@shared/schema";
+import { useOrgContext } from "@/hooks/useOrgContext";
 
 interface BlockoutDetailsModalProps {
   isOpen: boolean;
@@ -25,16 +26,20 @@ export default function BlockoutDetailsModal({
 }: BlockoutDetailsModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { orgId } = useOrgContext();
 
   // Fetch blockout details
   const { data: blockout, isLoading } = useQuery<Blockout>({
-    queryKey: ["/api/blockouts", blockoutId],
+    queryKey: ["/api/orgs", orgId ?? "", "blockouts", blockoutId],
     queryFn: async () => {
-      if (!blockoutId) return null;
-      const response = await apiRequest("GET", `/api/blockouts/${blockoutId}`);
+      if (!blockoutId || !orgId) return null;
+      const response = await apiRequest(
+        "GET",
+        `/api/orgs/${orgId}/blockouts/${blockoutId}`
+      );
       return response.json();
     },
-    enabled: isOpen && !!blockoutId,
+    enabled: isOpen && !!blockoutId && !!orgId,
     retry: false,
   });
 
@@ -53,11 +58,13 @@ export default function BlockoutDetailsModal({
   // Delete blockout mutation
   const deleteBlockoutMutation = useMutation({
     mutationFn: async () => {
-      if (!blockoutId) return;
-      await apiRequest("DELETE", `/api/blockouts/${blockoutId}`);
+      if (!blockoutId || !orgId) return;
+      await apiRequest("DELETE", `/api/orgs/${orgId}/blockouts/${blockoutId}`);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+      });
       toast({
         title: "Success",
         description: "Blockout deleted successfully!",

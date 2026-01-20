@@ -50,6 +50,7 @@ export const organizations = pgTable("organizations", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
+  schemaName: varchar("schema_name"),
   createdBy: varchar("created_by")
     .notNull()
     .references(() => users.id),
@@ -112,48 +113,63 @@ export const teamMemberships = pgTable(
     [index("IDX_team_memberships_team_user").on(table.teamId, table.userId)]
 );
 
-export const events = pgTable("events", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  title: varchar("title").notNull(),
-  description: text("description"),
-  date: timestamp("date").notNull(),
-  createdBy: varchar("created_by")
-    .notNull()
-    .references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const events = pgTable(
+  "events",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    orgId: varchar("org_id").references(() => organizations.id),
+    title: varchar("title").notNull(),
+    description: text("description"),
+    date: timestamp("date").notNull(),
+    createdBy: varchar("created_by")
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [index("IDX_events_org_id").on(table.orgId)]
+);
 
-export const songs = pgTable("songs", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  title: varchar("title").notNull(),
-  artist: varchar("artist"),
-  key: varchar("key"),
-  youtubeUrl: varchar("youtube_url"),
-  createdBy: varchar("created_by")
-    .notNull()
-    .references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const songs = pgTable(
+  "songs",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    orgId: varchar("org_id").references(() => organizations.id),
+    title: varchar("title").notNull(),
+    artist: varchar("artist"),
+    key: varchar("key"),
+    youtubeUrl: varchar("youtube_url"),
+    createdBy: varchar("created_by")
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [index("IDX_songs_org_id").on(table.orgId)]
+);
 
-export const blockouts = pgTable("blockouts", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: varchar("user_id")
-    .notNull()
-    .references(() => users.id),
-  startDate: timestamp("start_date").notNull(),
-  endDate: timestamp("end_date").notNull(),
-  reason: varchar("reason"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const blockouts = pgTable(
+  "blockouts",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    orgId: varchar("org_id").references(() => organizations.id),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id),
+    startDate: timestamp("start_date").notNull(),
+    endDate: timestamp("end_date").notNull(),
+    reason: varchar("reason"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [index("IDX_blockouts_org_id").on(table.orgId)]
+);
 
 export const eventSongs = pgTable("event_songs", {
   id: varchar("id")
@@ -221,6 +237,10 @@ export const teamMembershipsRelations = relations(teamMemberships, ({ one }) => 
 }));
 
 export const eventsRelations = relations(events, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [events.orgId],
+    references: [organizations.id],
+  }),
   createdBy: one(users, {
     fields: [events.createdBy],
     references: [users.id],
@@ -229,6 +249,10 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
 }));
 
 export const songsRelations = relations(songs, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [songs.orgId],
+    references: [organizations.id],
+  }),
   createdBy: one(users, {
     fields: [songs.createdBy],
     references: [users.id],
@@ -237,6 +261,10 @@ export const songsRelations = relations(songs, ({ one, many }) => ({
 }));
 
 export const blockoutsRelations = relations(blockouts, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [blockouts.orgId],
+    references: [organizations.id],
+  }),
   user: one(users, {
     fields: [blockouts.userId],
     references: [users.id],
@@ -281,6 +309,7 @@ export const insertOrganizationSchema = createInsertSchema(organizations).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  schemaName: true,
 });
 
 export const insertTeamSchema = createInsertSchema(teams).omit({

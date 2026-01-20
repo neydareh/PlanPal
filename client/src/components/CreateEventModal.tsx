@@ -20,9 +20,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertEventSchema } from "@shared/schema";
 import type { Song, InsertEvent, Blockout } from "@shared/schema";
 import { z } from "zod";
+import { useOrgContext } from "@/hooks/useOrgContext";
 
 
-const eventFormSchema = insertEventSchema.omit({ createdBy: true }).extend({
+const eventFormSchema = insertEventSchema
+  .omit({ createdBy: true, orgId: true })
+  .extend({
   date: z.string(),
   time: z.string(),
   songIds: z.array(z.string()).optional(),
@@ -43,6 +46,7 @@ export default function CreateEventModal({
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [selectedSongs, setSelectedSongs] = useState<string[]>([]);
+  const { orgId } = useOrgContext();
 
   // Form setup
   const form = useForm<EventFormData>({
@@ -58,16 +62,16 @@ export default function CreateEventModal({
 
   // Fetch songs for selection
   const { data: songsData } = useQuery<{ data: Song[] }>({
-    queryKey: ["/api/songs"],
-    enabled: isOpen,
+    queryKey: ["/api/orgs", orgId ?? "", "songs"],
+    enabled: isOpen && !!orgId,
     retry: false,
   });
   const songs = songsData?.data ?? [];
 
   // Fetch blockouts to show team availability
   const { data: blockoutsData } = useQuery<{ data: Blockout[] }>({
-    queryKey: ["/api/blockouts"],
-    enabled: isOpen,
+    queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+    enabled: isOpen && !!orgId,
     retry: false,
   });
   const blockouts = blockoutsData?.data ?? [];
@@ -75,18 +79,22 @@ export default function CreateEventModal({
   // Create event mutation
   const createEventMutation = useMutation({
     mutationFn: async (data: InsertEvent) => {
-      console.log("Creating event:", data);
-      const response = await apiRequest("POST", "/api/events", data);
+      if (!orgId) {
+        throw new Error("Organization required");
+      }
+      const response = await apiRequest(
+        "POST",
+        `/api/orgs/${orgId}/events`,
+        data
+      );
       return response.json();
     },
     onSuccess: async (event) => {
-      console.log("Event created successfully:", event);
-
       // Add selected songs to the event
       if (selectedSongs.length > 0) {
         await Promise.all(
           selectedSongs.map((songId, index) =>
-            apiRequest("POST", `/api/events/${event.id}/songs`, {
+            apiRequest("POST", `/api/orgs/${orgId}/events/${event.id}/songs`, {
               songId,
               order: (index + 1).toString(),
             })
@@ -94,7 +102,9 @@ export default function CreateEventModal({
         );
       }
 
-      void queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/orgs", orgId ?? "", "events"],
+      });
 
       toast({
         title: "Success",
@@ -104,7 +114,6 @@ export default function CreateEventModal({
       handleClose();
     },
     onError: (err) => {
-      console.log("error => ", err);
       // set form errors
       // form.setError("root", {
       //   type: "manual",

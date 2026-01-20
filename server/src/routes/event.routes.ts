@@ -66,7 +66,7 @@ import { CreateEventSchema, UpdateEventSchema } from "../interfaces/dto";
  *           format: date-time
  */
 
-const router = Router();
+const router = Router({ mergeParams: true });
 const eventService = new EventService();
 const eventController = new EventController(eventService);
 

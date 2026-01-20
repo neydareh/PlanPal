@@ -4,7 +4,7 @@ import { BlockoutService } from "../services/blockout.service";
 import { validateRequest } from "../middleware/validation.middleware";
 import { CreateBlockoutSchema } from "../interfaces/dto";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 const blockoutService = new BlockoutService();
 const blockoutController = new BlockoutController(blockoutService);
 

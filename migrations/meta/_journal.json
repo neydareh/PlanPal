@@ -15,6 +15,20 @@
       "when": 1768517293698,
       "tag": "0001_add_org_team",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768579481603,
+      "tag": "0002_add_org_scoping",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1768583000000,
+      "tag": "0003_add_org_schema_name",
+      "breakpoints": true
     }
   ]
 }

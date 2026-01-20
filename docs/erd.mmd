@@ -1,0 +1,109 @@
+erDiagram
+  users {
+    varchar id PK
+    varchar email
+    varchar first_name
+    varchar last_name
+    varchar profile_image_url
+    user_role role
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  organizations {
+    varchar id PK
+    varchar name
+    varchar schema_name
+    varchar created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  teams {
+    varchar id PK
+    varchar org_id FK
+    varchar name
+    varchar created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  org_memberships {
+    varchar id PK
+    varchar org_id FK
+    varchar user_id FK
+    org_role role
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  team_memberships {
+    varchar id PK
+    varchar team_id FK
+    varchar user_id FK
+    org_role role
+    member_function member_function
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  events {
+    varchar id PK
+    varchar org_id FK
+    varchar title
+    text description
+    timestamp date
+    varchar created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  songs {
+    varchar id PK
+    varchar org_id FK
+    varchar title
+    varchar artist
+    varchar key
+    varchar youtube_url
+    varchar created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  blockouts {
+    varchar id PK
+    varchar org_id FK
+    varchar user_id FK
+    timestamp start_date
+    timestamp end_date
+    varchar reason
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  event_songs {
+    varchar id PK
+    varchar event_id FK
+    varchar song_id FK
+    varchar order
+    timestamp created_at
+  }
+
+  users ||--o{ organizations : created_by
+  users ||--o{ teams : created_by
+  users ||--o{ org_memberships : user_id
+  users ||--o{ team_memberships : user_id
+  users ||--o{ events : created_by
+  users ||--o{ songs : created_by
+  users ||--o{ blockouts : user_id
+
+  organizations ||--o{ teams : org_id
+  organizations ||--o{ org_memberships : org_id
+  organizations ||--o{ events : org_id
+  organizations ||--o{ songs : org_id
+  organizations ||--o{ blockouts : org_id
+
+  teams ||--o{ team_memberships : team_id
+
+  events ||--o{ event_songs : event_id
+  songs ||--o{ event_songs : song_id

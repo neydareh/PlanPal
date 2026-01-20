@@ -1,16 +1,18 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { blockouts } from "server/shared/schema";
 import { Blockout } from "../interfaces/models";
 import { IBlockoutService } from "../interfaces/services";
 import { CreateBlockoutDTO } from "../interfaces/dto";
-import { db } from "../db";
+import { getDb } from "../db";
 import { PaginatedResult, paginateResponse } from "../utils/pagination";
 
 export class BlockoutService implements IBlockoutService {
   async getBlockouts(
+    orgId: string,
     page: number = 1,
     limit: number = 10
   ): Promise<PaginatedResult<Blockout>> {
+    const db = getDb();
     // const cacheKey = `blockouts:page:${page}:limit:${limit}`;
 
     // Try to get from cache
@@ -22,11 +24,13 @@ export class BlockoutService implements IBlockoutService {
     // Get total count
     const countResult = await db
       .select({ count: sql`count(*)` })
-      .from(blockouts);
+      .from(blockouts)
+      .where(eq(blockouts.orgId, orgId));
     const total = Number(countResult[0].count);
 
     // Get paginated results
     const results = await db.query.blockouts.findMany({
+      where: eq(blockouts.orgId, orgId),
       limit,
       offset: (page - 1) * limit,
       orderBy: (blockouts, { desc }) => [desc(blockouts.startDate)],
@@ -44,7 +48,8 @@ export class BlockoutService implements IBlockoutService {
     return paginatedResult;
   }
 
-  async getBlockout(id: string): Promise<Blockout | null> {
+  async getBlockout(orgId: string, id: string): Promise<Blockout | null> {
+    const db = getDb();
     // const cacheKey = `blockout:${id}`;
 
     // Try to get from cache
@@ -54,7 +59,7 @@ export class BlockoutService implements IBlockoutService {
     // }
 
     const result = await db.query.blockouts.findFirst({
-      where: eq(blockouts.id, id),
+      where: and(eq(blockouts.id, id), eq(blockouts.orgId, orgId)),
     });
 
     if (result) {
@@ -65,10 +70,14 @@ export class BlockoutService implements IBlockoutService {
     return result as Blockout | null;
   }
 
-  async createBlockout(blockoutData: CreateBlockoutDTO): Promise<Blockout> {
+  async createBlockout(
+    blockoutData: CreateBlockoutDTO & { orgId: string }
+  ): Promise<Blockout> {
+    const db = getDb();
     const [blockout] = await db
       .insert(blockouts)
       .values({
+        orgId: blockoutData.orgId,
         userId: blockoutData.userId,
         startDate: new Date(blockoutData.startDate),
         endDate: new Date(blockoutData.endDate),
@@ -78,7 +87,10 @@ export class BlockoutService implements IBlockoutService {
     return blockout as Blockout;
   }
 
-  async deleteBlockout(id: string): Promise<void> {
-    await db.delete(blockouts).where(eq(blockouts.id, id));
+  async deleteBlockout(orgId: string, id: string): Promise<void> {
+    const db = getDb();
+    await db
+      .delete(blockouts)
+      .where(and(eq(blockouts.id, id), eq(blockouts.orgId, orgId)));
   }
 }

@@ -11,6 +11,7 @@ export interface User {
 
 export interface Event {
   id: string;
+  orgId: string | null;
   title: string;
   description: string | null;
   date: Date;
@@ -21,6 +22,7 @@ export interface Event {
 
 export interface Song {
   id: string;
+  orgId: string | null;
   title: string;
   artist: string;
   key: string;
@@ -39,10 +41,54 @@ export interface EventSong {
 
 export interface Blockout {
   id: string;
+  orgId: string | null;
   userId: string;
   startDate: Date;
   endDate: Date;
   reason: string | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  schemaName?: string | null;
+  createdBy: string;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface Team {
+  id: string;
+  orgId: string;
+  name: string;
+  createdBy: string;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface OrgMembership {
+  id: string;
+  orgId: string;
+  userId: string;
+  role: "admin" | "member";
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface TeamMembership {
+  id: string;
+  teamId: string;
+  userId: string;
+  role: "admin" | "member";
+  memberFunction:
+    | "vocalist"
+    | "bass"
+    | "piano"
+    | "guitar"
+    | "other"
+    | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 }

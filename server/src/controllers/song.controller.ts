@@ -1,13 +1,19 @@
 import { SongService } from "@server/services/song.service";
 import { Request, Response } from "express";
 import { CreateSongSchema } from "@server/interfaces/dto";
+import { getOrgIdFromRequest } from "@server/utils/org-id";
 
 export class SongController {
   constructor(private songService: SongService) {}
 
   async getSongs(req: Request, res: Response) {
     try {
-      const songs = await this.songService.getSongs();
+      const orgId = getOrgIdFromRequest(req);
+      if (!orgId) {
+        return res.status(400).json({ message: "Organization ID is required" });
+      }
+
+      const songs = await this.songService.getSongs(orgId);
       res.json(songs);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch songs" });
@@ -16,6 +22,11 @@ export class SongController {
 
   async createSong(req: Request & { user?: unknown }, res: Response) {
     try {
+      const orgId = getOrgIdFromRequest(req);
+      if (!orgId) {
+        return res.status(400).json({ message: "Organization ID is required" });
+      }
+
       // Validate input using the schema
       const validationResult = CreateSongSchema.safeParse(req.body);
       if (!validationResult.success) {
@@ -27,6 +38,7 @@ export class SongController {
 
       const song = await this.songService.createSong({
         ...validationResult.data,
+        orgId,
         createdBy: validationResult.data.createdBy,
       });
       
@@ -48,7 +60,16 @@ export class SongController {
 
   async updateSong(req: Request, res: Response) {
     try {
-      const song = await this.songService.updateSong(req.params.id, req.body);
+      const orgId = getOrgIdFromRequest(req);
+      if (!orgId) {
+        return res.status(400).json({ message: "Organization ID is required" });
+      }
+
+      const song = await this.songService.updateSong(
+        orgId,
+        req.params.id,
+        req.body
+      );
       res.json(song);
     } catch (error) {
       res.status(500).json({ message: "Failed to update song" });
@@ -57,7 +78,12 @@ export class SongController {
 
   async deleteSong(req: Request, res: Response) {
     try {
-      await this.songService.deleteSong(req.params.id);
+      const orgId = getOrgIdFromRequest(req);
+      if (!orgId) {
+        return res.status(400).json({ message: "Organization ID is required" });
+      }
+
+      await this.songService.deleteSong(orgId, req.params.id);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete song" });

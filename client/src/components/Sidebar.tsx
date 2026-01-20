@@ -3,6 +3,7 @@ import { Badge } from "@neydareh/ui";
 import { Button } from "@neydareh/ui";
 import {
   Church,
+  Users,
   Calendar,
   CalendarX,
   Music,
@@ -10,8 +11,9 @@ import {
   X,
   Menu,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
+import { useOrgContext } from "@/hooks/useOrgContext";
 
 interface SidebarProps {
   currentPath: string;
@@ -20,6 +22,8 @@ interface SidebarProps {
 export default function Sidebar({ currentPath }: SidebarProps) {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const { orgId } = useOrgContext();
+  const [location] = useLocation();
 
   // Close sidebar when route changes on mobile
   useEffect(() => {
@@ -40,31 +44,51 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     };
   }, []);
 
+  const dashboardHref = orgId ? `/orgs/${orgId}/dashboard` : "/orgs";
+  const calendarHref = orgId ? `/orgs/${orgId}/calendar` : "/orgs";
+  const blockoutsHref = orgId ? `/orgs/${orgId}/blockouts` : "/orgs";
+  const songsHref = orgId ? `/orgs/${orgId}/songs` : "/orgs";
+
   const navItems = [
     {
-      href: "/",
+      href: dashboardHref,
       icon: Church,
       label: "Dashboard",
       adminOnly: false,
     },
     {
-      href: "/calendar",
+      href: calendarHref,
       icon: Calendar,
       label: "Calendar",
       adminOnly: false,
     },
     {
-      href: "/blockouts",
+      href: blockoutsHref,
       icon: CalendarX,
       label: "My Blockouts",
-      adminOnly: false,
+      adminOnly: true,
     },
     {
-      href: "/songs",
+      href: songsHref,
       icon: Music,
       label: "Song Library",
       adminOnly: true,
     },
+  ];
+
+  const orgItems = [
+    {
+      href: "/orgs",
+      icon: Users,
+      label: "Team Management",
+      adminOnly: true,
+    },
+    // {
+    //   href: "/teams",
+    //   icon: Users,
+    //   label: "Team Management",
+    //   adminOnly: true,
+    // },
   ];
 
   return (
@@ -84,7 +108,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-opacity-10 z-40 lg:hidden"
           onClick={() => {
             setIsOpen(false);
           }}
@@ -93,13 +117,14 @@ export default function Sidebar({ currentPath }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-          }`}
+        className={`fixed left-0 top-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ${
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
       >
         <div className="h-full px-3 py-4 overflow-y-auto">
           {/* Logo and Brand */}
           <div className="flex items-center mb-8 p-4 mt-12 lg:mt-0">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center mr-3">
+            <div className="w-10 h-10 bg-linear-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center mr-3">
               <Church className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-xl font-bold text-gray-800 dark:text-white">
@@ -115,23 +140,63 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                 return null;
               }
 
-              const isActive = currentPath === item.href;
+              const isActive = (currentPath || location) === item.href;
               const Icon = item.icon;
 
               return (
                 <li key={item.href}>
                   <Link href={item.href}>
                     <div
-                      className={`flex items-center p-2 rounded-lg group transition-all duration-200 cursor-pointer relative ${isActive
+                      className={`flex items-center p-2 rounded-lg group transition-all duration-200 cursor-pointer relative ${
+                        isActive
                           ? "text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 font-semibold shadow-sm border-l-4 border-primary-600 dark:border-primary-400 pl-3"
                           : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-l-4 border-transparent"
-                        }`}
+                      }`}
                     >
                       <Icon
-                        className={`w-5 h-5 ${isActive
+                        className={`w-5 h-5 ${
+                          isActive
                             ? "text-primary-600 dark:text-primary-400"
                             : ""
-                          }`}
+                        }`}
+                      />
+                      <span className="ml-3">{item.label}</span>
+                      {item.adminOnly && (
+                        <Badge variant="secondary" className="ml-auto text-xs">
+                          Admin
+                        </Badge>
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+
+            {orgItems.map((item) => {
+              // Skip admin-only items for non-admin users
+              if (item.adminOnly && user?.role !== "admin") {
+                return null;
+              }
+
+              const isActive = (currentPath || location) === item.href;
+              const Icon = item.icon;
+
+              return (
+                <li key={item.href}>
+                  <Link href={item.href}>
+                    <div
+                      className={`flex items-center p-2 rounded-lg group transition-all duration-200 cursor-pointer relative ${
+                        isActive
+                          ? "text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 font-semibold shadow-sm border-l-4 border-primary-600 dark:border-primary-400 pl-3"
+                          : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-l-4 border-transparent"
+                      }`}
+                    >
+                      <Icon
+                        className={`w-5 h-5 ${
+                          isActive
+                            ? "text-primary-600 dark:text-primary-400"
+                            : ""
+                        }`}
                       />
                       <span className="ml-3">{item.label}</span>
                       {item.adminOnly && (
@@ -150,7 +215,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           <div className="absolute bottom-4 left-3 right-3">
             <div className="glass-card rounded-lg p-4">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-linear-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
                   <span className="text-white font-medium">
                     {user?.firstName?.[0] || user?.email?.[0] || "U"}
                   </span>

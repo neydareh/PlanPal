@@ -99,12 +99,29 @@ When running in development mode, you can access the interactive API documentati
 
 ## API Endpoints
 
-### Events
+### Org scoping
 
-- `GET /api/events` - List events
-- `POST /api/events` - Create event
-- `PUT /api/events/:id` - Update event
-- `DELETE /api/events/:id` - Delete event
+All event, song, and blockout endpoints are org-scoped. Provide the `:orgId` in the URL path. The UI selects the active org from the URL (for example, `/orgs/:orgId/...`) and mirrors the current org in localStorage for the global org switcher.
+
+Example:
+
+```bash
+curl -X GET http://localhost:3000/api/orgs/ORG_ID/events
+```
+
+UI paths:
+
+- `/orgs/ORG_ID/dashboard`
+- `/orgs/ORG_ID/calendar`
+- `/orgs/ORG_ID/songs`
+- `/orgs/ORG_ID/blockouts`
+
+### Events (Org-scoped)
+
+- `GET /api/orgs/:orgId/events` - List events
+- `POST /api/orgs/:orgId/events` - Create event
+- `PUT /api/orgs/:orgId/events/:id` - Update event
+- `DELETE /api/orgs/:orgId/events/:id` - Delete event
 
 ### Users
 
@@ -113,12 +130,19 @@ When running in development mode, you can access the interactive API documentati
 - `GET /api/users/:id` - Get user
 - `PUT /api/users/:id` - Update user
 
-### Songs
+### Songs (Org-scoped)
 
-- `GET /api/songs` - List songs
-- `POST /api/songs` - Create song
-- `PUT /api/songs/:id` - Update song
-- `DELETE /api/songs/:id` - Delete song
+- `GET /api/orgs/:orgId/songs` - List songs
+- `POST /api/orgs/:orgId/songs` - Create song
+- `PUT /api/orgs/:orgId/songs/:id` - Update song
+- `DELETE /api/orgs/:orgId/songs/:id` - Delete song
+
+### Blockouts (Org-scoped)
+
+- `GET /api/orgs/:orgId/blockouts` - List blockouts
+- `POST /api/orgs/:orgId/blockouts` - Create blockout
+- `GET /api/orgs/:orgId/blockouts/:id` - Get blockout
+- `DELETE /api/orgs/:orgId/blockouts/:id` - Delete blockout
 
 ## Health Checks
 

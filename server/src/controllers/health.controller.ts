@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { db } from "../db";
+import { getDb } from "../db";
 import { sql } from "drizzle-orm";
 // import Redis from "ioredis";
 // import { config } from "../config";
@@ -19,6 +19,7 @@ export async function healthCheck(req: Request, res: Response) {
 
   try {
     // Check database
+    const db = getDb();
     await db.execute(sql`SELECT 1`);
     health.services.database = "OK";
   } catch (error) {

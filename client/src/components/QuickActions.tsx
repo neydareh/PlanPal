@@ -4,9 +4,14 @@ import { Card, CardContent, Button } from "@neydareh/ui";
 
 type QuickActionsProps = {
   role: string;
+  orgId: string | null | undefined;
 };
 
-export default function QuickActions({ role }: QuickActionsProps) {
+export default function QuickActions({ role, orgId }: QuickActionsProps) {
+  const calendarHref = orgId ? `/orgs/${orgId}/calendar` : "/orgs";
+  const blockoutsHref = orgId ? `/orgs/${orgId}/blockouts` : "/orgs";
+  const songsHref = orgId ? `/orgs/${orgId}/songs` : "/orgs";
+
   return (
     <Card className="glass-card">
       <CardContent className="p-4 lg:p-6">
@@ -14,7 +19,7 @@ export default function QuickActions({ role }: QuickActionsProps) {
           Quick Actions
         </h3>
         <div className="space-y-3">
-          <Link href="/calendar">
+          <Link href={calendarHref}>
             <Button className="w-full justify-between bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700">
               <span className="flex items-center">
                 <Calendar className="w-4 h-4 mr-3" />
@@ -26,7 +31,7 @@ export default function QuickActions({ role }: QuickActionsProps) {
 
           <div className="my-2"></div>
 
-          <Link href="/blockouts">
+          <Link href={blockoutsHref}>
             <Button className="w-full justify-between bg-linear-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700">
               <span className="flex items-center">
                 <CalendarPlus className="w-4 h-4 mr-3" />
@@ -39,7 +44,7 @@ export default function QuickActions({ role }: QuickActionsProps) {
           {role === "admin" && (
             <>
               <div className="my-2"></div>
-              <Link href="/songs">
+              <Link href={songsHref}>
                 <Button className="w-full justify-between bg-linear-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700">
                   <span className="flex items-center">
                     <Music className="w-4 h-4 mr-3" />

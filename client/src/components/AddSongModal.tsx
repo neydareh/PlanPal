@@ -23,8 +23,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertSongSchema } from "@shared/schema";
 import type { InsertSong } from "@shared/schema";
 import { z } from "zod";
+import { useOrgContext } from "@/hooks/useOrgContext";
 
-const songFormSchema = insertSongSchema.extend({
+const songFormSchema = insertSongSchema
+  .omit({ orgId: true, createdBy: true })
+  .extend({
   youtubeUrl: z
     .string()
     .url("Please enter a valid YouTube URL")
@@ -43,6 +46,7 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { orgId } = useOrgContext();
 
   // Form setup
   const form = useForm<SongFormData>({
@@ -59,11 +63,20 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
   // Create song mutation
   const createSongMutation = useMutation({
     mutationFn: async (data: InsertSong) => {
-      const response = await apiRequest("POST", "/api/songs", data);
+      if (!orgId) {
+        throw new Error("Organization required");
+      }
+      const response = await apiRequest(
+        "POST",
+        `/api/orgs/${orgId}/songs`,
+        data
+      );
       return response.json();
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/songs"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/orgs", orgId ?? "", "songs"],
+      });
       toast({
         title: "Success",
         description: "Song added successfully!",

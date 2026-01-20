@@ -1,17 +1,18 @@
-import { eq, sql } from "drizzle-orm";
-import { events, eventSongs } from "server/shared/schema";
+import { and, eq, sql } from "drizzle-orm";
+import { events, eventSongs, songs } from "server/shared/schema";
 import { Event } from "../interfaces/models";
 import { IEventService } from "../interfaces/services";
 import { CreateEventDTO, UpdateEventDTO } from "../interfaces/dto";
-import { CacheService } from "../utils/cache";
 import { PaginatedResult, paginateResponse } from "../utils/pagination";
-import { db } from "../db";
+import { getDb } from "../db";
 
 export class EventService implements IEventService {
   async getEvents(
+    orgId: string,
     page: number = 1,
     limit: number = 10
   ): Promise<PaginatedResult<Event>> {
+    const db = getDb();
     // const cacheKey = `events:page:${page}:limit:${limit}`;
 
     // // Try to get from cache
@@ -21,11 +22,15 @@ export class EventService implements IEventService {
     // }
 
     // Get total count
-    const countResult = await db.select({ count: sql`count(*)` }).from(events);
+    const countResult = await db
+      .select({ count: sql`count(*)` })
+      .from(events)
+      .where(eq(events.orgId, orgId));
     const total = Number(countResult[0].count);
 
     // Get paginated results
     const results = await db.query.events.findMany({
+      where: eq(events.orgId, orgId),
       limit,
       offset: (page - 1) * limit,
       orderBy: (events, { desc }) => [desc(events.createdAt)],
@@ -43,7 +48,8 @@ export class EventService implements IEventService {
     return paginatedResult;
   }
 
-  async getEvent(id: string): Promise<Event | null> {
+  async getEvent(orgId: string, id: string): Promise<Event | null> {
+    const db = getDb();
     const cacheKey = `event:${id}`;
 
     // Try to get from cache
@@ -53,7 +59,7 @@ export class EventService implements IEventService {
     // }
 
     const result = await db.query.events.findFirst({
-      where: eq(events.id, id),
+      where: and(eq(events.id, id), eq(events.orgId, orgId)),
     });
 
     if (result) {
@@ -65,21 +71,28 @@ export class EventService implements IEventService {
   }
 
   async createEvent(
-    eventData: CreateEventDTO & { createdBy: string }
+    eventData: CreateEventDTO & { createdBy: string; orgId: string }
   ): Promise<Event> {
+    const db = getDb();
     const [event] = await db
       .insert(events)
       .values({
         title: eventData.title,
         description: eventData.description ?? null,
         date: new Date(eventData.date),
+        orgId: eventData.orgId,
         createdBy: eventData.createdBy,
       })
       .returning();
     return event as Event;
   }
 
-  async updateEvent(id: string, eventData: UpdateEventDTO): Promise<Event> {
+  async updateEvent(
+    orgId: string,
+    id: string,
+    eventData: UpdateEventDTO
+  ): Promise<Event> {
+    const db = getDb();
     const { date, ...rest } = eventData;
     const updateData = {
       ...rest,
@@ -90,18 +103,20 @@ export class EventService implements IEventService {
     const [event] = await db
       .update(events)
       .set(updateData)
-      .where(eq(events.id, id))
+      .where(and(eq(events.id, id), eq(events.orgId, orgId)))
       .returning();
     return event as Event;
   }
 
-  async deleteEvent(id: string): Promise<void> {
-    await db.delete(events).where(eq(events.id, id));
+  async deleteEvent(orgId: string, id: string): Promise<void> {
+    const db = getDb();
+    await db.delete(events).where(and(eq(events.id, id), eq(events.orgId, orgId)));
   }
 
-  async getEventSongs(id: string) {
+  async getEventSongs(orgId: string, id: string) {
+    const db = getDb();
     const result = await db.query.events.findFirst({
-      where: eq(events.id, id),
+      where: and(eq(events.id, id), eq(events.orgId, orgId)),
       with: {
         eventSongs: {
           with: {
@@ -120,7 +135,29 @@ export class EventService implements IEventService {
     }));
   }
 
-  async addEventSong(eventId: string, songId: string, order: string) {
+  async addEventSong(
+    orgId: string,
+    eventId: string,
+    songId: string,
+    order: string
+  ) {
+    const db = getDb();
+    const event = await db.query.events.findFirst({
+      where: and(eq(events.id, eventId), eq(events.orgId, orgId)),
+    });
+
+    if (!event) {
+      throw new Error("event not found");
+    }
+
+    const song = await db.query.songs.findFirst({
+      where: and(eq(songs.id, songId), eq(songs.orgId, orgId)),
+    });
+
+    if (!song) {
+      throw new Error("song not found");
+    }
+
     const [eventSong] = await db
       .insert(eventSongs)
       .values({

@@ -49,3 +49,88 @@ export const UpdateBlockoutSchema = CreateBlockoutSchema.partial();
 
 export type CreateBlockoutDTO = z.infer<typeof CreateBlockoutSchema>;
 export type UpdateBlockoutDTO = z.infer<typeof UpdateBlockoutSchema>;
+
+// Org/Team DTOs
+const OrgRoleSchema = z.enum(['admin', 'member']);
+const MemberFunctionSchema = z.enum([
+  'vocalist',
+  'bass',
+  'piano',
+  'guitar',
+  'other',
+]);
+
+export const CreateOrgSchema = z.object({
+  name: z.string().min(1).max(120),
+});
+
+export const UpdateOrgSchema = CreateOrgSchema.partial();
+
+export const CreateTeamSchema = z.object({
+  name: z.string().min(1).max(120),
+});
+
+export const UpdateTeamSchema = CreateTeamSchema.partial();
+
+export const AddOrgMemberSchema = z.object({
+  userId: z.string().uuid(),
+  role: OrgRoleSchema,
+});
+
+export const UpdateOrgMemberSchema = z.object({
+  role: OrgRoleSchema,
+});
+
+export const AddTeamMemberSchema = z
+  .object({
+    userId: z.string().uuid(),
+    role: OrgRoleSchema,
+    memberFunction: MemberFunctionSchema.optional(),
+  })
+  .refine(
+    (data) =>
+      data.role === 'admin' ? data.memberFunction === undefined : true,
+    {
+      message: 'memberFunction is only allowed for member role',
+      path: ['memberFunction'],
+    }
+  )
+  .refine(
+    (data) =>
+      data.role === 'member' ? data.memberFunction !== undefined : true,
+    {
+      message: 'memberFunction is required for member role',
+      path: ['memberFunction'],
+    }
+  );
+
+export const UpdateTeamMemberSchema = z
+  .object({
+    role: OrgRoleSchema.optional(),
+    memberFunction: MemberFunctionSchema.optional(),
+  })
+  .refine(
+    (data) =>
+      data.role === 'admin' ? data.memberFunction === undefined : true,
+    {
+      message: 'memberFunction is only allowed for member role',
+      path: ['memberFunction'],
+    }
+  )
+  .refine(
+    (data) =>
+      data.role === 'member' ? data.memberFunction !== undefined : true,
+    {
+      message: 'memberFunction is required for member role',
+      path: ['memberFunction'],
+    }
+  );
+
+export type CreateOrgDTO = z.infer<typeof CreateOrgSchema>;
+export type UpdateOrgDTO = z.infer<typeof UpdateOrgSchema>;
+export type CreateTeamDTO = z.infer<typeof CreateTeamSchema>;
+export type UpdateTeamDTO = z.infer<typeof UpdateTeamSchema>;
+export type AddOrgMemberDTO = z.infer<typeof AddOrgMemberSchema>;
+export type UpdateOrgMemberDTO = z.infer<typeof UpdateOrgMemberSchema>;
+export type AddTeamMemberDTO = z.infer<typeof AddTeamMemberSchema>;
+export type UpdateTeamMemberDTO = z.infer<typeof UpdateTeamMemberSchema>;

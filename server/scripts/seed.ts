@@ -1,5 +1,5 @@
 
-import { db } from "../src/db";
+import { getDb, withDbClient, withPoolClient } from "../src/db";
 import {
   orgMemberships,
   organizations,
@@ -9,11 +9,13 @@ import {
   users,
 } from "../shared/schema";
 import { and, eq } from "drizzle-orm";
+import { provisionOrgSchema, toOrgSchemaName } from "../src/utils/org-schema";
 
 async function seed() {
   console.log("🌱 Starting seed process...");
 
   try {
+    const db = getDb();
     // 1. Ensure a user exists to be the creator
     let systemUser = await db.query.users.findFirst({
       where: eq(users.email, "system@churchflow.com"),
@@ -51,6 +53,18 @@ async function seed() {
         })
         .returning();
       organization = newOrg;
+    }
+
+    let schemaName = organization.schemaName ?? null;
+    if (!schemaName) {
+      schemaName = toOrgSchemaName(organization.id);
+      await withPoolClient(async (client) => {
+        await provisionOrgSchema(client, schemaName as string);
+        await client.query(
+          "UPDATE organizations SET schema_name = $1 WHERE id = $2",
+          [schemaName, organization?.id]
+        );
+      });
     }
 
     const teamName = "Worship Team";
@@ -101,54 +115,65 @@ async function seed() {
       });
     }
 
-    // 3. Check if songs exist
-    const existingSongs = await db.select().from(songs);
-    if (existingSongs.length > 0) {
-      console.log("Songs already exist. Skipping song seed.");
-      process.exit(0);
-    }
+    await withPoolClient(async (client) => {
+      await client.query(`SET search_path TO "${schemaName}", public`);
+      await withDbClient(client, async () => {
+        const db = getDb();
+        // 3. Check if songs exist
+        const existingSongs = await db.select().from(songs);
+        if (existingSongs.length > 0) {
+          console.log("Songs already exist. Skipping song seed.");
+          return;
+        }
 
-    // 4. Insert default songs
-    console.log("Seeding songs...");
-    const defaultSongs = [
-      {
-        title: "Way Maker",
-        artist: "Sinach",
-        key: "E",
-        youtubeUrl: "https://www.youtube.com/watch?v=n4XWfwLHeLM",
-        createdBy: systemUser.id,
-      },
-      {
-        title: "10,000 Reasons (Bless the Lord)",
-        artist: "Matt Redman",
-        key: "G",
-        youtubeUrl: "https://www.youtube.com/watch?v=DXDGE_lRI0E",
-        createdBy: systemUser.id,
-      },
-      {
-        title: "Oceans (Where Feet May Fail)",
-        artist: "Hillsong United",
-        key: "D",
-        youtubeUrl: "https://www.youtube.com/watch?v=dy9nwe9_xzw",
-        createdBy: systemUser.id,
-      },
-      {
-        title: "Good Good Father",
-        artist: "Chris Tomlin",
-        key: "A",
-        youtubeUrl: "https://www.youtube.com/watch?v=CqybaIesbuA",
-        createdBy: systemUser.id,
-      },
-      {
-        title: "What A Beautiful Name",
-        artist: "Hillsong Worship",
-        key: "D",
-        youtubeUrl: "https://www.youtube.com/watch?v=nQWFzMvCfLE",
-        createdBy: systemUser.id,
-      },
-    ];
+        // 4. Insert default songs
+        console.log("Seeding songs...");
+        const defaultSongs = [
+          {
+            title: "Way Maker",
+            artist: "Sinach",
+            key: "E",
+            youtubeUrl: "https://www.youtube.com/watch?v=n4XWfwLHeLM",
+            orgId: organization.id,
+            createdBy: systemUser.id,
+          },
+          {
+            title: "10,000 Reasons (Bless the Lord)",
+            artist: "Matt Redman",
+            key: "G",
+            youtubeUrl: "https://www.youtube.com/watch?v=DXDGE_lRI0E",
+            orgId: organization.id,
+            createdBy: systemUser.id,
+          },
+          {
+            title: "Oceans (Where Feet May Fail)",
+            artist: "Hillsong United",
+            key: "D",
+            youtubeUrl: "https://www.youtube.com/watch?v=dy9nwe9_xzw",
+            orgId: organization.id,
+            createdBy: systemUser.id,
+          },
+          {
+            title: "Good Good Father",
+            artist: "Chris Tomlin",
+            key: "A",
+            youtubeUrl: "https://www.youtube.com/watch?v=CqybaIesbuA",
+            orgId: organization.id,
+            createdBy: systemUser.id,
+          },
+          {
+            title: "What A Beautiful Name",
+            artist: "Hillsong Worship",
+            key: "D",
+            youtubeUrl: "https://www.youtube.com/watch?v=nQWFzMvCfLE",
+            orgId: organization.id,
+            createdBy: systemUser.id,
+          },
+        ];
 
-    await db.insert(songs).values(defaultSongs);
+        await db.insert(songs).values(defaultSongs);
+      });
+    });
     console.log(`✅ Successfully seeded ${defaultSongs.length} songs.`);
   } catch (error) {
     console.error("❌ Seed failed:", error);

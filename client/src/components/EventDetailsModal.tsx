@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
@@ -13,6 +12,7 @@ import { Badge } from "@neydareh/ui";
 import { Calendar, Clock, Music, Users, Trash2 } from "lucide-react";
 import type { Event, Song, Blockout } from "@shared/schema";
 import { UserDisplay } from "@/components/UserDisplay";
+import { useOrgContext } from "@/hooks/useOrgContext";
 
 interface EventDetailsModalProps {
   isOpen: boolean;
@@ -30,45 +30,51 @@ export default function EventDetailsModal({
   eventId,
 }: EventDetailsModalProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { orgId } = useOrgContext();
 
   // Fetch event details
   const { data: event, isLoading: eventLoading } = useQuery<Event>({
-    queryKey: ["/api/events", eventId],
+    queryKey: ["/api/orgs", orgId ?? "", "events", eventId],
     queryFn: async () => {
-      if (!eventId) return null;
-      const response = await apiRequest("GET", `/api/events/${eventId}`);
+      if (!eventId || !orgId) return null;
+      const response = await apiRequest(
+        "GET",
+        `/api/orgs/${orgId}/events/${eventId}`
+      );
       return response.json();
     },
-    enabled: isOpen && !!eventId,
+    enabled: isOpen && !!eventId && !!orgId,
     retry: false,
   });
 
   // Fetch event songs
   const { data: eventSongs = [] } = useQuery<EventSongDetails[]>({
-    queryKey: ["/api/events", eventId, "songs"],
+    queryKey: ["/api/orgs", orgId ?? "", "events", eventId, "songs"],
     queryFn: async () => {
-      if (!eventId) return [];
-      const response = await apiRequest("GET", `/api/events/${eventId}/songs`);
+      if (!eventId || !orgId) return [];
+      const response = await apiRequest(
+        "GET",
+        `/api/orgs/${orgId}/events/${eventId}/songs`
+      );
       return response.json();
     },
-    enabled: isOpen && !!eventId,
+    enabled: isOpen && !!eventId && !!orgId,
     retry: false,
   });
 
   // Fetch blockouts for the event date
   const { data: blockoutsData } = useQuery<{ data: Blockout[] }>({
-    queryKey: ["/api/blockouts", event?.date],
+    queryKey: ["/api/orgs", orgId ?? "", "blockouts", event?.date],
     queryFn: async () => {
-      if (!event?.date) return { data: [] };
+      if (!event?.date || !orgId) return { data: [] };
       const response = await apiRequest(
         "GET",
-        "/api/blockouts?page=1&limit=100"
+        `/api/orgs/${orgId}/blockouts?page=1&limit=100`
       );
       return response.json();
     },
-    enabled: isOpen && !!event?.date,
+    enabled: isOpen && !!event?.date && !!orgId,
     retry: false,
   });
 
@@ -87,11 +93,13 @@ export default function EventDetailsModal({
   // Delete event mutation
   const deleteEventMutation = useMutation({
     mutationFn: async () => {
-      if (!eventId) return;
-      await apiRequest("DELETE", `/api/events/${eventId}`);
+      if (!eventId || !orgId) return;
+      await apiRequest("DELETE", `/api/orgs/${orgId}/events/${eventId}`);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/orgs", orgId ?? "", "events"],
+      });
       toast({
         title: "Success",
         description: "Event deleted successfully!",

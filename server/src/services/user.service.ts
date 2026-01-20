@@ -3,15 +3,17 @@ import { users } from "server/shared/schema";
 import { User } from "../interfaces/models";
 import { IUserData, IUserService } from "../interfaces/services";
 import { UpdateUserDTO } from "../interfaces/dto";
-import { db } from "../db";
+import { getDb } from "../db";
 
 export class UserService implements IUserService {
   async getUsers(): Promise<User[]> {
+    const db = getDb();
     const results = await db.query.users.findMany();
     return results as User[];
   }
 
   async getUser(id: string): Promise<User | null> {
+    const db = getDb();
     const result = await db.query.users.findFirst({
       where: eq(users.id, id),
     });
@@ -19,6 +21,7 @@ export class UserService implements IUserService {
   }
 
   async createUser(userData: IUserData): Promise<User> {
+    const db = getDb();
     const [user] = await db
       .insert(users)
       .values({
@@ -33,6 +36,7 @@ export class UserService implements IUserService {
   }
 
   async updateUser(id: string, userData: UpdateUserDTO): Promise<User> {
+    const db = getDb();
     const updateData = {
       ...userData,
       updatedAt: new Date(),
@@ -47,6 +51,7 @@ export class UserService implements IUserService {
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
+    const db = getDb();
     const result = await db.query.users.findFirst({
       where: eq(users.email, email),
     });

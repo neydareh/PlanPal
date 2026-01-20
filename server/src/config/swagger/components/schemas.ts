@@ -22,6 +22,7 @@ export const schemas = {
     type: 'object',
     properties: {
       id: { type: 'string' },
+      orgId: { type: 'string' },
       title: { type: 'string' },
       date: { type: 'string', format: 'date-time' },
       createdBy: { type: 'string' },
@@ -41,6 +42,7 @@ export const schemas = {
     type: 'object',
     properties: {
       id: { type: 'string' },
+      orgId: { type: 'string' },
       title: { type: 'string' },
       artist: { type: 'string' },
       key: { type: 'string' },
@@ -80,6 +82,7 @@ export const schemas = {
     type: 'object',
     properties: {
       id: { type: 'string' },
+      orgId: { type: 'string' },
       userId: { type: 'string' },
       startDate: { type: 'string', format: 'date-time' },
       endDate: { type: 'string', format: 'date-time' },
@@ -96,6 +99,117 @@ export const schemas = {
       startDate: { type: 'string', format: 'date-time' },
       endDate: { type: 'string', format: 'date-time' },
       reason: { type: 'string' }
+    }
+  },
+  Organization: {
+    type: 'object',
+    properties: {
+      id: { type: 'string' },
+      name: { type: 'string' },
+      createdBy: { type: 'string' },
+      createdAt: { type: 'string', format: 'date-time' },
+      updatedAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  Team: {
+    type: 'object',
+    properties: {
+      id: { type: 'string' },
+      orgId: { type: 'string' },
+      name: { type: 'string' },
+      createdBy: { type: 'string' },
+      createdAt: { type: 'string', format: 'date-time' },
+      updatedAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  OrgMembership: {
+    type: 'object',
+    properties: {
+      id: { type: 'string' },
+      orgId: { type: 'string' },
+      userId: { type: 'string' },
+      role: { type: 'string', enum: ['admin', 'member'] },
+      createdAt: { type: 'string', format: 'date-time' },
+      updatedAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  TeamMembership: {
+    type: 'object',
+    properties: {
+      id: { type: 'string' },
+      teamId: { type: 'string' },
+      userId: { type: 'string' },
+      role: { type: 'string', enum: ['admin', 'member'] },
+      memberFunction: {
+        type: 'string',
+        enum: ['vocalist', 'bass', 'piano', 'guitar', 'other'],
+        nullable: true
+      },
+      createdAt: { type: 'string', format: 'date-time' },
+      updatedAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  CreateOrganization: {
+    type: 'object',
+    required: ['name'],
+    properties: {
+      name: { type: 'string' }
+    }
+  },
+  UpdateOrganization: {
+    type: 'object',
+    properties: {
+      name: { type: 'string' }
+    }
+  },
+  CreateTeam: {
+    type: 'object',
+    required: ['name'],
+    properties: {
+      name: { type: 'string' }
+    }
+  },
+  UpdateTeam: {
+    type: 'object',
+    properties: {
+      name: { type: 'string' }
+    }
+  },
+  AddOrgMember: {
+    type: 'object',
+    required: ['userId', 'role'],
+    properties: {
+      userId: { type: 'string' },
+      role: { type: 'string', enum: ['admin', 'member'] }
+    }
+  },
+  UpdateOrgMember: {
+    type: 'object',
+    required: ['role'],
+    properties: {
+      role: { type: 'string', enum: ['admin', 'member'] }
+    }
+  },
+  AddTeamMember: {
+    type: 'object',
+    required: ['userId', 'role'],
+    properties: {
+      userId: { type: 'string' },
+      role: { type: 'string', enum: ['admin', 'member'] },
+      memberFunction: {
+        type: 'string',
+        enum: ['vocalist', 'bass', 'piano', 'guitar', 'other']
+      }
+    }
+  },
+  UpdateTeamMember: {
+    type: 'object',
+    properties: {
+      role: { type: 'string', enum: ['admin', 'member'] },
+      memberFunction: {
+        type: 'string',
+        enum: ['vocalist', 'bass', 'piano', 'guitar', 'other']
+      }
     }
   }
 };

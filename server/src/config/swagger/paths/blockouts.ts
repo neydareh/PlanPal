@@ -1,10 +1,11 @@
 export const blockoutPaths = {
-  '/blockouts': {
+  '/orgs/{orgId}/blockouts': {
     get: {
       summary: 'List blockouts',
       tags: ['Blockouts'],
       security: [{ BearerAuth: [] }, { ApiKeyAuth: [] }],
       parameters: [
+        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
         { in: 'query', name: 'limit', schema: { type: 'integer', default: 10, maximum: 100 } }
       ],
@@ -29,6 +30,9 @@ export const blockoutPaths = {
       summary: 'Create blockout',
       tags: ['Blockouts'],
       security: [{ BearerAuth: [] }],
+      parameters: [
+        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } }
+      ],
       requestBody: {
         required: true,
         content: {
@@ -49,12 +53,13 @@ export const blockoutPaths = {
       }
     }
   },
-  '/blockouts/{id}': {
+  '/orgs/{orgId}/blockouts/{id}': {
     get: {
       summary: 'Get blockout',
       tags: ['Blockouts'],
       security: [{ BearerAuth: [] }],
       parameters: [
+        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
       ],
       responses: {
@@ -81,6 +86,7 @@ export const blockoutPaths = {
       tags: ['Blockouts'],
       security: [{ BearerAuth: [] }],
       parameters: [
+        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
       ],
       responses: {

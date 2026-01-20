@@ -22,7 +22,6 @@ app.use(express.urlencoded({ extended: false }));
 
 // login route
 app.get("/login", async (_, res) => {
-  console.log("login");
   const url = "https://dev-xnai8ncc3612wn4n.us.auth0.com/authorize";
   const payload = {
     response_type: "code",

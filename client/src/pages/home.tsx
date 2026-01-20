@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent } from "@neydareh/ui";
+import { Button, Card, CardContent } from "@neydareh/ui";
 
 import { Heart } from "lucide-react";
 import type { Event, Song } from "@shared/schema";
@@ -14,21 +14,26 @@ import RoleIndicator from "@/components/RoleIndicator";
 import SongsInLibrary from "@/components/SongsInLibrary";
 import TopNavBar from "@/components/TopNavBar";
 import Sidebar from "@/components/Sidebar";
+import { useOrgContext } from "@/hooks/useOrgContext";
+import { Link } from "wouter";
 
 export default function Home() {
   const { isLoading, user } = useAuth();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const { orgId } = useOrgContext();
 
   // Fetch dashboard data
   const { isLoading: isLoadingEvents, data: events } = useQuery<
     PaginatedResult<Event>
   >({
-    queryKey: ["/api/events"],
+    queryKey: ["/api/orgs", orgId ?? "", "events"],
+    enabled: !!orgId,
     retry: false,
   });
 
   const { isLoading: isLoadingSongs, data: songs = [] } = useQuery<Song[]>({
-    queryKey: ["/api/songs"],
+    queryKey: ["/api/orgs", orgId ?? "", "songs"],
+    enabled: !!orgId,
     retry: false,
   });
 
@@ -49,7 +54,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar currentPath="/" />
+      <Sidebar currentPath={orgId ? `/orgs/${orgId}/dashboard` : "/orgs"} />
 
       <div className="lg:ml-64">
         <TopNavBar title="Dashboard" />
@@ -57,6 +62,25 @@ export default function Home() {
         {/* render loading state */}
         {isLoading && isLoadingEvents && isLoadingSongs ? (
           <LoadingSpinner />
+        ) : !orgId ? (
+          <main className="p-4 lg:p-6 pt-20 lg:pt-6">
+            <Card className="glass-card">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Select an organization
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Choose an organization to view the shared dashboard, songs,
+                  and blockouts.
+                </p>
+                <Link href="/orgs">
+                  <Button className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700">
+                    Go to Organizations
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </main>
         ) : (
           <main className="p-4 lg:p-6 pt-20 lg:pt-6">
             {/* Analytics Cards */}
@@ -73,7 +97,7 @@ export default function Home() {
 
             {/* Quick Actions and Upcoming Events */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-4lg:p-6 mb-6 lg:mb-6">
-              <QuickActions role={user.role} />
+              <QuickActions role={user.role} orgId={orgId} />
               <UpcomingEvents events={upcomingEvents} />
             </div>
 
