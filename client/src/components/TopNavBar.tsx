@@ -2,15 +2,13 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Button,
-  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@neydareh/ui";
-import { Search, Bell, Moon, Sun } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Bell, Moon, Sun } from "lucide-react";
 import { useOrgContext } from "@/hooks/useOrgContext";
 import { useLocation } from "wouter";
 
@@ -19,13 +17,9 @@ interface TopNavBarProps {
 }
 
 export default function TopNavBar({ title }: TopNavBarProps) {
-  const { user } = useAuth();
-  const { orgId, setOrgId } = useOrgContext();
+  const { user, orgCodes, login } = useAuth();
+  const { orgId } = useOrgContext();
   const [, setLocation] = useLocation();
-  const { data: orgs = [] } = useQuery<{ id: string; name: string }[]>({
-    queryKey: ["/api/orgs"],
-    retry: false,
-  });
   const [isDarkMode, setIsDarkMode] = useState(
     document.documentElement.classList.contains('dark')
   );
@@ -53,21 +47,21 @@ export default function TopNavBar({ title }: TopNavBarProps) {
         </div>
 
         <div className="flex items-center space-x-2 lg:space-x-4">
-          {orgs.length > 0 && (
+          {orgCodes.length > 0 && (
             <Select
               value={orgId ?? ""}
               onValueChange={(value) => {
-                setOrgId(value);
                 void setLocation(`/orgs/${value}/dashboard`);
+                void login({ org_code: value });
               }}
             >
               <SelectTrigger className="w-48 hidden lg:flex">
                 <SelectValue placeholder="Select org" />
               </SelectTrigger>
               <SelectContent>
-                {orgs.map((org) => (
-                  <SelectItem key={org.id} value={org.id}>
-                    {org.name}
+                {orgCodes.map((orgCode) => (
+                  <SelectItem key={orgCode} value={orgCode}>
+                    {orgCode}
                   </SelectItem>
                 ))}
               </SelectContent>

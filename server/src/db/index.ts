@@ -9,6 +9,8 @@ import ws from "ws";
 
 neonConfig.webSocketConstructor = ws;
 
+const rejectUnauthorized: boolean = !!process.env.NODE_TLS_REJECT_UNAUTHORIZED || false
+
 // Create a connection pool
 export const pool = new Pool({
   connectionString: config.database.url,
@@ -16,7 +18,7 @@ export const pool = new Pool({
   idleTimeoutMillis: config.database.idleTimeout,
   // SSL configuration if needed
   ssl: process.env.NODE_ENV === 'production' ? {
-    rejectUnauthorized: false
+    rejectUnauthorized 
   } : undefined
 });
 

@@ -33,10 +33,14 @@ function App() {
 }
 
 function AppContent() {
-  const { isLoading } = useAuth();
+  const { isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (!isAuthenticated) {
+    return <Landing />;
   }
 
   const OrgRedirect = ({

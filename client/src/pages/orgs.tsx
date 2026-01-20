@@ -13,7 +13,6 @@ import {
   useToast,
 } from "@neydareh/ui";
 import { useState } from "react";
-import { useOrgContext } from "@/hooks/useOrgContext";
 
 type Organization = {
   id: string;
@@ -26,7 +25,6 @@ export default function Orgs() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [orgName, setOrgName] = useState("");
-  const { setOrgId } = useOrgContext();
 
   const { data: orgs = [], isLoading } = useQuery<Organization[]>({
     queryKey: ["/api/orgs"],
@@ -146,11 +144,7 @@ export default function Orgs() {
                             : "recently"}
                         </div>
                         <Link href={`/orgs/${org.id}/dashboard`}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setOrgId(org.id)}
-                          >
+                          <Button variant="ghost" size="sm">
                             View
                             <ArrowRight className="w-4 h-4 ml-2" />
                           </Button>

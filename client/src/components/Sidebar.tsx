@@ -21,6 +21,7 @@ interface SidebarProps {
 
 export default function Sidebar({ currentPath }: SidebarProps) {
   const { user } = useAuth();
+  console.log('user => ', user)
   const [isOpen, setIsOpen] = useState(false);
   const { orgId } = useOrgContext();
   const [location] = useLocation();
@@ -144,7 +145,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
               const Icon = item.icon;
 
               return (
-                <li key={item.href}>
+                <li key={`${item.label}-${item.href}`}>
                   <Link href={item.href}>
                     <div
                       className={`flex items-center p-2 rounded-lg group transition-all duration-200 cursor-pointer relative ${
@@ -182,7 +183,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
               const Icon = item.icon;
 
               return (
-                <li key={item.href}>
+                <li key={`${item.label}-${item.href}`}>
                   <Link href={item.href}>
                     <div
                       className={`flex items-center p-2 rounded-lg group transition-all duration-200 cursor-pointer relative ${

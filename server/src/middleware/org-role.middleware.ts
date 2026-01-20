@@ -6,7 +6,8 @@ import { getDb } from "../db";
 type OrgRole = "admin" | "member";
 
 function getUserId(req: Request): string | undefined {
-  return (req as any).user?.sub;
+  const user = (req as any).user;
+  return user?.id ?? user?.sub;
 }
 
 export function requireOrgRole(role: OrgRole, orgIdParam = "orgId") {

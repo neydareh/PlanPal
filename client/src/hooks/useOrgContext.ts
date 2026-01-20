@@ -1,7 +1,6 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useLocation } from "wouter";
-
-const STORAGE_KEY = "currentOrgId";
+import { useAuth } from "@/hooks/useAuth";
 
 function getOrgIdFromPath(pathname: string) {
   const match = pathname.match(/^\/orgs\/([^/]+)/);
@@ -9,6 +8,7 @@ function getOrgIdFromPath(pathname: string) {
 }
 
 export function useOrgContext() {
+  const { orgCodes } = useAuth();
   const [location] = useLocation();
 
   const orgIdFromPath = useMemo(
@@ -16,22 +16,12 @@ export function useOrgContext() {
     [location]
   );
 
-  useEffect(() => {
-    if (orgIdFromPath) {
-      localStorage.setItem(STORAGE_KEY, orgIdFromPath);
+  const orgId = useMemo(() => {
+    if (orgIdFromPath && orgCodes.includes(orgIdFromPath)) {
+      return orgIdFromPath;
     }
-  }, [orgIdFromPath]);
+    return orgCodes.length > 0 ? orgCodes[0] : null;
+  }, [orgCodes, orgIdFromPath]);
 
-  const storedOrgId =
-    typeof window !== "undefined"
-      ? localStorage.getItem(STORAGE_KEY)
-      : null;
-
-  const orgId = orgIdFromPath ?? storedOrgId;
-
-  const setOrgId = (nextOrgId: string) => {
-    localStorage.setItem(STORAGE_KEY, nextOrgId);
-  };
-
-  return { orgId, setOrgId };
+  return { orgId };
 }

@@ -8,6 +8,7 @@ import { blockoutRoutes } from "./blockout.routes";
 import { orgRoutes } from "./org.routes";
 import { teamRoutes } from "./team.routes";
 import { orgSchemaMiddleware } from "../middleware/org-schema.middleware";
+import { kindeJwtVerifier } from "../middleware/kinde-auth.middleware";
 
 export function registerRoutes(app: Express) {
   // Apply rate limiting to all API routes
@@ -18,6 +19,7 @@ export function registerRoutes(app: Express) {
 
   // API routes
   app.use("/api/users", userRoutes);
+  app.use("/api/orgs", kindeJwtVerifier);
   app.use("/api/orgs/:orgId", orgSchemaMiddleware);
   app.use("/api/orgs/:orgId/events", eventRoutes);
   app.use("/api/orgs/:orgId/songs", songRoutes);

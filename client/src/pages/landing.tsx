@@ -101,7 +101,7 @@ export default function Landing() {
                 className="w-full bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                 size="lg"
               >
-                Enter App
+                Get Started
               </Button>
             </CardContent>
           </Card>

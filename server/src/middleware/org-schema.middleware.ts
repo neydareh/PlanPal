@@ -12,6 +12,11 @@ export const orgSchemaMiddleware = async (
     return next();
   }
 
+  const userOrgCodes = (req as any).user?.org_codes;
+  if (Array.isArray(userOrgCodes) && !userOrgCodes.includes(orgId)) {
+    return res.status(403).json({ message: "Not a member of this org" });
+  }
+
   const client = await pool.connect();
   let released = false;
   const releaseClient = () => {
