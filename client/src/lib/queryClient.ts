@@ -14,7 +14,6 @@ export async function apiRequest(
   data?: unknown | undefined
 ): Promise<Response> {
   const token = getAuthToken();
-  console.log("token -> ", token)
   const headers: Record<string, string> = data
     ? { "Content-Type": "application/json" }
     : {};

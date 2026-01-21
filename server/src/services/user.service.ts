@@ -20,6 +20,29 @@ export class UserService implements IUserService {
     return result as User | null;
   }
 
+  async getUserByAuthProviderId(authProviderId: string): Promise<User | null> {
+    const db = getDb();
+    const result = await db.query.users.findFirst({
+      where: eq(users.authProviderId, authProviderId),
+    });
+    return result as User | null;
+  }
+
+  async getOrCreateByAuthProviderId(authProviderId: string): Promise<User> {
+    const existing = await this.getUserByAuthProviderId(authProviderId);
+    if (existing) return existing;
+
+    const db = getDb();
+    const [user] = await db
+      .insert(users)
+      .values({
+        authProviderId,
+        role: "user",
+      })
+      .returning();
+    return user as User;
+  }
+
   async createUser(userData: IUserData): Promise<User> {
     const db = getDb();
     const [user] = await db

@@ -62,16 +62,16 @@ export default function CreateEventModal({
 
   // Fetch songs for selection
   const { data: songsData } = useQuery<{ data: Song[] }>({
-    queryKey: ["/api/orgs", orgId ?? "", "songs"],
-    enabled: isOpen && !!orgId,
+    queryKey: ["/api/songs"],
+    enabled: isOpen,
     retry: false,
   });
   const songs = songsData?.data ?? [];
 
   // Fetch blockouts to show team availability
   const { data: blockoutsData } = useQuery<{ data: Blockout[] }>({
-    queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
-    enabled: isOpen && !!orgId,
+    queryKey: ["/api/blockouts"],
+    enabled: isOpen,
     retry: false,
   });
   const blockouts = blockoutsData?.data ?? [];
@@ -94,7 +94,7 @@ export default function CreateEventModal({
       if (selectedSongs.length > 0) {
         await Promise.all(
           selectedSongs.map((songId, index) =>
-            apiRequest("POST", `/api/orgs/${orgId}/events/${event.id}/songs`, {
+            apiRequest("POST", `/api/events/${event.id}/songs`, {
               songId,
               order: (index + 1).toString(),
             })
@@ -103,7 +103,7 @@ export default function CreateEventModal({
       }
 
       void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "events"],
+        queryKey: ["/api/events"],
       });
 
       toast({
@@ -129,6 +129,8 @@ export default function CreateEventModal({
 
   const onSubmit = (data: EventFormData) => {
     const eventDateTime = new Date(`${data.date}T${data.time}`);
+
+    if (!user) return
 
     const eventData: InsertEvent = {
       title: data.title,

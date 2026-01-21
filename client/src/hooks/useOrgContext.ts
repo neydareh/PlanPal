@@ -9,19 +9,19 @@ function getOrgIdFromPath(pathname: string) {
 
 export function useOrgContext() {
   const { orgCodes } = useAuth();
-  const [location] = useLocation();
+  // const [location] = useLocation();
 
-  const orgIdFromPath = useMemo(
-    () => getOrgIdFromPath(location),
-    [location]
-  );
+  // const orgIdFromPath = useMemo(
+  //   () => getOrgIdFromPath(location),
+  //   [location]
+  // );
 
-  const orgId = useMemo(() => {
-    if (orgIdFromPath && orgCodes.includes(orgIdFromPath)) {
-      return orgIdFromPath;
-    }
-    return orgCodes.length > 0 ? orgCodes[0] : null;
-  }, [orgCodes, orgIdFromPath]);
+  // const  = useMemo(() => {
+  //   if (orgIdFromPath && orgCodes.includes(orgIdFromPath)) {
+  //     return orgIdFromPath;
+  //   }
+  //   return orgCodes.length > 0 ? orgCodes[0] : null;
+  // }, [orgCodes, orgIdFromPath]);
 
-  return { orgId };
+  return { orgId: orgCodes };
 }

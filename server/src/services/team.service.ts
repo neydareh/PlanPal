@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { teamMemberships, teams } from "server/shared/schema";
+import { orgTeamMemberships, teamMemberships, teams } from "server/shared/schema";
 import { getDb } from "../db";
 import {
   AddTeamMemberDTO,
@@ -24,6 +24,10 @@ export class TeamService {
         createdBy: userId,
       })
       .returning();
+    await db.insert(orgTeamMemberships).values({
+      orgId,
+      teamId: team.id,
+    });
     return team as Team;
   }
 
@@ -59,6 +63,9 @@ export class TeamService {
   async deleteTeam(teamId: string): Promise<void> {
     const db = getDb();
     await db.delete(teams).where(eq(teams.id, teamId));
+    await db
+      .delete(orgTeamMemberships)
+      .where(eq(orgTeamMemberships.teamId, teamId));
   }
 
   async listTeamMembers(teamId: string) {
@@ -100,35 +107,33 @@ export class TeamService {
       .values({
         teamId,
         userId: memberData.userId,
-        role: memberData.role,
-        memberFunction:
-          memberData.role === "admin" ? null : memberData.memberFunction,
+        memberFunction: memberData.memberFunction,
       })
       .returning();
     return membership as TeamMembership;
   }
 
-  async updateTeamMember(
-    membershipId: string,
-    memberData: UpdateTeamMemberDTO
-  ): Promise<TeamMembership> {
-    const db = getDb();
-    const updateData = {
-      ...memberData,
-      memberFunction:
-        memberData.role === "admin"
-          ? null
-          : memberData.memberFunction,
-      updatedAt: new Date(),
-    };
+  // async updateTeamMember(
+  //   membershipId: string,
+  //   memberData: UpdateTeamMemberDTO
+  // ): Promise<TeamMembership> {
+  //   const db = getDb();
+  //   const updateData = {
+  //     ...memberData,
+  //     memberFunction:
+  //       memberData.role === "admin"
+  //         ? null
+  //         : memberData.memberFunction,
+  //     updatedAt: new Date(),
+  //   };
 
-    const [membership] = await db
-      .update(teamMemberships)
-      .set(updateData)
-      .where(eq(teamMemberships.id, membershipId))
-      .returning();
-    return membership as TeamMembership;
-  }
+  //   const [membership] = await db
+  //     .update(teamMemberships)
+  //     .set(updateData)
+  //     .where(eq(teamMemberships.id, membershipId))
+  //     .returning();
+  //   return membership as TeamMembership;
+  // }
 
   async removeTeamMember(membershipId: string): Promise<void> {
     const db = getDb();

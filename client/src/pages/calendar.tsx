@@ -15,28 +15,23 @@ import { Link } from "wouter";
 export default function Calendar() {
   const { user } = useAuth();
   const { orgId } = useOrgContext();
-  // const [currentDate, setCurrentDate] = useState(new Date());
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isEventDetailsModalOpen, setIsEventDetailsModalOpen] = useState(false);
 
-  // Fetch events for current month
   const { data: eventsData, isLoading: isLoadingEvents } = useQuery<{
     data: Event[];
   }>({
-    queryKey: ["/api/orgs", orgId ?? "", "events"],
-    enabled: !!orgId,
+    queryKey: ["/api/events"],
     retry: false,
   });
 
   const events = eventsData?.data ?? [];
 
-  // Fetch blockouts for current month
   const { data: blockoutsData, isLoading: isLoadingBlockouts } = useQuery<{
     data: Blockout[];
   }>({
-    queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
-    enabled: !!orgId,
+    queryKey: ["/api/blockouts"],
     retry: false,
   });
 
@@ -44,7 +39,7 @@ export default function Calendar() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar currentPath={orgId ? `/orgs/${orgId}/calendar` : "/orgs"} />
+      <Sidebar currentPath={"/calendar"} />
 
       <div className="lg:ml-64">
         <TopNavBar title="Calendar" />
@@ -76,7 +71,7 @@ export default function Calendar() {
                 <CalendarGrid
                   events={events}
                   blockouts={blockouts}
-                  user={user}
+                  user={user!}
                   onCreateEventClick={() => {
                     setIsCreateEventModalOpen(true);
                   }}

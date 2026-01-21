@@ -16,6 +16,7 @@ import { useState } from "react";
 
 type Organization = {
   id: string;
+  orgCode?: string | null;
   name: string;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -143,7 +144,7 @@ export default function Orgs() {
                             ? new Date(org.updatedAt).toLocaleDateString()
                             : "recently"}
                         </div>
-                        <Link href={`/orgs/${org.id}/dashboard`}>
+                        <Link href={`/orgs/${org.orgCode ?? org.id}`}>
                           <Button variant="ghost" size="sm">
                             View
                             <ArrowRight className="w-4 h-4 ml-2" />

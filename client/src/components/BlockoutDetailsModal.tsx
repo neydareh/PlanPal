@@ -30,12 +30,12 @@ export default function BlockoutDetailsModal({
 
   // Fetch blockout details
   const { data: blockout, isLoading } = useQuery<Blockout>({
-    queryKey: ["/api/orgs", orgId ?? "", "blockouts", blockoutId],
+    queryKey: ["/api/blockouts", blockoutId],
     queryFn: async () => {
       if (!blockoutId || !orgId) return null;
       const response = await apiRequest(
         "GET",
-        `/api/orgs/${orgId}/blockouts/${blockoutId}`
+        `/api/blockouts/${blockoutId}`
       );
       return response.json();
     },
@@ -59,11 +59,11 @@ export default function BlockoutDetailsModal({
   const deleteBlockoutMutation = useMutation({
     mutationFn: async () => {
       if (!blockoutId || !orgId) return;
-      await apiRequest("DELETE", `/api/orgs/${orgId}/blockouts/${blockoutId}`);
+      await apiRequest("DELETE", `/api/blockouts/${blockoutId}`);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+        queryKey: ["/api/blockouts"],
       });
       toast({
         title: "Success",

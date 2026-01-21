@@ -41,7 +41,12 @@ const blockoutFormSchema = insertBlockoutSchema.omit({ orgId: true }).extend({
   userId: z.string().optional(),
 });
 
-type BlockoutFormData = z.infer<typeof blockoutFormSchema>;
+interface IBlockoutFormData  {
+  startDate: string;
+  endDate: string;
+  userId: string;
+  reason: string;
+};
 
 export default function Blockouts() {
   const { toast } = useToast();
@@ -51,34 +56,28 @@ export default function Blockouts() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingBlockout, setEditingBlockout] = useState<Blockout>();
   const [selectedBlockoutId, setSelectedBlockoutId] = useState<string | null>(
-    null
+    null,
   );
   const [isBlockoutDetailsModalOpen, setIsBlockoutDetailsModalOpen] =
     useState(false);
 
-  // useCallback
   const isUserAdmin = useCallback(() => user?.role === "admin", [user]);
 
-  // Fetch user's blockouts
   const { data: blockoutData, isLoading: isBlockoutLoading } = useQuery<{
     data: Blockout[];
   }>({
-    queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
-    enabled: !!orgId,
+    queryKey: ["/api/blockouts"],
     retry: false,
   });
 
   // Fetch users
   const { data: memberData, isLoading: isUserLoading } = useQuery<any[]>({
     queryKey: ["/api/orgs", orgId ?? "", "members"],
-    enabled: !!orgId,
     retry: false,
   });
 
-
-
   // Form setup
-  const form = useForm<BlockoutFormData>({
+  const form = useForm<IBlockoutFormData>({
     resolver: zodResolver(blockoutFormSchema),
     defaultValues: {
       startDate: "",
@@ -93,19 +92,12 @@ export default function Blockouts() {
   // Create blockout mutation
   const createBlockoutMutation = useMutation({
     mutationFn: async (data: InsertBlockout) => {
-      if (!orgId) {
-        throw new Error("Organization required");
-      }
-      const response = await apiRequest(
-        "POST",
-        `/api/orgs/${orgId}/blockouts`,
-        data
-      );
+      const response = await apiRequest("POST", `/api/blockouts`, data);
       return response.json();
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+        queryKey: ["/api/blockouts"],
       });
       toast({
         title: "Success",
@@ -132,19 +124,12 @@ export default function Blockouts() {
       id: string;
       data: Partial<InsertBlockout>;
     }) => {
-      if (!orgId) {
-        throw new Error("Organization required");
-      }
-      const response = await apiRequest(
-        "PUT",
-        `/api/orgs/${orgId}/blockouts/${id}`,
-        data
-      );
+      const response = await apiRequest("PUT", `/api/blockouts/${id}`, data);
       return response.json();
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+        queryKey: ["/api/blockouts"],
       });
       toast({
         title: "Success",
@@ -165,14 +150,11 @@ export default function Blockouts() {
   // Delete blockout mutation
   const deleteBlockoutMutation = useMutation({
     mutationFn: async (blockoutId: string) => {
-      if (!orgId) {
-        throw new Error("Organization required");
-      }
-      await apiRequest("DELETE", `/api/orgs/${orgId}/blockouts/${blockoutId}`);
+      await apiRequest("DELETE", `/api/blockouts/${blockoutId}`);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "blockouts"],
+        queryKey: ["/api/blockouts"],
       });
       toast({
         title: "Success",
@@ -188,7 +170,9 @@ export default function Blockouts() {
     },
   });
 
-  const onSubmit = (data: BlockoutFormData) => {
+  const onSubmit = (data: IBlockoutFormData) => {
+    if (!data.userId || !user?.id) return;
+
     const blockoutData: InsertBlockout = {
       startDate: new Date(data.startDate),
       endDate: new Date(data.endDate),
@@ -225,7 +209,7 @@ export default function Blockouts() {
 
   // Sort blockouts by start date
   const sortedBlockouts = [...blockouts].sort(
-    (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+    (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
   );
 
   const getFormattedDate = (date: Date) => {
@@ -239,31 +223,14 @@ export default function Blockouts() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar currentPath={orgId ? `/orgs/${orgId}/blockouts` : "/orgs"} />
+      <Sidebar currentPath={"/blockouts"} />
 
       <div className="lg:ml-64">
         <TopNavBar title="My Blockouts" />
 
-        {isBlockoutLoading || isUserLoading ?
-          <LoadingSpinner /> : !orgId ? (
-            <main className="p-4 lg:p-4 pt-20 lg:pt-6">
-              <Card className="glass-card">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    Select an organization
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    Choose an organization to view blockouts.
-                  </p>
-                  <Link href="/orgs">
-                    <Button className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700">
-                      Go to Organizations
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </main>
-          ) : (
+        {isBlockoutLoading || isUserLoading ? (
+          <LoadingSpinner />
+        ) : (
           <main className="p-4 lg:p-4 pt-20 lg:pt-6">
             {/* Header */}
             <div className="mb-6">
@@ -475,7 +442,11 @@ export default function Blockouts() {
 
                             {blockout.userId && (
                               <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                                Created by <BlockoutUserDisplay userId={blockout.userId} createdAt={blockout.createdAt} />
+                                Created by{" "}
+                                <BlockoutUserDisplay
+                                  userId={blockout.userId}
+                                  createdAt={blockout.createdAt}
+                                />
                               </p>
                             )}
                           </div>
@@ -500,7 +471,8 @@ export default function Blockouts() {
                 })}
               </div>
             )}
-          </main>)}
+          </main>
+        )}
       </div>
 
       <BlockoutDetailsModal

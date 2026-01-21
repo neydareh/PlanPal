@@ -3,21 +3,42 @@ import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { User } from "@shared/schema";
 import { setAuthToken } from "@/lib/authToken";
 
-const toAppUser = (kindeUser: Record<string, unknown> | null): User | null => {
+export type AppUser = Omit<User, "authProviderId">;
+interface IRole {
+  id: string;
+  key: "admin" | "user";
+  name: string;
+}
+
+const toAppUser = (
+  kindeUser: Record<string, unknown> | null,
+  // roles: IRole | undefined,
+): AppUser | null => {
   if (!kindeUser) return null;
   const id = (kindeUser.id as string | undefined) ?? "";
   const email = (kindeUser.email as string | undefined) ?? null;
-  const firstName = (kindeUser.given_name as string | undefined) ?? null;
-  const lastName = (kindeUser.family_name as string | undefined) ?? null;
+  const firstName = (kindeUser.givenName as string | undefined) ?? null;
+  const lastName = (kindeUser.familyName as string | undefined) ?? null;
   const profileImageUrl = (kindeUser.picture as string | undefined) ?? null;
+
+  // let appUser = {
+  //   id,
+  //   email,
+  //   firstName,
+  //   lastName,
+  //   role: "admin",
+  //   profileImageUrl,
+  //   createdAt: new Date(),
+  //   updatedAt: new Date(),
+  // };
 
   return {
     id,
     email,
     firstName,
     lastName,
+    role: "admin",
     profileImageUrl,
-    role: "user",
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -31,23 +52,29 @@ export const useAuth = () => {
     getToken,
     getClaim,
     login,
+    register,
     logout,
   } = useKindeAuth();
   const [orgCodes, setOrgCodes] = useState<string[]>([]);
+  const [isTokenReady, setIsTokenReady] = useState(false);
+  const [userRoles, setUserRoles] = useState<IRole>();
 
   useEffect(() => {
     if (!isAuthenticated) {
       setAuthToken(null);
       setOrgCodes([]);
+      setIsTokenReady(true);
       return;
     }
 
     getToken()
       .then((token) => {
         setAuthToken(token ?? null);
+        setIsTokenReady(true);
       })
       .catch(() => {
         setAuthToken(null);
+        setIsTokenReady(true);
       });
 
     getClaim("org_codes", "idToken")
@@ -58,17 +85,22 @@ export const useAuth = () => {
       .catch(() => {
         setOrgCodes([]);
       });
-  }, [getClaim, getToken, isAuthenticated]);
+      
+  }, [getClaim, isAuthenticated]);
 
-  const mappedUser = useMemo(() => toAppUser(user ?? null), [user]);
+  console.log('user roles => ', userRoles, isLoading)
+
+  const mappedUser = useMemo(() => toAppUser(user!), [user]);
 
   return {
     user: mappedUser,
     isAuthenticated,
     isLoading,
     login,
+    register,
     logout,
     orgCodes,
     getToken,
+    isTokenReady,
   };
 };

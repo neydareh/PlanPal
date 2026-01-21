@@ -21,7 +21,6 @@ import { Search, Plus, Play, ExternalLink, Trash2 } from "lucide-react";
 import type { Song } from "@shared/schema";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useOrgContext } from "@/hooks/useOrgContext";
-import { Link } from "wouter";
 
 export default function Songs() {
   const { toast } = useToast();
@@ -29,11 +28,9 @@ export default function Songs() {
   const [searchQuery, setSearchQuery] = useState("");
   const [keyFilter, setKeyFilter] = useState("");
   const [isAddSongModalOpen, setIsAddSongModalOpen] = useState(false);
-  const { orgId } = useOrgContext();
 
   const { data, isLoading } = useQuery<{ data: Song[] }>({
-    queryKey: ["/api/orgs", orgId ?? "", "songs"],
-    enabled: !!orgId,
+    queryKey: ["/api/songs"],
     retry: false,
   });
 
@@ -47,14 +44,11 @@ export default function Songs() {
 
   const deleteSongMutation = useMutation({
     mutationFn: async (songId: string) => {
-      if (!orgId) {
-        return;
-      }
-      await apiRequest("DELETE", `/api/orgs/${orgId}/songs/${songId}`);
+      await apiRequest("DELETE", `/api/songs/${songId}`);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "songs"],
+        queryKey: ["/api/songs"],
       });
       toast({
         title: "Success",
@@ -101,31 +95,13 @@ export default function Songs() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar currentPath={orgId ? `/orgs/${orgId}/songs` : "/orgs"} />
+      <Sidebar currentPath={"/songs"} />
 
       <div className="lg:ml-64">
         <TopNavBar title="Song Library" />
 
         {isLoading ? (
           <LoadingSpinner />
-        ) : !orgId ? (
-          <main className="p-4 lg:p-4 pt-20 lg:pt-6">
-            <Card className="glass-card">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  Select an organization
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Choose an organization to view its song library.
-                </p>
-                <Link href="/orgs">
-                  <Button className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700">
-                    Go to Organizations
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </main>
         ) : (
           <main className="p-4 lg:p-4 pt-20 lg:pt-6">
             {/* Header */}

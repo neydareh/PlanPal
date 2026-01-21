@@ -7,23 +7,20 @@ import {
   Calendar,
   CalendarX,
   Music,
-  Settings,
   X,
   Menu,
+  // LogOut,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
-import { useOrgContext } from "@/hooks/useOrgContext";
 
 interface SidebarProps {
   currentPath: string;
 }
 
 export default function Sidebar({ currentPath }: SidebarProps) {
-  const { user } = useAuth();
-  console.log('user => ', user)
+  const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const { orgId } = useOrgContext();
   const [location] = useLocation();
 
   // Close sidebar when route changes on mobile
@@ -45,52 +42,39 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     };
   }, []);
 
-  const dashboardHref = orgId ? `/orgs/${orgId}/dashboard` : "/orgs";
-  const calendarHref = orgId ? `/orgs/${orgId}/calendar` : "/orgs";
-  const blockoutsHref = orgId ? `/orgs/${orgId}/blockouts` : "/orgs";
-  const songsHref = orgId ? `/orgs/${orgId}/songs` : "/orgs";
-
   const navItems = [
     {
-      href: dashboardHref,
+      href: "/",
       icon: Church,
       label: "Dashboard",
       adminOnly: false,
     },
     {
-      href: calendarHref,
+      href: "/calendar",
       icon: Calendar,
       label: "Calendar",
       adminOnly: false,
     },
     {
-      href: blockoutsHref,
+      href: "/blockouts",
       icon: CalendarX,
       label: "My Blockouts",
       adminOnly: true,
     },
     {
-      href: songsHref,
+      href: "/songs",
       icon: Music,
       label: "Song Library",
       adminOnly: true,
     },
-  ];
-
-  const orgItems = [
     {
       href: "/orgs",
       icon: Users,
-      label: "Team Management",
+      label: "Manage your orgs",
       adminOnly: true,
     },
-    // {
-    //   href: "/teams",
-    //   icon: Users,
-    //   label: "Team Management",
-    //   adminOnly: true,
-    // },
   ];
+
 
   return (
     <>
@@ -136,45 +120,6 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           {/* Navigation Menu */}
           <ul className="space-y-2 font-medium">
             {navItems.map((item) => {
-              // Skip admin-only items for non-admin users
-              if (item.adminOnly && user?.role !== "admin") {
-                return null;
-              }
-
-              const isActive = (currentPath || location) === item.href;
-              const Icon = item.icon;
-
-              return (
-                <li key={`${item.label}-${item.href}`}>
-                  <Link href={item.href}>
-                    <div
-                      className={`flex items-center p-2 rounded-lg group transition-all duration-200 cursor-pointer relative ${
-                        isActive
-                          ? "text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 font-semibold shadow-sm border-l-4 border-primary-600 dark:border-primary-400 pl-3"
-                          : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-l-4 border-transparent"
-                      }`}
-                    >
-                      <Icon
-                        className={`w-5 h-5 ${
-                          isActive
-                            ? "text-primary-600 dark:text-primary-400"
-                            : ""
-                        }`}
-                      />
-                      <span className="ml-3">{item.label}</span>
-                      {item.adminOnly && (
-                        <Badge variant="secondary" className="ml-auto text-xs">
-                          Admin
-                        </Badge>
-                      )}
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-
-            {orgItems.map((item) => {
-              // Skip admin-only items for non-admin users
               if (item.adminOnly && user?.role !== "admin") {
                 return null;
               }
@@ -216,11 +161,11 @@ export default function Sidebar({ currentPath }: SidebarProps) {
           <div className="absolute bottom-4 left-3 right-3">
             <div className="glass-card rounded-lg p-4">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-linear-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+                {/* <div className="w-10 h-10 bg-linear-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
                   <span className="text-white font-medium">
                     {user?.firstName?.[0] || user?.email?.[0] || "U"}
                   </span>
-                </div>
+                </div> */}
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {user?.firstName || user?.email || "User"}
@@ -229,14 +174,16 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                     {user?.role || "Member"}
                   </p>
                 </div>
+              </div>
+              <div className="ml-3 flex-1">
                 <button
                   onClick={() => {
-                    console.log("go to user settings");
-                    // (window.location.href = "/api/logout")
+                    logout();
                   }}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="text-gray-400 dark:text-gray-100 hover:text-gray-600 dark:hover:text-gray-300 text-xs capitalize cursor-pointer"
                 >
-                  <Settings className="w-4 h-4" />
+                  logout
+                  {/* <LogOut className="w-4 h-4" /> */}
                 </button>
               </div>
             </div>

@@ -3,14 +3,21 @@ import { EventService } from "../services/event.service";
 import { CreateEventSchema } from "../interfaces/dto";
 import { getOrgIdFromRequest } from "../utils/org-id";
 
+export type EventRequest = {
+  orgId?: string;
+} & Request;
+
 export class EventController {
   constructor(private eventService: EventService) {}
 
   async getEvents(req: Request, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
-      if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+
+      if (!orgId && orgId != "") {
+        return res
+          .status(400)
+          .json({ message: "Organization ID was not found" });
       }
 
       const events = await this.eventService.getEvents(orgId);
@@ -20,11 +27,14 @@ export class EventController {
     }
   }
 
-  async getEvent(req: Request, res: Response) {
+  async getEvent(req: EventRequest, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
-      if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+
+      if (!orgId && orgId != "") {
+        return res
+          .status(400)
+          .json({ message: "Organization ID was not found" });
       }
 
       const event = await this.eventService.getEvent(orgId, req.params.id);
@@ -37,11 +47,14 @@ export class EventController {
     }
   }
 
-  async createEvent(req: Request & { user?: unknown }, res: Response) {
+  async createEvent(req: EventRequest, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
-      if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+
+      if (!orgId && orgId != "") {
+        return res
+          .status(400)
+          .json({ message: "Organization ID was not found" });
       }
 
       // Validate input using the schema
@@ -75,17 +88,20 @@ export class EventController {
     }
   }
 
-  async updateEvent(req: Request, res: Response) {
+  async updateEvent(req: EventRequest, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
-      if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+
+      if (!orgId && orgId != "") {
+        return res
+          .status(400)
+          .json({ message: "Organization ID was not found" });
       }
 
       const event = await this.eventService.updateEvent(
         orgId,
         req.params.id,
-        req.body
+        req.body,
       );
       res.json(event);
     } catch (error) {
@@ -93,11 +109,13 @@ export class EventController {
     }
   }
 
-  async deleteEvent(req: Request, res: Response) {
+  async deleteEvent(req: EventRequest, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res
+          .status(400)
+          .json({ message: "Organization ID was not found" });
       }
 
       await this.eventService.deleteEvent(orgId, req.params.id);
@@ -107,11 +125,13 @@ export class EventController {
     }
   }
 
-  async getEventSongs(req: Request, res: Response) {
+  async getEventSongs(req: EventRequest, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res
+          .status(400)
+          .json({ message: "Organization ID was not found" });
       }
 
       const songs = await this.eventService.getEventSongs(orgId, req.params.id);
@@ -121,11 +141,13 @@ export class EventController {
     }
   }
 
-  async addEventSong(req: Request, res: Response) {
+  async addEventSong(req: EventRequest, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res
+          .status(400)
+          .json({ message: "Organization ID was not found" });
       }
 
       const { songId, order } = req.body;
@@ -137,7 +159,7 @@ export class EventController {
         orgId,
         req.params.id,
         songId,
-        order
+        order,
       );
       res.status(201).json(eventSong);
     } catch (error) {

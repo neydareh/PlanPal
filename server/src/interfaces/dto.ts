@@ -28,11 +28,13 @@ export const UpdateSongSchema = CreateSongSchema.partial();
 export type CreateSongDTO = z.infer<typeof CreateSongSchema>;
 export type UpdateSongDTO = z.infer<typeof UpdateSongSchema>;
 
+const UserRoleSchema = z.enum(['admin', 'user']).optional();
+
 // User DTOs
 export const UpdateUserSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   email: z.string().email().optional(),
-  role: z.enum(['admin', 'user']).optional(),
+  role: UserRoleSchema,
 });
 
 export type UpdateUserDTO = z.infer<typeof UpdateUserSchema>;
@@ -51,7 +53,6 @@ export type CreateBlockoutDTO = z.infer<typeof CreateBlockoutSchema>;
 export type UpdateBlockoutDTO = z.infer<typeof UpdateBlockoutSchema>;
 
 // Org/Team DTOs
-const OrgRoleSchema = z.enum(['admin', 'member']);
 const MemberFunctionSchema = z.enum([
   'vocalist',
   'bass',
@@ -62,6 +63,7 @@ const MemberFunctionSchema = z.enum([
 
 export const CreateOrgSchema = z.object({
   name: z.string().min(1).max(120),
+  orgCode: z.string().min(1).max(120).optional(),
 });
 
 export const UpdateOrgSchema = CreateOrgSchema.partial();
@@ -73,58 +75,57 @@ export const CreateTeamSchema = z.object({
 export const UpdateTeamSchema = CreateTeamSchema.partial();
 
 export const AddOrgMemberSchema = z.object({
-  userId: z.string().uuid(),
-  role: OrgRoleSchema,
+  teamId: z.string().uuid(),
 });
 
 export const UpdateOrgMemberSchema = z.object({
-  role: OrgRoleSchema,
+  teamId: z.string().uuid(),
 });
 
 export const AddTeamMemberSchema = z
   .object({
     userId: z.string().uuid(),
-    role: OrgRoleSchema,
+    role: UserRoleSchema,
     memberFunction: MemberFunctionSchema.optional(),
   })
-  .refine(
-    (data) =>
-      data.role === 'admin' ? data.memberFunction === undefined : true,
-    {
-      message: 'memberFunction is only allowed for member role',
-      path: ['memberFunction'],
-    }
-  )
-  .refine(
-    (data) =>
-      data.role === 'member' ? data.memberFunction !== undefined : true,
-    {
-      message: 'memberFunction is required for member role',
-      path: ['memberFunction'],
-    }
-  );
+  // .refine(
+  //   (data) =>
+  //     data.role === 'admin' ? data.memberFunction === undefined : true,
+  //   {
+  //     message: 'memberFunction is only allowed for member role',
+  //     path: ['memberFunction'],
+  //   }
+  // )
+  // .refine(
+  //   (data) =>
+  //     data.role === 'member' ? data.memberFunction !== undefined : true,
+  //   {
+  //     message: 'memberFunction is required for member role',
+  //     path: ['memberFunction'],
+  //   }
+  // );
 
 export const UpdateTeamMemberSchema = z
   .object({
-    role: OrgRoleSchema.optional(),
-    memberFunction: MemberFunctionSchema.optional(),
+    // role: OrgRoleSchema.optional(),
+    // memberFunction: MemberFunctionSchema.optional(),
   })
-  .refine(
-    (data) =>
-      data.role === 'admin' ? data.memberFunction === undefined : true,
-    {
-      message: 'memberFunction is only allowed for member role',
-      path: ['memberFunction'],
-    }
-  )
-  .refine(
-    (data) =>
-      data.role === 'member' ? data.memberFunction !== undefined : true,
-    {
-      message: 'memberFunction is required for member role',
-      path: ['memberFunction'],
-    }
-  );
+  // .refine(
+  //   (data) =>
+  //     data.role === 'admin' ? data.memberFunction === undefined : true,
+  //   {
+  //     message: 'memberFunction is only allowed for member role',
+  //     path: ['memberFunction'],
+  //   }
+  // )
+  // .refine(
+  //   (data) =>
+  //     data.role === 'member' ? data.memberFunction !== undefined : true,
+  //   {
+  //     message: 'memberFunction is required for member role',
+  //     path: ['memberFunction'],
+  //   }
+  // );
 
 export type CreateOrgDTO = z.infer<typeof CreateOrgSchema>;
 export type UpdateOrgDTO = z.infer<typeof UpdateOrgSchema>;

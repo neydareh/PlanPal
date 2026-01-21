@@ -13,24 +13,26 @@ export class BlockoutService implements IBlockoutService {
     limit: number = 10
   ): Promise<PaginatedResult<Blockout>> {
     const db = getDb();
+    // TODO: implement cache in the future
     // const cacheKey = `blockouts:page:${page}:limit:${limit}`;
-
     // Try to get from cache
     // const cached = await CacheService.get<PaginatedResult<Blockout>>(cacheKey);
     // if (cached) {
     //   return cached;
     // }
 
+    const whereConstraint = eq(blockouts.orgId, orgId);
+
     // Get total count
     const countResult = await db
       .select({ count: sql`count(*)` })
       .from(blockouts)
-      .where(eq(blockouts.orgId, orgId));
+      .where(whereConstraint);
     const total = Number(countResult[0].count);
 
     // Get paginated results
     const results = await db.query.blockouts.findMany({
-      where: eq(blockouts.orgId, orgId),
+      where: whereConstraint,
       limit,
       offset: (page - 1) * limit,
       orderBy: (blockouts, { desc }) => [desc(blockouts.startDate)],
@@ -42,7 +44,7 @@ export class BlockoutService implements IBlockoutService {
       offset: (page - 1) * limit,
     });
 
-    // Cache the results
+    //TODO: Cache the results
     // await CacheService.set(cacheKey, paginatedResult, 300); // Cache for 5 minutes
 
     return paginatedResult;

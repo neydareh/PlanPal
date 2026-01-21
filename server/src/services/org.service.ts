@@ -1,18 +1,18 @@
 import { and, eq } from "drizzle-orm";
 import {
-  orgMemberships,
+  orgTeamMemberships,
   organizations,
+  teamMemberships,
   teams,
 } from "server/shared/schema";
-import { getDb, withPoolClient } from "../db";
+import { getDb } from "../db";
 import {
   AddOrgMemberDTO,
   CreateOrgDTO,
   UpdateOrgDTO,
   UpdateOrgMemberDTO,
 } from "../interfaces/dto";
-import { Organization, OrgMembership } from "../interfaces/models";
-import { provisionOrgSchema, toOrgSchemaName } from "../utils/org-schema";
+import { Organization, OrgTeamMembership } from "../interfaces/models";
 
 export class OrgService {
   async createOrg(
@@ -24,40 +24,36 @@ export class OrgService {
       .insert(organizations)
       .values({
         name: orgData.name,
+        orgCode: orgData.orgCode ?? null,
         createdBy: userId,
       })
       .returning();
-
-    await db.insert(orgMemberships).values({
-      orgId: organization.id,
-      userId,
-      role: "admin",
-    });
-
-    await withPoolClient(async (client) => {
-      const schemaName = toOrgSchemaName(organization.id);
-      await provisionOrgSchema(client, schemaName);
-      await client.query(
-        "UPDATE organizations SET schema_name = $1 WHERE id = $2",
-        [schemaName, organization.id]
-      );
-    });
 
     return organization as Organization;
   }
 
   async getOrgsForUser(userId: string): Promise<Organization[]> {
     const db = getDb();
-    const memberships = await db.query.orgMemberships.findMany({
-      where: eq(orgMemberships.userId, userId),
+    const memberships = await db.query.teamMemberships.findMany({
+      where: eq(teamMemberships.userId, userId),
       with: {
-        organization: true,
+        team: {
+          with: {
+            organization: true,
+          },
+        },
       },
     });
 
-    return memberships
-      .map((membership) => membership.organization)
-      .filter(Boolean) as Organization[];
+    const orgMap = new Map<string, Organization>();
+    for (const membership of memberships) {
+      const organization = membership.team?.organization;
+      if (organization && !orgMap.has(organization.id)) {
+        orgMap.set(organization.id, organization as Organization);
+      }
+    }
+
+    return Array.from(orgMap.values());
   }
 
   async getOrgById(orgId: string) {
@@ -102,18 +98,18 @@ export class OrgService {
 
   async listOrgMembers(orgId: string) {
     const db = getDb();
-    return db.query.orgMemberships.findMany({
-      where: eq(orgMemberships.orgId, orgId),
+    return db.query.orgTeamMemberships.findMany({
+      where: eq(orgTeamMemberships.orgId, orgId),
       with: {
-        user: true,
+        team: true,
       },
     });
   }
 
   async getOrgMemberById(membershipId: string) {
     const db = getDb();
-    const result = await db.query.orgMemberships.findFirst({
-      where: eq(orgMemberships.id, membershipId),
+    const result = await db.query.orgTeamMemberships.findFirst({
+      where: eq(orgTeamMemberships.id, membershipId),
     });
     return result ?? null;
   }
@@ -121,12 +117,12 @@ export class OrgService {
   async addOrgMember(
     orgId: string,
     memberData: AddOrgMemberDTO
-  ): Promise<OrgMembership> {
+  ): Promise<OrgTeamMembership> {
     const db = getDb();
-    const existing = await db.query.orgMemberships.findFirst({
+    const existing = await db.query.orgTeamMemberships.findFirst({
       where: and(
-        eq(orgMemberships.orgId, orgId),
-        eq(orgMemberships.userId, memberData.userId)
+        eq(orgTeamMemberships.orgId, orgId),
+        eq(orgTeamMemberships.teamId, memberData.teamId)
       ),
     });
 
@@ -135,36 +131,37 @@ export class OrgService {
     }
 
     const [membership] = await db
-      .insert(orgMemberships)
+      .insert(orgTeamMemberships)
       .values({
         orgId,
-        userId: memberData.userId,
-        role: memberData.role,
+        teamId: memberData.teamId,
       })
       .returning();
 
-    return membership as OrgMembership;
+    return membership as OrgTeamMembership;
   }
 
   async updateOrgMemberRole(
     membershipId: string,
     memberData: UpdateOrgMemberDTO
-  ): Promise<OrgMembership> {
+  ): Promise<OrgTeamMembership> {
     const db = getDb();
     const [membership] = await db
-      .update(orgMemberships)
+      .update(orgTeamMemberships)
       .set({
-        role: memberData.role,
+        teamId: memberData.teamId,
         updatedAt: new Date(),
       })
-      .where(eq(orgMemberships.id, membershipId))
+      .where(eq(orgTeamMemberships.id, membershipId))
       .returning();
-    return membership as OrgMembership;
+    return membership as OrgTeamMembership;
   }
 
   async removeOrgMember(membershipId: string): Promise<void> {
     const db = getDb();
-    await db.delete(orgMemberships).where(eq(orgMemberships.id, membershipId));
+    await db
+      .delete(orgTeamMemberships)
+      .where(eq(orgTeamMemberships.id, membershipId));
   }
 
   async ensureTeamInOrg(orgId: string, teamId: string) {

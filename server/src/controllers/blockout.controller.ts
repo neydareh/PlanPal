@@ -10,7 +10,7 @@ export class BlockoutController {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res.status(400).json({ message: "Organization ID was not found" });
       }
 
       const page = parseInt(req.query.page as string) || 1;
@@ -31,7 +31,7 @@ export class BlockoutController {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res.status(400).json({ message: "Organization ID was not found" });
       }
 
       const blockout = await this.blockoutService.getBlockout(
@@ -51,7 +51,7 @@ export class BlockoutController {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res.status(400).json({ message: "Organization ID was not found" });
       }
 
       // Validate input using the schema
@@ -78,7 +78,7 @@ export class BlockoutController {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res.status(400).json({ message: "Organization ID was not found" });
       }
 
       await this.blockoutService.deleteBlockout(orgId, req.params.id);

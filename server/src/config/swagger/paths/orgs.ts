@@ -99,19 +99,19 @@ export const orgPaths = {
   },
   '/orgs/{orgId}/members': {
     get: {
-      summary: 'List org members',
+      summary: 'List org teams',
       tags: ['Organizations'],
       parameters: [
         { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } }
       ],
       responses: {
         200: {
-          description: 'List of org members',
+          description: 'List of org teams',
           content: {
             'application/json': {
               schema: {
                 type: 'array',
-                items: { $ref: '#/components/schemas/OrgMembership' }
+                items: { $ref: '#/components/schemas/OrgTeamMembership' }
               }
             }
           }
@@ -119,7 +119,7 @@ export const orgPaths = {
       }
     },
     post: {
-      summary: 'Add org member',
+      summary: 'Add org team',
       tags: ['Organizations'],
       parameters: [
         { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } }
@@ -134,10 +134,10 @@ export const orgPaths = {
       },
       responses: {
         201: {
-          description: 'Org member added',
+          description: 'Org team added',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/OrgMembership' }
+              schema: { $ref: '#/components/schemas/OrgTeamMembership' }
             }
           }
         },
@@ -147,7 +147,7 @@ export const orgPaths = {
   },
   '/orgs/{orgId}/members/{memberId}': {
     patch: {
-      summary: 'Update org member role',
+      summary: 'Update org team',
       tags: ['Organizations'],
       parameters: [
         { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
@@ -163,10 +163,10 @@ export const orgPaths = {
       },
       responses: {
         200: {
-          description: 'Org member updated',
+          description: 'Org team updated',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/OrgMembership' }
+              schema: { $ref: '#/components/schemas/OrgTeamMembership' }
             }
           }
         },
@@ -174,15 +174,15 @@ export const orgPaths = {
       }
     },
     delete: {
-      summary: 'Remove org member',
+      summary: 'Remove org team',
       tags: ['Organizations'],
       parameters: [
         { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'memberId', required: true, schema: { type: 'string' } }
       ],
       responses: {
-        204: { description: 'Org member removed' },
-        404: { description: 'Org member not found' }
+        204: { description: 'Org team removed' },
+        404: { description: 'Org team not found' }
       }
     }
   }

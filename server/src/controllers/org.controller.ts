@@ -7,11 +7,12 @@ import {
   UpdateOrgMemberSchema,
   UpdateOrgSchema,
 } from "../interfaces/dto";
+import { getOrgIdFromRequest } from "@server/utils/org-id";
 
 export class OrgController {
   constructor(
     private orgService: OrgService,
-    private userService: UserService = new UserService()
+    private userService: UserService = new UserService(),
   ) {}
 
   async createOrg(req: Request, res: Response) {
@@ -24,12 +25,15 @@ export class OrgController {
     }
 
     try {
-      const userId = (req as any).user?.sub;
-      const fallbackUser = userId
+      const authProviderId = (req as any).user?.id ?? (req as any).user?.sub;
+      const fallbackUser = authProviderId
         ? null
         : await this.userService.getUserByEmail("system@churchflow.com");
 
-      const createdBy = userId ?? fallbackUser?.id;
+      const createdBy = authProviderId
+        ? (await this.userService.getOrCreateByAuthProviderId(authProviderId))
+            .id
+        : fallbackUser?.id;
       if (!createdBy) {
         return res
           .status(400)
@@ -38,7 +42,7 @@ export class OrgController {
 
       const org = await this.orgService.createOrg(
         createdBy,
-        validationResult.data
+        validationResult.data,
       );
       res.status(201).json(org);
     } catch (error) {
@@ -48,14 +52,19 @@ export class OrgController {
 
   async getOrgs(req: Request, res: Response) {
     try {
-      const userId = (req as any).user?.sub;
-      const fallbackUser = userId
+      const authProviderId = (req as any).user?.id ?? (req as any).user?.sub;
+      const fallbackUser = authProviderId
         ? null
         : await this.userService.getUserByEmail("system@churchflow.com");
-      const lookupUserId = userId ?? fallbackUser?.id;
+      const lookupUserId = authProviderId
+        ? (await this.userService.getOrCreateByAuthProviderId(authProviderId))
+            .id
+        : fallbackUser?.id;
 
       if (!lookupUserId) {
-        return res.status(400).json({ message: "No user available to list orgs" });
+        return res
+          .status(400)
+          .json({ message: "No user available to list orgs" });
       }
 
       const orgs = await this.orgService.getOrgsForUser(lookupUserId);
@@ -67,7 +76,8 @@ export class OrgController {
 
   async getOrg(req: Request, res: Response) {
     try {
-      const org = await this.orgService.getOrgById(req.params.orgId);
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
+      const org = await this.orgService.getOrgById(resolvedOrgId);
       if (!org) {
         return res.status(404).json({ message: "Organization not found" });
       }
@@ -87,9 +97,10 @@ export class OrgController {
     }
 
     try {
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
       const org = await this.orgService.updateOrg(
-        req.params.orgId,
-        validationResult.data
+        resolvedOrgId,
+        validationResult.data,
       );
       res.json(org);
     } catch (error) {
@@ -99,7 +110,8 @@ export class OrgController {
 
   async deleteOrg(req: Request, res: Response) {
     try {
-      await this.orgService.deleteOrg(req.params.orgId);
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
+      await this.orgService.deleteOrg(resolvedOrgId);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete organization" });
@@ -108,10 +120,19 @@ export class OrgController {
 
   async getOrgMembers(req: Request, res: Response) {
     try {
-      const members = await this.orgService.listOrgMembers(req.params.orgId);
+      const orgId = getOrgIdFromRequest(req);
+      console.log("orgId => ", orgId);
+
+      if (!orgId && orgId != "") {
+        return res
+          .status(400)
+          .json({ message: "Organization ID was not found" });
+      }
+
+      const members = await this.orgService.listOrgMembers(orgId);
       res.json(members);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch org members" });
+      res.status(500).json({ message: "Failed to fetch org teams" });
     }
   }
 
@@ -125,16 +146,17 @@ export class OrgController {
     }
 
     try {
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
       const member = await this.orgService.addOrgMember(
-        req.params.orgId,
-        validationResult.data
+        resolvedOrgId,
+        validationResult.data,
       );
       res.status(201).json(member);
     } catch (error) {
       if (error instanceof Error && error.message.includes("duplicate")) {
         return res.status(409).json({ message: "Member already exists" });
       }
-      res.status(500).json({ message: "Failed to add org member" });
+      res.status(500).json({ message: "Failed to add org team" });
     }
   }
 
@@ -148,36 +170,38 @@ export class OrgController {
     }
 
     try {
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
       const membership = await this.orgService.getOrgMemberById(
-        req.params.memberId
+        req.params.memberId,
       );
-      if (!membership || membership.orgId !== req.params.orgId) {
-        return res.status(404).json({ message: "Org member not found" });
+      if (!membership || membership.orgId !== resolvedOrgId) {
+        return res.status(404).json({ message: "Org team not found" });
       }
 
       const member = await this.orgService.updateOrgMemberRole(
         req.params.memberId,
-        validationResult.data
+        validationResult.data,
       );
       res.json(member);
     } catch (error) {
-      res.status(500).json({ message: "Failed to update org member" });
+      res.status(500).json({ message: "Failed to update org team" });
     }
   }
 
   async removeOrgMember(req: Request, res: Response) {
     try {
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
       const membership = await this.orgService.getOrgMemberById(
-        req.params.memberId
+        req.params.memberId,
       );
-      if (!membership || membership.orgId !== req.params.orgId) {
-        return res.status(404).json({ message: "Org member not found" });
+      if (!membership || membership.orgId !== resolvedOrgId) {
+        return res.status(404).json({ message: "Org team not found" });
       }
 
       await this.orgService.removeOrgMember(req.params.memberId);
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ message: "Failed to remove org member" });
+      res.status(500).json({ message: "Failed to remove org team" });
     }
   }
 }

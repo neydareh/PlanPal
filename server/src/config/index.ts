@@ -22,7 +22,9 @@ export const config = {
     issuerBaseUrl:
       process.env.KINDE_ISSUER_BASE_URL ??
       (process.env.KINDE_DOMAIN
-        ? `https://${process.env.KINDE_DOMAIN}`
+        ? process.env.KINDE_DOMAIN.startsWith("http")
+          ? process.env.KINDE_DOMAIN
+          : `https://${process.env.KINDE_DOMAIN}`
         : undefined),
   },
   database: {

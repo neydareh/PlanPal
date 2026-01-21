@@ -10,9 +10,7 @@ neonConfig.webSocketConstructor = ws;
 
 async function validateSetup() {
   console.log("🔍 Validating system setup...\n");
-
-  // Check environment variables
-  console.log("📝 Checking environment variables:");
+  console.info("📝 Checking environment variables:");
   const requiredEnvVars = [
     "DATABASE_URL",
     "AUTH0_DOMAIN",

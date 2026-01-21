@@ -122,13 +122,12 @@ export const schemas = {
       updatedAt: { type: 'string', format: 'date-time' }
     }
   },
-  OrgMembership: {
+  OrgTeamMembership: {
     type: 'object',
     properties: {
       id: { type: 'string' },
       orgId: { type: 'string' },
-      userId: { type: 'string' },
-      role: { type: 'string', enum: ['admin', 'member'] },
+      teamId: { type: 'string' },
       createdAt: { type: 'string', format: 'date-time' },
       updatedAt: { type: 'string', format: 'date-time' }
     }
@@ -177,17 +176,16 @@ export const schemas = {
   },
   AddOrgMember: {
     type: 'object',
-    required: ['userId', 'role'],
+    required: ['teamId'],
     properties: {
-      userId: { type: 'string' },
-      role: { type: 'string', enum: ['admin', 'member'] }
+      teamId: { type: 'string' }
     }
   },
   UpdateOrgMember: {
     type: 'object',
-    required: ['role'],
+    required: ['teamId'],
     properties: {
-      role: { type: 'string', enum: ['admin', 'member'] }
+      teamId: { type: 'string' }
     }
   },
   AddTeamMember: {

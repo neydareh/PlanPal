@@ -2,12 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@neydareh/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@neydareh/ui";
 import { Button } from "@neydareh/ui";
 import { Input } from "@neydareh/ui";
 import { Label } from "@neydareh/ui";
@@ -28,12 +23,12 @@ import { useOrgContext } from "@/hooks/useOrgContext";
 const songFormSchema = insertSongSchema
   .omit({ orgId: true, createdBy: true })
   .extend({
-  youtubeUrl: z
-    .string()
-    .url("Please enter a valid YouTube URL")
-    .optional()
-    .or(z.literal("")),
-});
+    youtubeUrl: z
+      .string()
+      .url("Please enter a valid YouTube URL")
+      .optional()
+      .or(z.literal("")),
+  });
 
 type SongFormData = z.infer<typeof songFormSchema>;
 
@@ -66,16 +61,12 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
       if (!orgId) {
         throw new Error("Organization required");
       }
-      const response = await apiRequest(
-        "POST",
-        `/api/orgs/${orgId}/songs`,
-        data
-      );
+      const response = await apiRequest("POST", `/api/songs`, data);
       return response.json();
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "songs"],
+        queryKey: ["/api/songs"],
       });
       toast({
         title: "Success",
@@ -93,6 +84,8 @@ export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
   });
 
   const onSubmit = (data: SongFormData) => {
+    if (!user) return;
+
     const songData: InsertSong = {
       title: data.title,
       artist: data.artist || null,

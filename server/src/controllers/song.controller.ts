@@ -10,7 +10,7 @@ export class SongController {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res.status(400).json({ message: "Organization ID was not found" });
       }
 
       const songs = await this.songService.getSongs(orgId);
@@ -24,7 +24,7 @@ export class SongController {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res.status(400).json({ message: "Organization ID was not found" });
       }
 
       // Validate input using the schema
@@ -62,7 +62,7 @@ export class SongController {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res.status(400).json({ message: "Organization ID was not found" });
       }
 
       const song = await this.songService.updateSong(
@@ -80,7 +80,7 @@ export class SongController {
     try {
       const orgId = getOrgIdFromRequest(req);
       if (!orgId) {
-        return res.status(400).json({ message: "Organization ID is required" });
+        return res.status(400).json({ message: "Organization ID was not found" });
       }
 
       await this.songService.deleteSong(orgId, req.params.id);

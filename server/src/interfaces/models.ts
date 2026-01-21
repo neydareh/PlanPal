@@ -1,5 +1,6 @@
 export interface User {
   id: string;
+  authProviderId?: string | null;
   email: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -53,7 +54,7 @@ export interface Blockout {
 export interface Organization {
   id: string;
   name: string;
-  schemaName?: string | null;
+  orgCode?: string | null;
   createdBy: string;
   createdAt: Date | null;
   updatedAt: Date | null;
@@ -68,11 +69,10 @@ export interface Team {
   updatedAt: Date | null;
 }
 
-export interface OrgMembership {
+export interface OrgTeamMembership {
   id: string;
   orgId: string;
-  userId: string;
-  role: "admin" | "member";
+  teamId: string;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -81,7 +81,7 @@ export interface TeamMembership {
   id: string;
   teamId: string;
   userId: string;
-  role: "admin" | "member";
+  // role: "admin" | "member";
   memberFunction:
     | "vocalist"
     | "bass"

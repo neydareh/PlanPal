@@ -6,9 +6,16 @@ type UserRole = (typeof userRoleEnum.enumValues)[number];
 export function requireRoles(roles: UserRole[]) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = (req as any).user.sub;
+      const authProviderId = (req as any).user?.id ?? (req as any).user?.sub;
       const userService = new UserService();
-      const user = await userService.getUser(userId);
+      if (!authProviderId) {
+        return res.status(401).json({
+          message: "Authentication required",
+          code: "AUTH_REQUIRED",
+        });
+      }
+
+      const user = await userService.getOrCreateByAuthProviderId(authProviderId);
 
       if (!user) {
         return res.status(401).json({

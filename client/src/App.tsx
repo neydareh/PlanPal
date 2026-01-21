@@ -33,9 +33,9 @@ function App() {
 }
 
 function AppContent() {
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading, isAuthenticated, isTokenReady } = useAuth();
 
-  if (isLoading) {
+  if (isLoading || (isAuthenticated && !isTokenReady)) {
     return <LoadingSpinner />;
   }
 
@@ -43,42 +43,36 @@ function AppContent() {
     return <Landing />;
   }
 
-  const OrgRedirect = ({
-    target,
-  }: {
-    target: "dashboard" | "calendar" | "songs" | "blockouts";
-  }) => {
-    const { orgId } = useOrgContext();
-    const [, setLocation] = useLocation();
+  // const OrgRedirect = ({
+  //   target,
+  // }: {
+  //   target: "dashboard" | "calendar" | "songs" | "blockouts";
+  // }) => {
+  //   const { orgId } = useOrgContext();
+  //   const [, setLocation] = useLocation();
 
-    if (orgId) {
-      void setLocation(`/orgs/${orgId}/${target}`);
-    } else {
-      void setLocation("/orgs");
-    }
+  //   if (orgId) {
+  //     void setLocation(`/orgs/${orgId}/${target}`);
+  //   } else {
+  //     void setLocation("/orgs");
+  //   }
 
-    return null;
-  };
+  //   return null;
+  // };
 
   return (
     <Switch>
-      <Route path="/" component={() => <OrgRedirect target="dashboard" />} />
-      <Route
-        path="/calendar"
-        component={() => <OrgRedirect target="calendar" />}
-      />
-      <Route path="/songs" component={() => <OrgRedirect target="songs" />} />
-      <Route
-        path="/blockouts"
-        component={() => <OrgRedirect target="blockouts" />}
-      />
+      <Route path="/" component={Home} />
+      <Route path="/calendar" component={Calendar} />
+      <Route path="/songs" component={Songs} />
+      <Route path="/blockouts" component={Blockouts} />
       <Route path="/orgs" component={Orgs} />
       <Route path="/orgs/:orgId" component={OrgDetail} />
-      <Route path="/orgs/:orgId/dashboard" component={Home} />
+      {/* <Route path="/orgs/:orgId/dashboard" component={Home} />
       <Route path="/orgs/:orgId/calendar" component={Calendar} />
       <Route path="/orgs/:orgId/songs" component={Songs} />
       <Route path="/orgs/:orgId/blockouts" component={Blockouts} />
-      <Route path="/orgs/:orgId/teams/:teamId" component={TeamDetail} />
+      <Route path="/orgs/:orgId/teams/:teamId" component={TeamDetail} /> */}
       <Route path="/landing" component={Landing} />
       <Route component={NotFound} />
     </Switch>

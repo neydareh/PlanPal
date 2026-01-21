@@ -11,7 +11,7 @@ import {
 } from "../../src/interfaces/dto";
 import {
   Organization,
-  OrgMembership,
+  OrgTeamMembership,
   Team,
   TeamMembership,
   User,
@@ -20,7 +20,7 @@ import {
 type InMemoryStore = {
   users: User[];
   organizations: Organization[];
-  orgMemberships: OrgMembership[];
+  orgTeamMemberships: OrgTeamMembership[];
   teams: Team[];
   teamMemberships: TeamMembership[];
 };
@@ -39,25 +39,21 @@ export class InMemoryOrgService {
 
     this.store.organizations.push(organization);
 
-    const membership: OrgMembership = {
-      id: crypto.randomUUID(),
-      orgId: organization.id,
-      userId,
-      role: "admin",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.store.orgMemberships.push(membership);
-
     return organization;
   }
 
   async getOrgsForUser(userId: string): Promise<Organization[]> {
-    const orgIds = this.store.orgMemberships
+    const teamIds = this.store.teamMemberships
       .filter((membership) => membership.userId === userId)
-      .map((membership) => membership.orgId);
+      .map((membership) => membership.teamId);
 
-    return this.store.organizations.filter((org) => orgIds.includes(org.id));
+    const orgIds = new Set(
+      this.store.teams
+        .filter((team) => teamIds.includes(team.id))
+        .map((team) => team.orgId)
+    );
+
+    return this.store.organizations.filter((org) => orgIds.has(org.id));
   }
 
   async getOrgById(orgId: string) {
@@ -66,7 +62,7 @@ export class InMemoryOrgService {
 
     const teamCount = this.store.teams.filter((team) => team.orgId === orgId)
       .length;
-    const memberCount = this.store.orgMemberships.filter(
+    const memberCount = this.store.orgTeamMemberships.filter(
       (membership) => membership.orgId === orgId
     ).length;
 
@@ -91,7 +87,7 @@ export class InMemoryOrgService {
     this.store.organizations = this.store.organizations.filter(
       (item) => item.id !== orgId
     );
-    this.store.orgMemberships = this.store.orgMemberships.filter(
+    this.store.orgTeamMemberships = this.store.orgTeamMemberships.filter(
       (item) => item.orgId !== orgId
     );
     const teamIds = this.store.teams
@@ -104,65 +100,63 @@ export class InMemoryOrgService {
   }
 
   async listOrgMembers(orgId: string) {
-    return this.store.orgMemberships
+    return this.store.orgTeamMemberships
       .filter((membership) => membership.orgId === orgId)
       .map((membership) => ({
         ...membership,
-        user:
-          this.store.users.find((user) => user.id === membership.userId) ??
-          null,
+        team: this.store.teams.find((team) => team.id === membership.teamId) ?? null,
       }));
   }
 
   async addOrgMember(
     orgId: string,
     memberData: AddOrgMemberDTO
-  ): Promise<OrgMembership> {
-    const existing = this.store.orgMemberships.find(
+  ): Promise<OrgTeamMembership> {
+    const existing = this.store.orgTeamMemberships.find(
       (membership) =>
-        membership.orgId === orgId && membership.userId === memberData.userId
+        membership.orgId === orgId && membership.teamId === memberData.teamId
     );
 
     if (existing) {
       throw new Error("duplicate membership");
     }
 
-    const membership: OrgMembership = {
+    const membership: OrgTeamMembership = {
       id: crypto.randomUUID(),
       orgId,
-      userId: memberData.userId,
-      role: memberData.role,
+      teamId: memberData.teamId,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    this.store.orgMemberships.push(membership);
+    this.store.orgTeamMemberships.push(membership);
     return membership;
   }
 
   async updateOrgMemberRole(
     membershipId: string,
     memberData: UpdateOrgMemberDTO
-  ): Promise<OrgMembership> {
-    const membership = this.store.orgMemberships.find(
+  ): Promise<OrgTeamMembership> {
+    const membership = this.store.orgTeamMemberships.find(
       (item) => item.id === membershipId
     );
     if (!membership) {
       throw new Error("Org member not found");
     }
-    membership.role = memberData.role;
+    membership.teamId = memberData.teamId;
     membership.updatedAt = new Date();
     return membership;
   }
 
   async removeOrgMember(membershipId: string): Promise<void> {
-    this.store.orgMemberships = this.store.orgMemberships.filter(
+    this.store.orgTeamMemberships = this.store.orgTeamMemberships.filter(
       (item) => item.id !== membershipId
     );
   }
 
   async getOrgMemberById(membershipId: string) {
     return (
-      this.store.orgMemberships.find((item) => item.id === membershipId) ?? null
+      this.store.orgTeamMemberships.find((item) => item.id === membershipId) ??
+      null
     );
   }
 
@@ -191,6 +185,13 @@ export class InMemoryTeamService {
       updatedAt: new Date(),
     };
     this.store.teams.push(team);
+    this.store.orgTeamMemberships.push({
+      id: crypto.randomUUID(),
+      orgId,
+      teamId: team.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
     return team;
   }
 
@@ -214,6 +215,9 @@ export class InMemoryTeamService {
 
   async deleteTeam(teamId: string): Promise<void> {
     this.store.teams = this.store.teams.filter((item) => item.id !== teamId);
+    this.store.orgTeamMemberships = this.store.orgTeamMemberships.filter(
+      (membership) => membership.teamId !== teamId
+    );
     this.store.teamMemberships = this.store.teamMemberships.filter(
       (membership) => membership.teamId !== teamId
     );
@@ -300,7 +304,7 @@ export function createInMemoryStore(seed?: {
   return {
     users: seed?.users ?? [],
     organizations: [],
-    orgMemberships: [],
+    orgTeamMemberships: [],
     teams: [],
     teamMemberships: [],
   };

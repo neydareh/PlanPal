@@ -26,20 +26,24 @@ export class TeamController {
     }
 
     try {
-      const userId = (req as any).user?.sub;
-      const fallbackUser = userId
+      const authProviderId = (req as any).user?.id ?? (req as any).user?.sub;
+      const fallbackUser = authProviderId
         ? null
         : await this.userService.getUserByEmail("system@churchflow.com");
 
-      const createdBy = userId ?? fallbackUser?.id;
+      const createdBy = authProviderId
+        ? (await this.userService.getOrCreateByAuthProviderId(authProviderId))
+            .id
+        : fallbackUser?.id;
       if (!createdBy) {
         return res
           .status(400)
           .json({ message: "No user available to create team" });
       }
 
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
       const team = await this.teamService.createTeam(
-        req.params.orgId,
+        resolvedOrgId,
         createdBy,
         validationResult.data
       );
@@ -51,7 +55,8 @@ export class TeamController {
 
   async getTeams(req: Request, res: Response) {
     try {
-      const teams = await this.teamService.getTeamsForOrg(req.params.orgId);
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
+      const teams = await this.teamService.getTeamsForOrg(resolvedOrgId);
       res.json(teams);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch teams" });
@@ -61,7 +66,8 @@ export class TeamController {
   async getTeam(req: Request, res: Response) {
     try {
       const team = await this.teamService.getTeamById(req.params.teamId);
-      if (!team || team.orgId !== req.params.orgId) {
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
+      if (!team || team.orgId !== resolvedOrgId) {
         return res.status(404).json({ message: "Team not found" });
       }
       res.json(team);
@@ -81,7 +87,8 @@ export class TeamController {
 
     try {
       const existingTeam = await this.teamService.getTeamById(req.params.teamId);
-      if (!existingTeam || existingTeam.orgId !== req.params.orgId) {
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
+      if (!existingTeam || existingTeam.orgId !== resolvedOrgId) {
         return res.status(404).json({ message: "Team not found" });
       }
 
@@ -98,7 +105,8 @@ export class TeamController {
   async deleteTeam(req: Request, res: Response) {
     try {
       const team = await this.teamService.getTeamById(req.params.teamId);
-      if (!team || team.orgId !== req.params.orgId) {
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
+      if (!team || team.orgId !== resolvedOrgId) {
         return res.status(404).json({ message: "Team not found" });
       }
       await this.teamService.deleteTeam(req.params.teamId);
