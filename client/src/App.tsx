@@ -74,7 +74,8 @@ function AppContent() {
       <Route path="/orgs/:orgId/calendar" component={Calendar} />
       <Route path="/orgs/:orgId/songs" component={Songs} />
       <Route path="/orgs/:orgId/blockouts" component={Blockouts} />
-      <Route path="/orgs/:orgId/teams/:teamId" component={TeamDetail} /> */}
+       */}
+      <Route path="/orgs/:orgId/teams/:teamId" component={TeamDetail} />
       <Route path="/landing" component={Landing} />
       <Route component={NotFound} />
     </Switch>

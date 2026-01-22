@@ -82,7 +82,7 @@ export class TeamController {
       }
 
       const team = await this.teamService.getTeamById(req.params.teamId);
-      
+
       if (!team || team.orgId !== orgId) {
         return res.status(404).json({ message: "Team not found" });
       }
@@ -158,37 +158,37 @@ export class TeamController {
     }
   }
 
-  // async addTeamMember(req: Request, res: Response) {
-  //   const validationResult = AddTeamMemberSchema.safeParse(req.body);
-  //   if (!validationResult.success) {
-  //     return res.status(400).json({
-  //       message: "Invalid input",
-  //       errors: validationResult.error.errors,
-  //     });
-  //   }
+  async addTeamMember(req: Request, res: Response) {
+    const validationResult = AddTeamMemberSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({
+        message: "Invalid input",
+        errors: validationResult.error.errors,
+      });
+    }
 
-  //   try {
-  //     const team = await this.orgService.ensureTeamInOrg(
-  //       req.params.orgId,
-  //       req.params.teamId
-  //     );
-  //     if (!team) {
-  //       return res.status(404).json({ message: "Team not found" });
-  //     }
+    try {
+      const team = await this.orgService.ensureTeamInOrg(
+        req.params.orgId,
+        req.params.teamId
+      );
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
 
-  //     const member = await this.teamService.addTeamMember(
-  //       req.params.teamId,
-  //       validationResult.data
-  //     );
-  //     res.status(201).json(member);
-  //   } catch (error) {
-  //     if (error instanceof Error && error.message.includes("duplicate")) {
-  //       return res.status(409).json({ message: "Member already exists" });
-  //     }
-  //     console.error(error)
-  //     res.status(500).json({ message: "Failed to add team member" });
-  //   }
-  // }
+      const member = await this.teamService.addTeamMember(
+        req.params.teamId,
+        validationResult.data
+      );
+      res.status(201).json(member);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("duplicate")) {
+        return res.status(409).json({ message: "Member already exists" });
+      }
+      console.error(error)
+      res.status(500).json({ message: "Failed to add team member" });
+    }
+  }
 
   // async updateTeamMember(req: Request, res: Response) {
   //   const validationResult = UpdateTeamMemberSchema.safeParse(req.body);

@@ -212,7 +212,7 @@ export default function TeamDetail() {
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+                {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
                   <Input
                     placeholder="User ID"
                     value={memberUserId}
@@ -232,6 +232,7 @@ export default function TeamDetail() {
                       <SelectItem value="member">Member</SelectItem>
                     </SelectContent>
                   </Select>
+
                   <Select
                     value={memberFunction}
                     onValueChange={(value: (typeof memberFunctions)[number]) =>
@@ -250,7 +251,9 @@ export default function TeamDetail() {
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
+
+
                 <Button
                   onClick={() => {
                     if (!memberUserId.trim()) {
