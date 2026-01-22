@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 
 function getOrgIdFromPath(pathname: string) {
   const match = pathname.match(/^\/orgs\/([^/]+)/);
@@ -8,7 +8,7 @@ function getOrgIdFromPath(pathname: string) {
 }
 
 export function useOrgContext() {
-  const { orgCodes } = useAuth();
+  const { orgCodes } = useAuthContext();
   // const [location] = useLocation();
 
   // const orgIdFromPath = useMemo(

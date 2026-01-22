@@ -1,9 +1,9 @@
 import { Button, Card, CardContent } from "@neydareh/ui";
 import { Church, Calendar, Music, Users } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 
 export default function Landing() {
-  const { login, register } = useAuth();
+  const { login, register } = useAuthContext();
 
   return (
     <div className="min-h-screen bg-linear-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">

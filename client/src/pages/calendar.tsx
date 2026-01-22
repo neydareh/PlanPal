@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
 import CreateEventModal from "@/components/CreateEventModal";
@@ -13,7 +13,7 @@ import { useOrgContext } from "@/hooks/useOrgContext";
 import { Link } from "wouter";
 
 export default function Calendar() {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const { orgId } = useOrgContext();
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);

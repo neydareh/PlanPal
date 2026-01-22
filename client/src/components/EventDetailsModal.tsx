@@ -8,7 +8,7 @@ import { Calendar, Clock, Music, Users, Trash2 } from "lucide-react";
 import type { Event, Song, Blockout } from "@shared/schema";
 import { UserDisplay } from "@/components/UserDisplay";
 import { useOrgContext } from "@/hooks/useOrgContext";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface EventDetailsModalProps {
   isOpen: boolean;
@@ -28,7 +28,7 @@ export default function EventDetailsModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { orgId } = useOrgContext();
-  const { user } = useAuth();
+  const { user } = useAuthContext();
 
   // Fetch event details
   const { data: event, isLoading: eventLoading } = useQuery<Event>({

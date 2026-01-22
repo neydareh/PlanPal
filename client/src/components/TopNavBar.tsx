@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 import {
   Button,
   Select,
@@ -15,7 +15,7 @@ interface TopNavBarProps {
 }
 
 export default function TopNavBar({ title }: TopNavBarProps) {
-  const { user, orgCodes, login } = useAuth();
+  const { user, orgCodes, login } = useAuthContext();
   const [isDarkMode, setIsDarkMode] = useState(
     document.documentElement.classList.contains("dark"),
   );

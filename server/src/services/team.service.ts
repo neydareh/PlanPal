@@ -108,6 +108,7 @@ export class TeamService {
         teamId,
         userId: memberData.userId,
         memberFunction: memberData.memberFunction,
+        role: memberData.role ?? "user",
       })
       .returning();
     return membership as TeamMembership;

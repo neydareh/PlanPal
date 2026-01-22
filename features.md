@@ -34,4 +34,6 @@ The application handles event creation and management, worship song libraries wi
 
 **Known Issues**
 - calendar blockout is not showing up in light mode. and the events legend for the dark mode is not visible
-- pairing kinde auth user with db user: when user is created in kinde, user should be added to db
+- pairing kinde auth user with db user: when user is created in kinde, user should be added to db ✅
+- onboard users to team
+  - create an onboarding wizard or some team invitation mechanism

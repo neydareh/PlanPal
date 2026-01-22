@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@neydareh/ui";
@@ -39,7 +39,7 @@ interface AddSongModalProps {
 
 export default function AddSongModal({ isOpen, onClose }: AddSongModalProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const queryClient = useQueryClient();
   const { orgId } = useOrgContext();
 

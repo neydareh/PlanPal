@@ -7,6 +7,7 @@ const userService = new UserService();
 const userController = new UserController(userService);
 
 router.get("/current", (req, res) => userController.getCurrentUser(req, res));
+router.post("/current", (req, res) => userController.pairCurrentUser(req, res));
 router.get("/", (req, res) => userController.getUsers(req, res));
 router.get("/:id", (req, res) => userController.getUser(req, res));
 router.put("/:id", (req, res) => userController.updateUser(req, res));

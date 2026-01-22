@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
 import {
@@ -43,7 +43,7 @@ export default function CreateEventModal({
   onClose,
 }: CreateEventModalProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const queryClient = useQueryClient();
   const [selectedSongs, setSelectedSongs] = useState<string[]>([]);
   const { orgId } = useOrgContext();

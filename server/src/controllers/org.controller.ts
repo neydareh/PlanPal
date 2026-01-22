@@ -76,8 +76,14 @@ export class OrgController {
 
   async getOrg(req: Request, res: Response) {
     try {
-      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
-      const org = await this.orgService.getOrgById(resolvedOrgId);
+      const orgId = getOrgIdFromRequest(req);
+      if (!orgId && orgId != "") {
+        return res
+          .status(400)
+          .json({ message: "Organization ID was not found" });
+      }
+
+      const org = await this.orgService.getOrgById(orgId);
       if (!org) {
         return res.status(404).json({ message: "Organization not found" });
       }
@@ -121,8 +127,6 @@ export class OrgController {
   async getOrgMembers(req: Request, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
-      console.log("orgId => ", orgId);
-
       if (!orgId && orgId != "") {
         return res
           .status(400)

@@ -6,12 +6,8 @@ import { getDb } from "../db";
 export const orgCodeMiddleware = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  // let orgCode = req.params.orgId;
-  // if (!orgCode) {
-  //   return next();
-  // }
   let orgCode = "";
 
   const authHeader = req.header("Authorization");
@@ -21,15 +17,14 @@ export const orgCodeMiddleware = async (
     if (payloadPart) {
       try {
         const payload = JSON.parse(
-          Buffer.from(payloadPart, "base64url").toString("utf8")
+          Buffer.from(payloadPart, "base64url").toString("utf8"),
         );
         const tokenOrgCode = payload?.org_code ?? payload?.orgCode;
         if (typeof tokenOrgCode === "string" && tokenOrgCode) {
           orgCode = tokenOrgCode;
         }
       } catch {
-        // ignore malformed token payload
-        res.status(401).json({ message: "Bad Authorization Header" })
+        res.status(401).json({ message: "Bad Authorization Header" });
       }
     }
   }
@@ -49,7 +44,7 @@ export const orgCodeMiddleware = async (
   }
 
   (req as any).orgId = organization.id;
-  (req as any).orgCode = orgCode;
-  
+  // (req as any).orgCode = orgCode;
+
   return next();
 };

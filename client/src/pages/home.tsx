@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { PaginatedResult } from "@server/utils/pagination";
@@ -9,7 +9,7 @@ import { Event, Song } from "@/types";
 import { Homepage } from "@/components/Homepage";
 
 export default function Home() {
-  const { isLoading, user, orgCodes } = useAuth();
+  const { isLoading, user } = useAuthContext();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
 
   const { isLoading: isLoadingEvents, data: events } = useQuery<

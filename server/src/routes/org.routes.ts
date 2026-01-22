@@ -28,9 +28,9 @@ export function createOrgRoutes(
   //   orgController.createOrg(req, res)
   // );
 
-  // router.get("/:orgId", guards.requireOrgMember(), (req, res) =>
-  //   orgController.getOrg(req, res)
-  // );
+  router.get("/:orgId", (req, res) =>
+    orgController.getOrg(req, res)
+  );
 
   // router.put(
   //   "/:orgId",
@@ -47,12 +47,11 @@ export function createOrgRoutes(
     orgController.getOrgMembers(req, res)
   );
 
-  // router.post(
-  //   "/:orgId/members",
-  //   guards.requireOrgAdmin(),
-  //   validateRequest(AddOrgMemberSchema),
-  //   (req, res) => orgController.addOrgMember(req, res)
-  // );
+  router.post(
+    "/:orgId/members",
+    validateRequest(AddOrgMemberSchema),
+    (req, res) => orgController.addOrgMember(req, res)
+  );
 
   // router.patch(
   //   "/:orgId/members/:memberId",

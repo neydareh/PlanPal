@@ -253,7 +253,7 @@ export default function OrgDetail() {
                 </CardContent>
               </Card>
 
-              <Card className="glass-card">
+              {/* <Card className="glass-card">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <Users className="w-4 h-4 text-primary-500" />
@@ -362,7 +362,7 @@ export default function OrgDetail() {
                     )}
                   </div>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
           </main>
         )}

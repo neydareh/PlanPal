@@ -13,27 +13,29 @@ import Blockouts from "@/pages/blockouts";
 import Orgs from "@/pages/orgs";
 import OrgDetail from "@/pages/org-detail";
 import TeamDetail from "@/pages/team-detail";
-import { useAuth } from "@/hooks/useAuth";
+import { AuthContextProvider, useAuthContext } from "@/context/AuthContext";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { useOrgContext } from "@/hooks/useOrgContext";
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <AppContent />
-          <SpeedInsights />
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <AuthContextProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <AppContent />
+            <SpeedInsights />
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </AuthContextProvider>
   );
 }
 
 function AppContent() {
-  const { isLoading, isAuthenticated, isTokenReady } = useAuth();
+  const { isLoading, isAuthenticated, isTokenReady } = useAuthContext();
 
   if (isLoading || (isAuthenticated && !isTokenReady)) {
     return <LoadingSpinner />;

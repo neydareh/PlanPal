@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 import { useOrgContext } from "@/hooks/useOrgContext";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/Sidebar";
@@ -50,7 +50,7 @@ interface IBlockoutFormData  {
 
 export default function Blockouts() {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const queryClient = useQueryClient();
   const { orgId } = useOrgContext();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

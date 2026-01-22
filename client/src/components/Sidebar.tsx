@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 import { Badge } from "@neydareh/ui";
 import { Button } from "@neydareh/ui";
 import {
@@ -19,7 +19,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ currentPath }: SidebarProps) {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthContext();
   const [isOpen, setIsOpen] = useState(false);
   const [location] = useLocation();
 
@@ -70,7 +70,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     {
       href: "/orgs",
       icon: Users,
-      label: "Manage your orgs",
+      label: "Manage Your Organization",
       adminOnly: true,
     },
   ];
