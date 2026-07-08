@@ -51,6 +51,6 @@ export const config = {
   },
   defaultRateLimit: {
     window: 15 * 60 * 1000, // 15 minutes
-    max: 100, // requests per window
+    max: 1000, // requests per window
   },
 };

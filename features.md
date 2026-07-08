@@ -37,3 +37,4 @@ The application handles event creation and management, worship song libraries wi
 - pairing kinde auth user with db user: when user is created in kinde, user should be added to db ✅
 - onboard users to team
   - create an onboarding wizard or some team invitation mechanism
+- in team members admin page, separate the team members list from the team invites list

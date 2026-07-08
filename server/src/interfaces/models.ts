@@ -81,7 +81,7 @@ export interface TeamMembership {
   id: string;
   teamId: string;
   userId: string;
-  // role: "admin" | "member";
+  role: "admin" | "user";
   memberFunction:
     | "vocalist"
     | "bass"
@@ -89,6 +89,27 @@ export interface TeamMembership {
     | "guitar"
     | "other"
     | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface TeamInvite {
+  id: string;
+  teamId: string;
+  email: string;
+  role: "admin" | "user";
+  memberFunction:
+    | "vocalist"
+    | "bass"
+    | "piano"
+    | "guitar"
+    | "other"
+    | null;
+  message: string | null;
+  tokenHash: string;
+  status: "pending" | "accepted" | "declined" | "expired" | "revoked";
+  expiresAt: Date;
+  createdBy: string;
   createdAt: Date | null;
   updatedAt: Date | null;
 }

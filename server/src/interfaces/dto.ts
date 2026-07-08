@@ -60,6 +60,7 @@ const MemberFunctionSchema = z.enum([
   'guitar',
   'other',
 ]);
+const TeamInviteRoleSchema = z.enum(['admin', 'user']);
 
 export const CreateOrgSchema = z.object({
   name: z.string().min(1).max(120),
@@ -127,6 +128,24 @@ export const UpdateTeamMemberSchema = z
   //   }
   // );
 
+export const CreateTeamInviteSchema = z
+  .object({
+    email: z.string().email(),
+    role: TeamInviteRoleSchema,
+    memberFunction: MemberFunctionSchema.optional(),
+    message: z.string().max(500).optional(),
+    expiresInDays: z.number().int().min(1).max(60).optional(),
+  })
+  .refine(
+    (data) => (data.role === 'admin' ? data.memberFunction === undefined : true),
+    {
+      message: 'memberFunction is only allowed for user role',
+      path: ['memberFunction'],
+    },
+  );
+
+export const AcceptTeamInviteSchema = z.object({});
+
 export type CreateOrgDTO = z.infer<typeof CreateOrgSchema>;
 export type UpdateOrgDTO = z.infer<typeof UpdateOrgSchema>;
 export type CreateTeamDTO = z.infer<typeof CreateTeamSchema>;
@@ -135,3 +154,5 @@ export type AddOrgMemberDTO = z.infer<typeof AddOrgMemberSchema>;
 export type UpdateOrgMemberDTO = z.infer<typeof UpdateOrgMemberSchema>;
 export type AddTeamMemberDTO = z.infer<typeof AddTeamMemberSchema>;
 export type UpdateTeamMemberDTO = z.infer<typeof UpdateTeamMemberSchema>;
+export type CreateTeamInviteDTO = z.infer<typeof CreateTeamInviteSchema>;
+export type AcceptTeamInviteDTO = z.infer<typeof AcceptTeamInviteSchema>;

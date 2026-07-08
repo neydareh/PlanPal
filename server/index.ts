@@ -20,32 +20,6 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// login route
-// app.get("/login", async (_, res) => {
-//   const url = "https://dev-xnai8ncc3612wn4n.us.auth0.com/authorize";
-//   const payload = {
-//     response_type: "code",
-//     client_id: config.auth0.clientId,
-//     redirect_uri: `${config.auth0.baseUrl}/`,
-//     scope: "openid email",
-//     audience: config.auth0.audience,
-//   };
-//   // redirect to url and payload
-//   const params = new URLSearchParams(payload as Record<string, string>);
-//   const redirectUrl = `${url}?${params.toString()}`;
-//   res.redirect(redirectUrl);
-// });
-
-// app.get("/logout", async (_, res) => {
-//   res.redirect(
-//     `https://${config.auth0.domain}/v2/logout?client_id=${
-//       config.auth0.clientId
-//     }&returnTo=${encodeURIComponent(
-//       config.auth0.baseUrl || "http://localhost:5002"
-//     )}`
-//   );
-// });
-
 // Register all routes (including auth routes)
 registerRoutes(app);
 

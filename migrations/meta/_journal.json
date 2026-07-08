@@ -8,6 +8,13 @@
       "when": 1768517293697,
       "tag": "0000_majestic_wildside",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769059187925,
+      "tag": "0001_team_invites",
+      "breakpoints": true
     }
   ]
 }

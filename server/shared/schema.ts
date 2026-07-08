@@ -30,6 +30,13 @@ export const memberFunctionEnum = pgEnum("member_function", [
   "guitar",
   "other",
 ]);
+export const teamInviteStatusEnum = pgEnum("team_invite_status", [
+  "pending",
+  "accepted",
+  "declined",
+  "expired",
+  "revoked",
+]);
 
 export const users = pgTable("users", {
   id: varchar("id")
@@ -112,6 +119,35 @@ export const teamMemberships = pgTable(
   },
   (table) => [
     index("IDX_team_memberships_team_user").on(table.teamId, table.userId),
+  ],
+);
+
+export const teamInvites = pgTable(
+  "team_invites",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    teamId: varchar("team_id")
+      .notNull()
+      .references(() => teams.id),
+    email: varchar("email").notNull(),
+    role: userRoleEnum("role").notNull(),
+    memberFunction: memberFunctionEnum("member_function"),
+    message: text("message"),
+    tokenHash: varchar("token_hash").notNull(),
+    status: teamInviteStatusEnum("status").notNull().default("pending"),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdBy: varchar("created_by")
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("IDX_team_invites_team").on(table.teamId),
+    index("IDX_team_invites_email").on(table.email),
+    index("IDX_team_invites_status").on(table.status),
   ],
 );
 
@@ -344,6 +380,12 @@ export const insertTeamMembershipSchema = createInsertSchema(
   updatedAt: true,
 });
 
+export const insertTeamInviteSchema = createInsertSchema(teamInvites).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Organization = typeof organizations.$inferSelect;
@@ -356,6 +398,8 @@ export type InsertOrgTeamMembership = z.infer<
 >;
 export type TeamMembership = typeof teamMemberships.$inferSelect;
 export type InsertTeamMembership = z.infer<typeof insertTeamMembershipSchema>;
+export type TeamInvite = typeof teamInvites.$inferSelect;
+export type InsertTeamInvite = z.infer<typeof insertTeamInviteSchema>;
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = z.infer<typeof insertEventSchema>;
 export type Song = typeof songs.$inferSelect;

@@ -6,9 +6,12 @@ import { validateRequest } from "../middleware/validation.middleware";
 import {
   AddTeamMemberSchema,
   CreateTeamSchema,
+  CreateTeamInviteSchema,
   UpdateTeamMemberSchema,
   UpdateTeamSchema,
 } from "../interfaces/dto";
+import { TeamInviteController } from "../controllers/team-invite.controller";
+import { TeamInviteService } from "../services/team-invite.service";
 
 type TeamRouteGuards = {
   requireOrgAdmin: (orgIdParam?: string) => any;
@@ -21,6 +24,11 @@ export function createTeamRoutes(
 ) {
   const router = Router();
   const teamController = new TeamController(teamService, orgService);
+  const teamInviteController = new TeamInviteController(
+    new TeamInviteService(),
+    teamService,
+    orgService,
+  );
 
   router.get("/:orgId/teams", (req, res) => teamController.getTeams(req, res));
   // router.post(
@@ -44,6 +52,18 @@ export function createTeamRoutes(
 
   router.get("/:orgId/teams/:teamId/members", (req, res) =>
     teamController.getTeamMembers(req, res),
+  );
+
+  router.get("/:orgId/teams/:teamId/invites", (req, res) =>
+    teamInviteController.listInvites(req, res),
+  );
+  router.post(
+    "/:orgId/teams/:teamId/invites",
+    validateRequest(CreateTeamInviteSchema),
+    (req, res) => teamInviteController.createInvite(req, res),
+  );
+  router.post("/:orgId/teams/:teamId/invites/:inviteId/regenerate", (req, res) =>
+    teamInviteController.regenerateInvite(req, res),
   );
   // router.post(
   //   "/:orgId/teams/:teamId/members",

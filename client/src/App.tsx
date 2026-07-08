@@ -13,6 +13,7 @@ import Blockouts from "@/pages/blockouts";
 import Orgs from "@/pages/orgs";
 import OrgDetail from "@/pages/org-detail";
 import TeamDetail from "@/pages/team-detail";
+import Invite from "@/pages/invite";
 import { AuthContextProvider, useAuthContext } from "@/context/AuthContext";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -76,6 +77,7 @@ function AppContent() {
       <Route path="/orgs/:orgId/blockouts" component={Blockouts} />
        */}
       <Route path="/orgs/:orgId/teams/:teamId" component={TeamDetail} />
+      <Route path="/invites/:token" component={Invite} />
       <Route path="/landing" component={Landing} />
       <Route component={NotFound} />
     </Switch>

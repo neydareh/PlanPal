@@ -114,6 +114,18 @@ export class TeamService {
     return membership as TeamMembership;
   }
 
+  async isTeamAdmin(teamId: string, userId: string): Promise<boolean> {
+    const db = getDb();
+    const membership = await db.query.teamMemberships.findFirst({
+      where: and(
+        eq(teamMemberships.teamId, teamId),
+        eq(teamMemberships.userId, userId)
+      ),
+    });
+
+    return membership?.role === "admin";
+  }
+
   // async updateTeamMember(
   //   membershipId: string,
   //   memberData: UpdateTeamMemberDTO
