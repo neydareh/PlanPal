@@ -17,42 +17,42 @@ export class TeamController {
     private userService: UserService = new UserService(),
   ) {}
 
-  // async createTeam(req: Request, res: Response) {
-  //   const validationResult = CreateTeamSchema.safeParse(req.body);
-  //   if (!validationResult.success) {
-  //     return res.status(400).json({
-  //       message: "Invalid input",
-  //       errors: validationResult.error.errors,
-  //     });
-  //   }
+  async createTeam(req: Request, res: Response) {
+    const validationResult = CreateTeamSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({
+        message: "Invalid input",
+        errors: validationResult.error.errors,
+      });
+    }
 
-  //   try {
-  //     const authProviderId = (req as any).user?.id ?? (req as any).user?.sub;
-  //     const fallbackUser = authProviderId
-  //       ? null
-  //       : await this.userService.getUserByEmail("system@churchflow.com");
+    try {
+      const authProviderId = (req as any).user?.id ?? (req as any).user?.sub;
+      const fallbackUser = authProviderId
+        ? null
+        : await this.userService.getUserByEmail("system@churchflow.com");
 
-  //     const createdBy = authProviderId
-  //       ? (await this.userService.getOrCreateByAuthProviderId(authProviderId))
-  //           .id
-  //       : fallbackUser?.id;
-  //     if (!createdBy) {
-  //       return res
-  //         .status(400)
-  //         .json({ message: "No user available to create team" });
-  //     }
+      const createdBy = authProviderId
+        ? (await this.userService.getOrCreateByAuthProviderId(authProviderId))
+            .id
+        : fallbackUser?.id;
+      if (!createdBy) {
+        return res
+          .status(400)
+          .json({ message: "No user available to create team" });
+      }
 
-  //     const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
-  //     const team = await this.teamService.createTeam(
-  //       resolvedOrgId,
-  //       createdBy,
-  //       validationResult.data
-  //     );
-  //     res.status(201).json(team);
-  //   } catch (error) {
-  //     res.status(500).json({ message: "Failed to create team" });
-  //   }
-  // }
+      const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
+      const team = await this.teamService.createTeam(
+        resolvedOrgId,
+        createdBy,
+        validationResult.data
+      );
+      res.status(201).json(team);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create team" });
+    }
+  }
 
   async getTeams(req: Request, res: Response) {
     try {
@@ -190,40 +190,40 @@ export class TeamController {
     }
   }
 
-  // async updateTeamMember(req: Request, res: Response) {
-  //   const validationResult = UpdateTeamMemberSchema.safeParse(req.body);
-  //   if (!validationResult.success) {
-  //     return res.status(400).json({
-  //       message: "Invalid input",
-  //       errors: validationResult.error.errors,
-  //     });
-  //   }
+  async updateTeamMember(req: Request, res: Response) {
+    const validationResult = UpdateTeamMemberSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({
+        message: "Invalid input",
+        errors: validationResult.error.errors,
+      });
+    }
 
-  //   try {
-  //     const team = await this.orgService.ensureTeamInOrg(
-  //       req.params.orgId,
-  //       req.params.teamId
-  //     );
-  //     if (!team) {
-  //       return res.status(404).json({ message: "Team not found" });
-  //     }
+    try {
+      const team = await this.orgService.ensureTeamInOrg(
+        req.params.orgId,
+        req.params.teamId
+      );
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
 
-  //     const membership = await this.teamService.getTeamMemberById(
-  //       req.params.memberId
-  //     );
-  //     if (!membership || membership.teamId !== req.params.teamId) {
-  //       return res.status(404).json({ message: "Team member not found" });
-  //     }
+      const membership = await this.teamService.getTeamMemberById(
+        req.params.memberId
+      );
+      if (!membership || membership.teamId !== req.params.teamId) {
+        return res.status(404).json({ message: "Team member not found" });
+      }
 
-  //     const member = await this.teamService.updateTeamMember(
-  //       req.params.memberId,
-  //       validationResult.data
-  //     );
-  //     res.json(member);
-  //   } catch (error) {
-  //     res.status(500).json({ message: "Failed to update team member" });
-  //   }
-  // }
+      const member = await this.teamService.updateTeamMember(
+        req.params.memberId,
+        validationResult.data
+      );
+      res.json(member);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update team member" });
+    }
+  }
 
   // async removeTeamMember(req: Request, res: Response) {
   //   try {

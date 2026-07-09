@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { OrgController } from "../controllers/org.controller";
 import { OrgService } from "../services/org.service";
+import { UserService } from "../services/user.service";
 import { validateRequest } from "../middleware/validation.middleware";
 import {
   AddOrgMemberSchema,
@@ -17,16 +18,17 @@ type OrgRouteGuards = {
 
 export function createOrgRoutes(
   orgService = new OrgService(),
-  // guards: OrgRouteGuards = { requireOrgAdmin, requireOrgMember }
+  _guards?: OrgRouteGuards,
+  userService = new UserService(),
 ) {
   const router = Router();
-  const orgController = new OrgController(orgService);
+  const orgController = new OrgController(orgService, userService);
 
   router.get("/", (req, res) => orgController.getOrgs(req, res));
 
-  // router.post("/", validateRequest(CreateOrgSchema), (req, res) =>
-  //   orgController.createOrg(req, res)
-  // );
+  router.post("/", validateRequest(CreateOrgSchema), (req, res) =>
+    orgController.createOrg(req, res)
+  );
 
   router.get("/:orgId", (req, res) =>
     orgController.getOrg(req, res)

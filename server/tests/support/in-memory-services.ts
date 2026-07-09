@@ -43,6 +43,13 @@ export class InMemoryOrgService {
   }
 
   async getOrgsForUser(userId: string): Promise<Organization[]> {
+    const orgMap = new Map<string, Organization>();
+    for (const org of this.store.organizations) {
+      if (org.createdBy === userId) {
+        orgMap.set(org.id, org);
+      }
+    }
+
     const teamIds = this.store.teamMemberships
       .filter((membership) => membership.userId === userId)
       .map((membership) => membership.teamId);
@@ -53,7 +60,13 @@ export class InMemoryOrgService {
         .map((team) => team.orgId)
     );
 
-    return this.store.organizations.filter((org) => orgIds.has(org.id));
+    for (const org of this.store.organizations) {
+      if (orgIds.has(org.id)) {
+        orgMap.set(org.id, org);
+      }
+    }
+
+    return Array.from(orgMap.values());
   }
 
   async getOrgById(orgId: string) {
@@ -165,6 +178,35 @@ export class InMemoryOrgService {
       (item) => item.id === teamId && item.orgId === orgId
     );
     return team ?? null;
+  }
+}
+
+export class InMemoryUserService {
+  constructor(private store: InMemoryStore) {}
+
+  async getUserByEmail(email: string): Promise<User | null> {
+    return this.store.users.find((user) => user.email === email) ?? null;
+  }
+
+  async getOrCreateByAuthProviderId(authProviderId: string): Promise<User> {
+    let user = this.store.users.find(
+      (item) => item.authProviderId === authProviderId || item.id === authProviderId
+    );
+    if (user) return user;
+
+    user = {
+      id: crypto.randomUUID(),
+      authProviderId,
+      email: null,
+      firstName: null,
+      lastName: null,
+      profileImageUrl: null,
+      role: "user",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.store.users.push(user);
+    return user;
   }
 }
 

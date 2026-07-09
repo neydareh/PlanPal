@@ -34,6 +34,9 @@ export class OrgService {
 
   async getOrgsForUser(userId: string): Promise<Organization[]> {
     const db = getDb();
+    const createdOrgs = await db.query.organizations.findMany({
+      where: eq(organizations.createdBy, userId),
+    });
     const memberships = await db.query.teamMemberships.findMany({
       where: eq(teamMemberships.userId, userId),
       with: {
@@ -46,6 +49,9 @@ export class OrgService {
     });
 
     const orgMap = new Map<string, Organization>();
+    for (const organization of createdOrgs) {
+      orgMap.set(organization.id, organization as Organization);
+    }
     for (const membership of memberships) {
       const organization = membership.team?.organization;
       if (organization && !orgMap.has(organization.id)) {

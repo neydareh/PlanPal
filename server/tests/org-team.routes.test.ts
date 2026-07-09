@@ -7,6 +7,7 @@ import {
   createInMemoryStore,
   InMemoryOrgService,
   InMemoryTeamService,
+  InMemoryUserService,
 } from "./support/in-memory-services";
 
 type TestUser = {
@@ -59,6 +60,7 @@ describe("Org/Team API flows", function () {
 
     const orgService = new InMemoryOrgService(store);
     const teamService = new InMemoryTeamService(store);
+    const userService = new InMemoryUserService(store);
 
     app = express();
     app.use(express.json());
@@ -75,8 +77,8 @@ describe("Org/Team API flows", function () {
       requireOrgMember: () => (_req: express.Request, _res: express.Response, next: express.NextFunction) => next(),
     };
 
-    app.use("/api/orgs", createOrgRoutes(orgService, noAuth));
-    app.use("/api/orgs", createTeamRoutes(teamService, orgService, noAuth));
+    app.use("/api/orgs", createOrgRoutes(orgService, noAuth, userService as any));
+    app.use("/api/orgs", createTeamRoutes(teamService, orgService, noAuth, userService as any));
   });
 
   after(async () => {
@@ -107,26 +109,22 @@ describe("Org/Team API flows", function () {
 
     createdTeamId = teamResponse.body.id;
 
-    const orgMemberResponse = await request(app)
-      .post(`/api/orgs/${createdOrgId}/members`)
-      .send({ userId: secondaryUser.id, role: "member" })
-      .expect(201);
-
-    createdOrgMemberId = orgMemberResponse.body.id;
-
     const orgMembersResponse = await request(app)
       .get(`/api/orgs/${createdOrgId}/members`)
       .expect(200);
-    const orgMemberIds = orgMembersResponse.body.map((member: any) => member.id);
-    if (!orgMemberIds.includes(createdOrgMemberId)) {
-      throw new Error("Expected org member list to include created member");
+    const orgMember = orgMembersResponse.body.find(
+      (member: any) => member.teamId === createdTeamId
+    );
+    if (!orgMember) {
+      throw new Error("Expected org member list to include created team");
     }
+    createdOrgMemberId = orgMember.id;
 
     const teamMemberResponse = await request(app)
       .post(`/api/orgs/${createdOrgId}/teams/${createdTeamId}/members`)
       .send({
         userId: secondaryUser.id,
-        role: "member",
+        role: "user",
         memberFunction: "vocalist",
       })
       .expect(201);

@@ -126,27 +126,25 @@ export class TeamService {
     return membership?.role === "admin";
   }
 
-  // async updateTeamMember(
-  //   membershipId: string,
-  //   memberData: UpdateTeamMemberDTO
-  // ): Promise<TeamMembership> {
-  //   const db = getDb();
-  //   const updateData = {
-  //     ...memberData,
-  //     memberFunction:
-  //       memberData.role === "admin"
-  //         ? null
-  //         : memberData.memberFunction,
-  //     updatedAt: new Date(),
-  //   };
+  async updateTeamMember(
+    membershipId: string,
+    memberData: UpdateTeamMemberDTO
+  ): Promise<TeamMembership> {
+    const db = getDb();
+    const updateData = {
+      ...memberData,
+      memberFunction:
+        memberData.role === "admin" ? null : memberData.memberFunction,
+      updatedAt: new Date(),
+    };
 
-  //   const [membership] = await db
-  //     .update(teamMemberships)
-  //     .set(updateData)
-  //     .where(eq(teamMemberships.id, membershipId))
-  //     .returning();
-  //   return membership as TeamMembership;
-  // }
+    const [membership] = await db
+      .update(teamMemberships)
+      .set(updateData)
+      .where(eq(teamMemberships.id, membershipId))
+      .returning();
+    return membership as TeamMembership;
+  }
 
   async removeTeamMember(membershipId: string): Promise<void> {
     const db = getDb();

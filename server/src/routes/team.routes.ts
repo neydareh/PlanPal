@@ -12,6 +12,7 @@ import {
 } from "../interfaces/dto";
 import { TeamInviteController } from "../controllers/team-invite.controller";
 import { TeamInviteService } from "../services/team-invite.service";
+import { UserService } from "../services/user.service";
 
 type TeamRouteGuards = {
   requireOrgAdmin: (orgIdParam?: string) => any;
@@ -21,9 +22,11 @@ type TeamRouteGuards = {
 export function createTeamRoutes(
   teamService = new TeamService(),
   orgService = new OrgService(),
+  _guards?: TeamRouteGuards,
+  userService = new UserService(),
 ) {
   const router = Router();
-  const teamController = new TeamController(teamService, orgService);
+  const teamController = new TeamController(teamService, orgService, userService);
   const teamInviteController = new TeamInviteController(
     new TeamInviteService(),
     teamService,
@@ -31,12 +34,11 @@ export function createTeamRoutes(
   );
 
   router.get("/:orgId/teams", (req, res) => teamController.getTeams(req, res));
-  // router.post(
-  //   "/:orgId/teams",
-  //   guards.requireOrgAdmin(),
-  //   validateRequest(CreateTeamSchema),
-  //   (req, res) => teamController.createTeam(req, res)
-  // );
+  router.post(
+    "/:orgId/teams",
+    validateRequest(CreateTeamSchema),
+    (req, res) => teamController.createTeam(req, res)
+  );
   router.get("/:orgId/teams/:teamId", (req, res) =>
     teamController.getTeam(req, res),
   );
@@ -65,18 +67,16 @@ export function createTeamRoutes(
   router.post("/:orgId/teams/:teamId/invites/:inviteId/regenerate", (req, res) =>
     teamInviteController.regenerateInvite(req, res),
   );
-  // router.post(
-  //   "/:orgId/teams/:teamId/members",
-  //   guards.requireOrgAdmin(),
-  //   validateRequest(AddTeamMemberSchema),
-  //   (req, res) => teamController.addTeamMember(req, res)
-  // );
-  // router.patch(
-  //   "/:orgId/teams/:teamId/members/:memberId",
-  //   guards.requireOrgAdmin(),
-  //   validateRequest(UpdateTeamMemberSchema),
-  //   (req, res) => teamController.updateTeamMember(req, res)
-  // );
+  router.post(
+    "/:orgId/teams/:teamId/members",
+    validateRequest(AddTeamMemberSchema),
+    (req, res) => teamController.addTeamMember(req, res)
+  );
+  router.patch(
+    "/:orgId/teams/:teamId/members/:memberId",
+    validateRequest(UpdateTeamMemberSchema),
+    (req, res) => teamController.updateTeamMember(req, res)
+  );
   // router.delete(
   //   "/:orgId/teams/:teamId/members/:memberId",
   //   guards.requireOrgAdmin(),

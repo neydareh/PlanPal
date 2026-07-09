@@ -108,8 +108,8 @@ export const AddTeamMemberSchema = z
 
 export const UpdateTeamMemberSchema = z
   .object({
-    // role: OrgRoleSchema.optional(),
-    // memberFunction: MemberFunctionSchema.optional(),
+    role: UserRoleSchema.optional(),
+    memberFunction: MemberFunctionSchema.optional(),
   })
   // .refine(
   //   (data) =>
