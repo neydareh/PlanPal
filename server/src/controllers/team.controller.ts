@@ -3,7 +3,6 @@ import {
   AddTeamMemberSchema,
   CreateTeamSchema,
   UpdateTeamMemberSchema,
-  UpdateTeamSchema,
 } from "../interfaces/dto";
 import { OrgService } from "../services/org.service";
 import { TeamService } from "../services/team.service";
@@ -57,7 +56,7 @@ export class TeamController {
   async getTeams(req: Request, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
-      if (!orgId && orgId != "") {
+      if (!orgId) {
         return res
           .status(400)
           .json({ message: "Organization ID was not found" });
@@ -75,7 +74,7 @@ export class TeamController {
     try {
       const orgId = getOrgIdFromRequest(req);
       
-      if (!orgId && orgId != "") {
+      if (!orgId) {
         return res
           .status(400)
           .json({ message: "Organization ID was not found" });
@@ -92,51 +91,11 @@ export class TeamController {
     }
   }
 
-  // async updateTeam(req: Request, res: Response) {
-  //   const validationResult = UpdateTeamSchema.safeParse(req.body);
-  //   if (!validationResult.success) {
-  //     return res.status(400).json({
-  //       message: "Invalid input",
-  //       errors: validationResult.error.errors,
-  //     });
-  //   }
-
-  //   try {
-  //     const existingTeam = await this.teamService.getTeamById(req.params.teamId);
-  //     const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
-  //     if (!existingTeam || existingTeam.orgId !== resolvedOrgId) {
-  //       return res.status(404).json({ message: "Team not found" });
-  //     }
-
-  //     const team = await this.teamService.updateTeam(
-  //       req.params.teamId,
-  //       validationResult.data
-  //     );
-  //     res.json(team);
-  //   } catch (error) {
-  //     res.status(500).json({ message: "Failed to update team" });
-  //   }
-  // }
-
-  // async deleteTeam(req: Request, res: Response) {
-  //   try {
-  //     const team = await this.teamService.getTeamById(req.params.teamId);
-  //     const resolvedOrgId = (req as any).orgId ?? req.params.orgId;
-  //     if (!team || team.orgId !== resolvedOrgId) {
-  //       return res.status(404).json({ message: "Team not found" });
-  //     }
-  //     await this.teamService.deleteTeam(req.params.teamId);
-  //     res.status(204).send();
-  //   } catch (error) {
-  //     res.status(500).json({ message: "Failed to delete team" });
-  //   }
-  // }
-
   async getTeamMembers(req: Request, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
 
-      if (!orgId && orgId != "") {
+      if (!orgId) {
         return res
           .status(400)
           .json({ message: "Organization ID was not found" });
@@ -185,7 +144,6 @@ export class TeamController {
       if (error instanceof Error && error.message.includes("duplicate")) {
         return res.status(409).json({ message: "Member already exists" });
       }
-      console.error(error)
       res.status(500).json({ message: "Failed to add team member" });
     }
   }
@@ -225,27 +183,4 @@ export class TeamController {
     }
   }
 
-  // async removeTeamMember(req: Request, res: Response) {
-  //   try {
-  //     const team = await this.orgService.ensureTeamInOrg(
-  //       req.params.orgId,
-  //       req.params.teamId
-  //     );
-  //     if (!team) {
-  //       return res.status(404).json({ message: "Team not found" });
-  //     }
-
-  //     const membership = await this.teamService.getTeamMemberById(
-  //       req.params.memberId
-  //     );
-  //     if (!membership || membership.teamId !== req.params.teamId) {
-  //       return res.status(404).json({ message: "Team member not found" });
-  //     }
-
-  //     await this.teamService.removeTeamMember(req.params.memberId);
-  //     res.status(204).send();
-  //   } catch (error) {
-  //     res.status(500).json({ message: "Failed to remove team member" });
-  //   }
-  // }
 }

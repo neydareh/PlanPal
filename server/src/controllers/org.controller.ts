@@ -77,7 +77,7 @@ export class OrgController {
   async getOrg(req: Request, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
-      if (!orgId && orgId != "") {
+      if (!orgId) {
         return res
           .status(400)
           .json({ message: "Organization ID was not found" });
@@ -127,7 +127,7 @@ export class OrgController {
   async getOrgMembers(req: Request, res: Response) {
     try {
       const orgId = getOrgIdFromRequest(req);
-      if (!orgId && orgId != "") {
+      if (!orgId) {
         return res
           .status(400)
           .json({ message: "Organization ID was not found" });

@@ -52,9 +52,9 @@ export class UserService implements IUserService {
   ): Promise<User> {
     const existing = await this.getUserByAuthProviderId(authProviderId);
     const updateData = this.buildAuthUpdateData(userData);
-    const role = userData.role![0].name;
+    const role = userData.role?.[0]?.name ?? "user";
 
-    if (existing) return existing
+    if (existing) return existing;
 
     if (userData.email) {
       const existingByEmail = await this.getUserByEmail(userData.email);
@@ -72,7 +72,7 @@ export class UserService implements IUserService {
       firstName: userData.firstName ?? null,
       lastName: userData.lastName ?? null,
       profileImageUrl: userData.profileImageUrl ?? null,
-      role: role ?? "user",
+      role,
     });
   }
 

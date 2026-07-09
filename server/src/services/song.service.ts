@@ -3,7 +3,6 @@ import { songs } from "server/shared/schema";
 import { Song } from "../interfaces/models";
 import { ISongService } from "../interfaces/services";
 import { getDb } from "../db";
-import { CacheService } from "../utils/cache";
 import { PaginatedResult, paginateResponse } from "../utils/pagination";
 import { CreateSongDTO } from "@server/interfaces/dto";
 
@@ -14,15 +13,6 @@ export class SongService implements ISongService {
     limit: number = 10
   ): Promise<PaginatedResult<Song>> {
     const db = getDb();
-    // const cacheKey = `songs:${orgId}:page:${page}:limit:${limit}`;
-
-    // Try to get from cache
-    // const cached = await CacheService.get<PaginatedResult<Song>>(cacheKey);
-    // if (cached) {
-    //   return cached;
-    // }
-
-    // Get total count
     const countResult = await db
       .select({ count: sql`count(*)` })
       .from(songs)
@@ -42,9 +32,6 @@ export class SongService implements ISongService {
       limit,
       offset: (page - 1) * limit,
     });
-
-    // Cache the results
-    // await CacheService.set(cacheKey, paginatedResult, 300); // Cache for 5 minutes
 
     return paginatedResult;
   }

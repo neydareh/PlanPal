@@ -3,13 +3,14 @@ import { drizzle, type NeonDatabase } from "drizzle-orm/neon-serverless";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { config } from '../config';
 import * as schema from "server/shared/schema";
+import LoggerService from "../utils/logger";
 
 import { neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 
 neonConfig.webSocketConstructor = ws;
 
-const rejectUnauthorized: boolean = !!process.env.NODE_TLS_REJECT_UNAUTHORIZED || false
+const rejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED !== "0";
 
 // Create a connection pool
 export const pool = new Pool({
@@ -28,7 +29,7 @@ pool.on('error', (err) => {
 });
 
 pool.on('connect', () => {
-  console.log('New database connection established');
+  LoggerService.debug('New database connection established');
 });
 
 // Export the drizzle instance

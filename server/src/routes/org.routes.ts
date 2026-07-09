@@ -6,10 +6,7 @@ import { validateRequest } from "../middleware/validation.middleware";
 import {
   AddOrgMemberSchema,
   CreateOrgSchema,
-  UpdateOrgMemberSchema,
-  UpdateOrgSchema,
 } from "../interfaces/dto";
-// import { requireOrgAdmin, requireOrgMember } from "../middleware/org-role.middleware";
 
 type OrgRouteGuards = {
   requireOrgAdmin: (orgIdParam?: string) => any;
@@ -34,17 +31,6 @@ export function createOrgRoutes(
     orgController.getOrg(req, res)
   );
 
-  // router.put(
-  //   "/:orgId",
-  //   guards.requireOrgAdmin(),
-  //   validateRequest(UpdateOrgSchema),
-  //   (req, res) => orgController.updateOrg(req, res)
-  // );
-
-  // router.delete("/:orgId", guards.requireOrgAdmin(), (req, res) =>
-  //   orgController.deleteOrg(req, res)
-  // );
-
   router.get("/:orgId/members", (req, res) =>
     orgController.getOrgMembers(req, res)
   );
@@ -54,17 +40,6 @@ export function createOrgRoutes(
     validateRequest(AddOrgMemberSchema),
     (req, res) => orgController.addOrgMember(req, res)
   );
-
-  // router.patch(
-  //   "/:orgId/members/:memberId",
-  //   guards.requireOrgAdmin(),
-  //   validateRequest(UpdateOrgMemberSchema),
-  //   (req, res) => orgController.updateOrgMember(req, res)
-  // );
-
-  // router.delete("/:orgId/members/:memberId", guards.requireOrgAdmin(), (req, res) =>
-  //   orgController.removeOrgMember(req, res)
-  // );
 
   return router;
 }

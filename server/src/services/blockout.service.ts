@@ -13,24 +13,14 @@ export class BlockoutService implements IBlockoutService {
     limit: number = 10
   ): Promise<PaginatedResult<Blockout>> {
     const db = getDb();
-    // TODO: implement cache in the future
-    // const cacheKey = `blockouts:page:${page}:limit:${limit}`;
-    // Try to get from cache
-    // const cached = await CacheService.get<PaginatedResult<Blockout>>(cacheKey);
-    // if (cached) {
-    //   return cached;
-    // }
-
     const whereConstraint = eq(blockouts.orgId, orgId);
 
-    // Get total count
     const countResult = await db
       .select({ count: sql`count(*)` })
       .from(blockouts)
       .where(whereConstraint);
     const total = Number(countResult[0].count);
 
-    // Get paginated results
     const results = await db.query.blockouts.findMany({
       where: whereConstraint,
       limit,
@@ -44,30 +34,15 @@ export class BlockoutService implements IBlockoutService {
       offset: (page - 1) * limit,
     });
 
-    //TODO: Cache the results
-    // await CacheService.set(cacheKey, paginatedResult, 300); // Cache for 5 minutes
-
     return paginatedResult;
   }
 
   async getBlockout(orgId: string, id: string): Promise<Blockout | null> {
     const db = getDb();
-    // const cacheKey = `blockout:${id}`;
-
-    // Try to get from cache
-    // const cached = await CacheService.get<Blockout>(cacheKey);
-    // if (cached) {
-    //   return cached;
-    // }
 
     const result = await db.query.blockouts.findFirst({
       where: and(eq(blockouts.id, id), eq(blockouts.orgId, orgId)),
     });
-
-    if (result) {
-      // Cache the result
-      // await CacheService.set(cacheKey, result, 300); // Cache for 5 minutes
-    }
 
     return result as Blockout | null;
   }

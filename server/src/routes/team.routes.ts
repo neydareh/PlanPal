@@ -8,7 +8,6 @@ import {
   CreateTeamSchema,
   CreateTeamInviteSchema,
   UpdateTeamMemberSchema,
-  UpdateTeamSchema,
 } from "../interfaces/dto";
 import { TeamInviteController } from "../controllers/team-invite.controller";
 import { TeamInviteService } from "../services/team-invite.service";
@@ -42,15 +41,6 @@ export function createTeamRoutes(
   router.get("/:orgId/teams/:teamId", (req, res) =>
     teamController.getTeam(req, res),
   );
-  // router.put(
-  //   "/:orgId/teams/:teamId",
-  //   guards.requireOrgAdmin(),
-  //   validateRequest(UpdateTeamSchema),
-  //   (req, res) => teamController.updateTeam(req, res)
-  // );
-  // router.delete("/:orgId/teams/:teamId", guards.requireOrgAdmin(), (req, res) =>
-  //   teamController.deleteTeam(req, res)
-  // );
 
   router.get("/:orgId/teams/:teamId/members", (req, res) =>
     teamController.getTeamMembers(req, res),
@@ -77,11 +67,6 @@ export function createTeamRoutes(
     validateRequest(UpdateTeamMemberSchema),
     (req, res) => teamController.updateTeamMember(req, res)
   );
-  // router.delete(
-  //   "/:orgId/teams/:teamId/members/:memberId",
-  //   guards.requireOrgAdmin(),
-  //   (req, res) => teamController.removeTeamMember(req, res)
-  // );
 
   return router;
 }

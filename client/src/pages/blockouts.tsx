@@ -325,23 +325,18 @@ export default function Blockouts() {
                               <SelectValue placeholder="Select a user" />
                             </SelectTrigger>
                             <SelectContent>
-                              {memberData?.map((member) => {
-                                console.log("member => ", member);
-                                return (
-                                  <SelectItem
-                                    key={member.id}
-                                    value={
-                                      member.userId?.toString() ?? member.id
-                                    }
-                                  >
-                                    {member.user?.firstName ?? "Member"}{" "}
-                                    {member.user?.lastName ?? ""}{" "}
-                                    {member.user?.email
-                                      ? `(${member.user.email})`
-                                      : ""}
-                                  </SelectItem>
-                                );
-                              })}
+                              {memberData?.map((member) => (
+                                <SelectItem
+                                  key={member.id}
+                                  value={member.userId?.toString() ?? member.id}
+                                >
+                                  {member.user?.firstName ?? "Member"}{" "}
+                                  {member.user?.lastName ?? ""}{" "}
+                                  {member.user?.email
+                                    ? `(${member.user.email})`
+                                    : ""}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>

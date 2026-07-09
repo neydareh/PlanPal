@@ -1,10 +1,6 @@
 import { Request, Response } from "express";
 import { getDb } from "../db";
 import { sql } from "drizzle-orm";
-// import Redis from "ioredis";
-// import { config } from "../config";
-
-// const redisClient = new Redis(config.redis.url);
 
 export async function healthCheck(req: Request, res: Response) {
   const health = {
@@ -13,12 +9,10 @@ export async function healthCheck(req: Request, res: Response) {
     status: "OK",
     services: {
       database: "unknown",
-      // redis: 'unknown',
     },
   };
 
   try {
-    // Check database
     const db = getDb();
     await db.execute(sql`SELECT 1`);
     health.services.database = "OK";
@@ -27,20 +21,10 @@ export async function healthCheck(req: Request, res: Response) {
     health.status = "ERROR";
   }
 
-  // try {
-  //   // Check Redis
-  //   await redisClient.ping();
-  //   health.services.redis = 'OK';
-  // } catch (error) {
-  //   health.services.redis = 'ERROR';
-  //   health.status = 'ERROR';
-  // }
-
   const httpCode = health.status === "OK" ? 200 : 503;
   res.status(httpCode).json(health);
 }
 
 export async function readinessCheck(req: Request, res: Response) {
-  // Add any additional readiness checks here
   res.status(200).json({ status: "OK" });
 }

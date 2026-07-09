@@ -36,7 +36,7 @@ export class TeamInviteController {
     }
 
     const orgId = getOrgIdFromRequest(req);
-    if (!orgId && orgId != "") {
+    if (!orgId) {
       return res
         .status(400)
         .json({ message: "Organization ID was not found" });
@@ -74,7 +74,7 @@ export class TeamInviteController {
     }
 
     const orgId = getOrgIdFromRequest(req);
-    if (!orgId && orgId != "") {
+    if (!orgId) {
       return res
         .status(400)
         .json({ message: "Organization ID was not found" });
@@ -108,7 +108,7 @@ export class TeamInviteController {
     }
 
     const orgId = getOrgIdFromRequest(req);
-    if (!orgId && orgId != "") {
+    if (!orgId) {
       return res
         .status(400)
         .json({ message: "Organization ID was not found" });

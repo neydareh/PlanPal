@@ -6,10 +6,6 @@ if (!config.kinde.issuerBaseUrl) {
   throw new Error("KINDE_ISSUER_BASE_URL or KINDE_DOMAIN must be set");
 }
 
-// if (!config.kinde.audience) {
-//   throw new Error("KINDE_AUDIENCE must be set");
-// }
-
 const verifier = jwtVerify(config.kinde.issuerBaseUrl, {
   audience: config.kinde.audience ?? "",
 });

@@ -1,4 +1,4 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -17,7 +17,6 @@ import Invite from "@/pages/invite";
 import { AuthContextProvider, useAuthContext } from "@/context/AuthContext";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { useOrgContext } from "@/hooks/useOrgContext";
 
 function App() {
   return (
@@ -46,23 +45,6 @@ function AppContent() {
     return <Landing />;
   }
 
-  // const OrgRedirect = ({
-  //   target,
-  // }: {
-  //   target: "dashboard" | "calendar" | "songs" | "blockouts";
-  // }) => {
-  //   const { orgId } = useOrgContext();
-  //   const [, setLocation] = useLocation();
-
-  //   if (orgId) {
-  //     void setLocation(`/orgs/${orgId}/${target}`);
-  //   } else {
-  //     void setLocation("/orgs");
-  //   }
-
-  //   return null;
-  // };
-
   return (
     <Switch>
       <Route path="/" component={Home} />
@@ -71,11 +53,6 @@ function AppContent() {
       <Route path="/blockouts" component={Blockouts} />
       <Route path="/orgs" component={Orgs} />
       <Route path="/orgs/:orgId" component={OrgDetail} />
-      {/* <Route path="/orgs/:orgId/dashboard" component={Home} />
-      <Route path="/orgs/:orgId/calendar" component={Calendar} />
-      <Route path="/orgs/:orgId/songs" component={Songs} />
-      <Route path="/orgs/:orgId/blockouts" component={Blockouts} />
-       */}
       <Route path="/orgs/:orgId/teams/:teamId" component={TeamDetail} />
       <Route path="/invites/:token" component={Invite} />
       <Route path="/landing" component={Landing} />

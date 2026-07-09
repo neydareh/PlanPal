@@ -13,15 +13,6 @@ export class EventService implements IEventService {
     limit: number = 10
   ): Promise<PaginatedResult<Event>> {
     const db = getDb();
-    // const cacheKey = `events:page:${page}:limit:${limit}`;
-
-    // // Try to get from cache
-    // const cached = await CacheService.get<PaginatedResult<Event>>(cacheKey);
-    // if (cached) {
-    //   return cached;
-    // }
-
-    // Get total count
     const countResult = await db
       .select({ count: sql`count(*)` })
       .from(events)
@@ -42,30 +33,15 @@ export class EventService implements IEventService {
       offset: (page - 1) * limit,
     });
 
-    // Cache the results
-    // await CacheService.set(cacheKey, paginatedResult, 300); // Cache for 5 minutes
-
     return paginatedResult;
   }
 
   async getEvent(orgId: string, id: string): Promise<Event | null> {
     const db = getDb();
-    const cacheKey = `event:${id}`;
-
-    // Try to get from cache
-    // const cached = await CacheService.get<Event>(cacheKey);
-    // if (cached) {
-    //   return cached;
-    // }
 
     const result = await db.query.events.findFirst({
       where: and(eq(events.id, id), eq(events.orgId, orgId)),
     });
-
-    if (result) {
-      // Cache the result
-      // await CacheService.set(cacheKey, result, 300); // Cache for 5 minutes
-    }
 
     return result as Event | null;
   }
