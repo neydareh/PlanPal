@@ -13,7 +13,6 @@ import { config } from "@server/config";
 
 const app = express();
 
-//@ts-expect-error - Add compression middleware
 app.use(compression());
 
 // Body parsing middleware
@@ -28,7 +27,6 @@ if (process.env.NODE_ENV !== "production") {
   // serve swagger ui
   app.use(
     "/api-docs",
-    //@ts-expect-error - swaggerUi serve mismatch
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
       explorer: true,

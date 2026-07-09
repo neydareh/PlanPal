@@ -292,7 +292,7 @@ export class InMemoryTeamService {
       id: crypto.randomUUID(),
       teamId,
       userId: memberData.userId,
-      role: memberData.role,
+      role: memberData.role ?? "user",
       memberFunction:
         memberData.role === "admin" ? null : memberData.memberFunction ?? null,
       createdAt: new Date(),

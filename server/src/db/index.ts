@@ -1,5 +1,5 @@
-import { Pool } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-serverless";
+import { Pool, type PoolClient } from "@neondatabase/serverless";
+import { drizzle, type NeonDatabase } from "drizzle-orm/neon-serverless";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { config } from '../config';
 import * as schema from "server/shared/schema";
@@ -32,12 +32,12 @@ pool.on('connect', () => {
 });
 
 // Export the drizzle instance
-const baseDb = drizzle({ client: pool, schema });
+type Db = NeonDatabase<typeof schema>;
+
+const baseDb: Db = drizzle(pool, { schema });
 export const db = baseDb;
 
-type PoolClient = Awaited<ReturnType<typeof pool.connect>>;
-
-const dbContext = new AsyncLocalStorage<typeof baseDb>();
+const dbContext = new AsyncLocalStorage<Db>();
 
 export const getDb = () => dbContext.getStore() ?? baseDb;
 
@@ -45,7 +45,7 @@ export const withDbClient = async <T>(
   client: PoolClient,
   callback: () => Promise<T>
 ) => {
-  const scopedDb = drizzle({ client, schema });
+  const scopedDb: Db = drizzle(client, { schema });
   return dbContext.run(scopedDb, callback);
 };
 
