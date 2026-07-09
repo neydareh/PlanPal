@@ -6,10 +6,7 @@ PlanPal is a ministry management platform that helps churches streamline schedul
 
 ## Authentication
 
-All API endpoints require authentication. We support two types of authentication:
-
-1. Bearer Token Authentication (for user-facing applications)
-2. API Key Authentication (for service-to-service communication)
+All API endpoints require Kinde bearer token authentication, except health checks.
 
 ### Bearer Token Authentication
 
@@ -18,18 +15,11 @@ Include the JWT token in the Authorization header:
 Authorization: Bearer <your_token>
 ```
 
-### API Key Authentication
-
-<!-- Include your API key in the X-API-Key header:
-```
-X-API-Key: <your_api_key> -->
-```
-
 ## Rate Limiting
 
-- Default rate limit: 100 requests per 15 minutes
-- Authentication endpoints: 5 requests per hour
-- Account creation: 3 accounts per 24 hours
+- Default rate limit: 1000 requests per 15 minutes
+- Authentication endpoints: 100 requests per 15 minutes
+- Account creation: 100 accounts per 24 hours
 
 ## Error Handling
 
@@ -101,12 +91,12 @@ When running in development mode, you can access the interactive API documentati
 
 ### Org scoping
 
-All event, song, and blockout endpoints are org-scoped. Provide the `:orgId` in the URL path. The UI selects the active org from the URL (for example, `/orgs/:orgId/...`) and mirrors the current org in localStorage for the global org switcher.
+Event, song, blockout, org, team, and invite endpoints are org-scoped. The API resolves the active organization from the Kinde JWT `org_code` or `orgCode` claim.
 
 Example:
 
 ```bash
-curl -X GET http://localhost:3000/api/orgs/ORG_ID/events
+curl -H "Authorization: Bearer TOKEN" http://localhost:3000/api/events
 ```
 
 UI paths:
@@ -116,35 +106,65 @@ UI paths:
 - `/orgs/ORG_ID/songs`
 - `/orgs/ORG_ID/blockouts`
 
-### Events (Org-scoped)
+### Events
 
-- `GET /api/orgs/:orgId/events` - List events
-- `POST /api/orgs/:orgId/events` - Create event
-- `PUT /api/orgs/:orgId/events/:id` - Update event
-- `DELETE /api/orgs/:orgId/events/:id` - Delete event
+- `GET /api/events` - List events
+- `POST /api/events` - Create event
+- `GET /api/events/:id` - Get event
+- `PUT /api/events/:id` - Update event
+- `DELETE /api/events/:id` - Delete event
+- `GET /api/events/:id/songs` - List event songs
+- `POST /api/events/:id/songs` - Add song to event
+
+### Organizations
+
+- `GET /api/orgs` - List organizations
+- `POST /api/orgs` - Create organization
+- `GET /api/orgs/:orgId` - Get organization
+- `GET /api/orgs/:orgId/members` - List org teams
+- `POST /api/orgs/:orgId/members` - Add org team
 
 ### Users
 
 - `GET /api/users` - List users
-- `GET /api/users/me` - Get current user
+- `GET /api/users/current` - Get current user
+- `POST /api/users/current` - Pair current Kinde user with local user
 - `GET /api/users/:id` - Get user
 - `PUT /api/users/:id` - Update user
 
-### Songs (Org-scoped)
+### Teams
 
-- `GET /api/orgs/:orgId/songs` - List songs
-- `POST /api/orgs/:orgId/songs` - Create song
-- `PUT /api/orgs/:orgId/songs/:id` - Update song
-- `DELETE /api/orgs/:orgId/songs/:id` - Delete song
+- `GET /api/orgs/:orgId/teams` - List teams
+- `POST /api/orgs/:orgId/teams` - Create team
+- `GET /api/orgs/:orgId/teams/:teamId` - Get team
+- `GET /api/orgs/:orgId/teams/:teamId/members` - List team members
+- `POST /api/orgs/:orgId/teams/:teamId/members` - Add team member
+- `PATCH /api/orgs/:orgId/teams/:teamId/members/:memberId` - Update team member
+- `GET /api/orgs/:orgId/teams/:teamId/invites` - List team invites
+- `POST /api/orgs/:orgId/teams/:teamId/invites` - Create team invite
+- `POST /api/orgs/:orgId/teams/:teamId/invites/:inviteId/regenerate` - Regenerate team invite
 
-### Blockouts (Org-scoped)
+### Invites
 
-- `GET /api/orgs/:orgId/blockouts` - List blockouts
-- `POST /api/orgs/:orgId/blockouts` - Create blockout
-- `GET /api/orgs/:orgId/blockouts/:id` - Get blockout
-- `DELETE /api/orgs/:orgId/blockouts/:id` - Delete blockout
+- `GET /api/invites/:token` - Get invite
+- `POST /api/invites/:token/accept` - Accept invite
+- `POST /api/invites/:token/decline` - Decline invite
+
+### Songs
+
+- `GET /api/songs` - List songs
+- `POST /api/songs` - Create song
+- `PUT /api/songs/:id` - Update song
+- `DELETE /api/songs/:id` - Delete song
+
+### Blockouts
+
+- `GET /api/blockouts` - List blockouts
+- `POST /api/blockouts` - Create blockout
+- `GET /api/blockouts/:id` - Get blockout
+- `DELETE /api/blockouts/:id` - Delete blockout
 
 ## Health Checks
 
-- `GET /health` - Service health status
-- `GET /readiness` - Service readiness status
+- `GET /api/health` - Service health status
+- `GET /api/health/readiness` - Service readiness status

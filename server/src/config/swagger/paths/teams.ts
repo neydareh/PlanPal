@@ -4,7 +4,7 @@ export const teamPaths = {
       summary: 'List teams for org',
       tags: ['Teams'],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } }
+        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
       ],
       responses: {
         200: {
@@ -13,38 +13,38 @@ export const teamPaths = {
             'application/json': {
               schema: {
                 type: 'array',
-                items: { $ref: '#/components/schemas/Team' }
-              }
-            }
-          }
-        }
-      }
+                items: { $ref: '#/components/schemas/Team' },
+              },
+            },
+          },
+        },
+      },
     },
     post: {
       summary: 'Create team',
       tags: ['Teams'],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } }
+        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
       ],
       requestBody: {
         required: true,
         content: {
           'application/json': {
-            schema: { $ref: '#/components/schemas/CreateTeam' }
-          }
-        }
+            schema: { $ref: '#/components/schemas/CreateTeam' },
+          },
+        },
       },
       responses: {
         201: {
           description: 'Team created',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/Team' }
-            }
-          }
-        }
-      }
-    }
+              schema: { $ref: '#/components/schemas/Team' },
+            },
+          },
+        },
+      },
+    },
   },
   '/orgs/{orgId}/teams/{teamId}': {
     get: {
@@ -52,59 +52,20 @@ export const teamPaths = {
       tags: ['Teams'],
       parameters: [
         { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
-        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } }
+        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } },
       ],
       responses: {
         200: {
           description: 'Team detail',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/Team' }
-            }
-          }
+              schema: { $ref: '#/components/schemas/Team' },
+            },
+          },
         },
-        404: { description: 'Team not found' }
-      }
-    },
-    put: {
-      summary: 'Update team',
-      tags: ['Teams'],
-      parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
-        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } }
-      ],
-      requestBody: {
-        required: true,
-        content: {
-          'application/json': {
-            schema: { $ref: '#/components/schemas/UpdateTeam' }
-          }
-        }
+        404: { description: 'Team not found' },
       },
-      responses: {
-        200: {
-          description: 'Team updated',
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/Team' }
-            }
-          }
-        },
-        404: { description: 'Team not found' }
-      }
     },
-    delete: {
-      summary: 'Delete team',
-      tags: ['Teams'],
-      parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
-        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } }
-      ],
-      responses: {
-        204: { description: 'Team deleted' },
-        404: { description: 'Team not found' }
-      }
-    }
   },
   '/orgs/{orgId}/teams/{teamId}/members': {
     get: {
@@ -112,7 +73,7 @@ export const teamPaths = {
       tags: ['Teams'],
       parameters: [
         { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
-        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } }
+        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } },
       ],
       responses: {
         200: {
@@ -121,40 +82,40 @@ export const teamPaths = {
             'application/json': {
               schema: {
                 type: 'array',
-                items: { $ref: '#/components/schemas/TeamMembership' }
-              }
-            }
-          }
-        }
-      }
+                items: { $ref: '#/components/schemas/TeamMembership' },
+              },
+            },
+          },
+        },
+      },
     },
     post: {
       summary: 'Add team member',
       tags: ['Teams'],
       parameters: [
         { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
-        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } }
+        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } },
       ],
       requestBody: {
         required: true,
         content: {
           'application/json': {
-            schema: { $ref: '#/components/schemas/AddTeamMember' }
-          }
-        }
+            schema: { $ref: '#/components/schemas/AddTeamMember' },
+          },
+        },
       },
       responses: {
         201: {
           description: 'Team member added',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/TeamMembership' }
-            }
-          }
+              schema: { $ref: '#/components/schemas/TeamMembership' },
+            },
+          },
         },
-        409: { description: 'Member already exists' }
-      }
-    }
+        409: { description: 'Member already exists' },
+      },
+    },
   },
   '/orgs/{orgId}/teams/{teamId}/members/{memberId}': {
     patch: {
@@ -163,40 +124,97 @@ export const teamPaths = {
       parameters: [
         { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } },
-        { in: 'path', name: 'memberId', required: true, schema: { type: 'string' } }
+        { in: 'path', name: 'memberId', required: true, schema: { type: 'string' } },
       ],
       requestBody: {
         required: true,
         content: {
           'application/json': {
-            schema: { $ref: '#/components/schemas/UpdateTeamMember' }
-          }
-        }
+            schema: { $ref: '#/components/schemas/UpdateTeamMember' },
+          },
+        },
       },
       responses: {
         200: {
           description: 'Team member updated',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/TeamMembership' }
-            }
-          }
+              schema: { $ref: '#/components/schemas/TeamMembership' },
+            },
+          },
         },
-        404: { description: 'Team member not found' }
-      }
+        404: { description: 'Team member not found' },
+      },
     },
-    delete: {
-      summary: 'Remove team member',
-      tags: ['Teams'],
+  },
+  '/orgs/{orgId}/teams/{teamId}/invites': {
+    get: {
+      summary: 'List team invites',
+      tags: ['Team Invites'],
       parameters: [
         { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } },
-        { in: 'path', name: 'memberId', required: true, schema: { type: 'string' } }
       ],
       responses: {
-        204: { description: 'Team member removed' },
-        404: { description: 'Team member not found' }
-      }
-    }
-  }
+        200: {
+          description: 'List of team invites',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'array',
+                items: { $ref: '#/components/schemas/TeamInvite' },
+              },
+            },
+          },
+        },
+      },
+    },
+    post: {
+      summary: 'Create team invite',
+      tags: ['Team Invites'],
+      parameters: [
+        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
+        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/CreateTeamInvite' },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: 'Invite created',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/TeamInviteTokenResponse' },
+            },
+          },
+        },
+      },
+    },
+  },
+  '/orgs/{orgId}/teams/{teamId}/invites/{inviteId}/regenerate': {
+    post: {
+      summary: 'Regenerate team invite',
+      tags: ['Team Invites'],
+      parameters: [
+        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
+        { in: 'path', name: 'teamId', required: true, schema: { type: 'string' } },
+        { in: 'path', name: 'inviteId', required: true, schema: { type: 'string' } },
+      ],
+      responses: {
+        200: {
+          description: 'Invite regenerated',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/TeamInviteTokenResponse' },
+            },
+          },
+        },
+      },
+    },
+  },
 };

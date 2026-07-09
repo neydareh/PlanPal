@@ -1,11 +1,10 @@
 export const eventPaths = {
-  '/orgs/{orgId}/events': {
+  '/events': {
     get: {
       summary: 'List events',
       tags: ['Events'],
-      security: [{ BearerAuth: [] }, { ApiKeyAuth: [] }],
+      security: [{ BearerAuth: [] }],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
         { in: 'query', name: 'limit', schema: { type: 'integer', default: 10, maximum: 100 } }
       ],
@@ -30,9 +29,7 @@ export const eventPaths = {
       summary: 'Create event',
       tags: ['Events'],
       security: [{ BearerAuth: [] }],
-      parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } }
-      ],
+      parameters: [],
       requestBody: {
         required: true,
         content: {
@@ -53,13 +50,31 @@ export const eventPaths = {
       }
     }
   },
-  '/orgs/{orgId}/events/{id}': {
+  '/events/{id}': {
+    get: {
+      summary: 'Get event',
+      tags: ['Events'],
+      security: [{ BearerAuth: [] }],
+      parameters: [
+        { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
+      ],
+      responses: {
+        200: {
+          description: 'Event detail',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/Event' }
+            }
+          }
+        },
+        404: { description: 'Event not found' }
+      }
+    },
     put: {
       summary: 'Update event',
       tags: ['Events'],
       security: [{ BearerAuth: [] }],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
       ],
       requestBody: {
@@ -86,7 +101,6 @@ export const eventPaths = {
       tags: ['Events'],
       security: [{ BearerAuth: [] }],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
       ],
       responses: {
@@ -94,12 +108,11 @@ export const eventPaths = {
       }
     }
   },
-  '/orgs/{orgId}/events/{id}/songs': {
+  '/events/{id}/songs': {
     get: {
       summary: 'List event songs',
       tags: ['Events'],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
       ],
       responses: {
@@ -120,7 +133,6 @@ export const eventPaths = {
       summary: 'Add song to event',
       tags: ['Events'],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
       ],
       requestBody: {

@@ -32,10 +32,12 @@ export const schemas = {
   },
   EventInput: {
     type: 'object',
-    required: ['title', 'date'],
+    required: ['title', 'date', 'createdBy'],
     properties: {
       title: { type: 'string' },
-      date: { type: 'string', format: 'date-time' }
+      description: { type: 'string' },
+      date: { type: 'string', format: 'date-time' },
+      createdBy: { type: 'string' }
     }
   },
   Song: {
@@ -53,19 +55,25 @@ export const schemas = {
   },
   SongInput: {
     type: 'object',
-    required: ['title', 'artist'],
+    required: ['title', 'artist', 'key', 'createdBy'],
     properties: {
       title: { type: 'string' },
       artist: { type: 'string' },
-      key: { type: 'string' }
+      key: { type: 'string' },
+      tempo: { type: 'number', minimum: 20, maximum: 300 },
+      youtubeUrl: { type: 'string', format: 'uri' },
+      createdBy: { type: 'string' }
     }
   },
   User: {
     type: 'object',
     properties: {
       id: { type: 'string' },
+      authProviderId: { type: 'string', nullable: true },
       email: { type: 'string', format: 'email' },
-      name: { type: 'string' },
+      firstName: { type: 'string', nullable: true },
+      lastName: { type: 'string', nullable: true },
+      profileImageUrl: { type: 'string', nullable: true },
       role: { type: 'string', enum: ['admin', 'user'] },
       createdAt: { type: 'string', format: 'date-time' },
       updatedAt: { type: 'string', format: 'date-time' }
@@ -74,7 +82,11 @@ export const schemas = {
   UpdateUser: {
     type: 'object',
     properties: {
-      name: { type: 'string' },
+      authProviderId: { type: 'string' },
+      email: { type: 'string', format: 'email' },
+      firstName: { type: 'string' },
+      lastName: { type: 'string' },
+      profileImageUrl: { type: 'string' },
       role: { type: 'string', enum: ['admin', 'user'] }
     }
   },
@@ -106,6 +118,7 @@ export const schemas = {
     properties: {
       id: { type: 'string' },
       name: { type: 'string' },
+      orgCode: { type: 'string', nullable: true },
       createdBy: { type: 'string' },
       createdAt: { type: 'string', format: 'date-time' },
       updatedAt: { type: 'string', format: 'date-time' }
@@ -138,7 +151,7 @@ export const schemas = {
       id: { type: 'string' },
       teamId: { type: 'string' },
       userId: { type: 'string' },
-      role: { type: 'string', enum: ['admin', 'member'] },
+      role: { type: 'string', enum: ['admin', 'user'] },
       memberFunction: {
         type: 'string',
         enum: ['vocalist', 'bass', 'piano', 'guitar', 'other'],
@@ -152,7 +165,8 @@ export const schemas = {
     type: 'object',
     required: ['name'],
     properties: {
-      name: { type: 'string' }
+      name: { type: 'string' },
+      orgCode: { type: 'string' }
     }
   },
   UpdateOrganization: {
@@ -190,10 +204,10 @@ export const schemas = {
   },
   AddTeamMember: {
     type: 'object',
-    required: ['userId', 'role'],
+    required: ['userId'],
     properties: {
       userId: { type: 'string' },
-      role: { type: 'string', enum: ['admin', 'member'] },
+      role: { type: 'string', enum: ['admin', 'user'] },
       memberFunction: {
         type: 'string',
         enum: ['vocalist', 'bass', 'piano', 'guitar', 'other']
@@ -203,10 +217,68 @@ export const schemas = {
   UpdateTeamMember: {
     type: 'object',
     properties: {
-      role: { type: 'string', enum: ['admin', 'member'] },
+      role: { type: 'string', enum: ['admin', 'user'] },
       memberFunction: {
         type: 'string',
         enum: ['vocalist', 'bass', 'piano', 'guitar', 'other']
+      }
+    }
+  },
+  TeamInvite: {
+    type: 'object',
+    properties: {
+      id: { type: 'string' },
+      teamId: { type: 'string' },
+      email: { type: 'string', format: 'email' },
+      role: { type: 'string', enum: ['admin', 'user'] },
+      memberFunction: {
+        type: 'string',
+        enum: ['vocalist', 'bass', 'piano', 'guitar', 'other'],
+        nullable: true
+      },
+      message: { type: 'string', nullable: true },
+      status: {
+        type: 'string',
+        enum: ['pending', 'accepted', 'declined', 'expired', 'revoked']
+      },
+      expiresAt: { type: 'string', format: 'date-time' },
+      createdBy: { type: 'string' },
+      createdAt: { type: 'string', format: 'date-time' },
+      updatedAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  CreateTeamInvite: {
+    type: 'object',
+    required: ['email', 'role'],
+    properties: {
+      email: { type: 'string', format: 'email' },
+      role: { type: 'string', enum: ['admin', 'user'] },
+      memberFunction: {
+        type: 'string',
+        enum: ['vocalist', 'bass', 'piano', 'guitar', 'other']
+      },
+      message: { type: 'string', maxLength: 500 },
+      expiresInDays: { type: 'integer', minimum: 1, maximum: 60 }
+    }
+  },
+  TeamInviteTokenResponse: {
+    type: 'object',
+    properties: {
+      invite: { $ref: '#/components/schemas/TeamInvite' },
+      token: { type: 'string' }
+    }
+  },
+  TeamInviteLookupResponse: {
+    type: 'object',
+    properties: {
+      invite: { $ref: '#/components/schemas/TeamInvite' },
+      team: {
+        type: 'object',
+        nullable: true,
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string' }
+        }
       }
     }
   }

@@ -1,11 +1,10 @@
 export const songPaths = {
-  '/orgs/{orgId}/songs': {
+  '/songs': {
     get: {
       summary: 'List songs',
       tags: ['Songs'],
-      security: [{ BearerAuth: [] }, { ApiKeyAuth: [] }],
+      security: [{ BearerAuth: [] }],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
         { in: 'query', name: 'limit', schema: { type: 'integer', default: 10, maximum: 100 } }
       ],
@@ -30,9 +29,7 @@ export const songPaths = {
       summary: 'Create song',
       tags: ['Songs'],
       security: [{ BearerAuth: [] }],
-      parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } }
-      ],
+      parameters: [],
       requestBody: {
         required: true,
         content: {
@@ -53,13 +50,12 @@ export const songPaths = {
       }
     }
   },
-  '/orgs/{orgId}/songs/{id}': {
+  '/songs/{id}': {
     put: {
       summary: 'Update song',
       tags: ['Songs'],
       security: [{ BearerAuth: [] }],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
       ],
       requestBody: {
@@ -86,7 +82,6 @@ export const songPaths = {
       tags: ['Songs'],
       security: [{ BearerAuth: [] }],
       parameters: [
-        { in: 'path', name: 'orgId', required: true, schema: { type: 'string' } },
         { in: 'path', name: 'id', required: true, schema: { type: 'string' } }
       ],
       responses: {

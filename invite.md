@@ -4,10 +4,12 @@
 - **Invite record:** `id`, `teamId`, `email`, `role`, `token` (hashed), `status` (pending/accepted/declined/expired), expiresAt, createdBy.
 - **Secure token:** random, unguessable; store hash in DB, send raw token in URL.
 - **Endpoints:**
-  - POST /teams/:teamId/invites (admin only): create invite, email link.
-  - GET /invites/:token: fetch invite details if valid.
-  - POST /invites/:token/accept: accept invite.
-  - POST /invites/:token/decline: decline invite.
+  - GET /api/orgs/:orgId/teams/:teamId/invites (admin only): list team invites.
+  - POST /api/orgs/:orgId/teams/:teamId/invites (admin only): create invite and return the raw token.
+  - POST /api/orgs/:orgId/teams/:teamId/invites/:inviteId/regenerate (admin only): revoke and replace invite token.
+  - GET /api/invites/:token: fetch invite details if valid.
+  - POST /api/invites/:token/accept: accept invite.
+  - POST /api/invites/:token/decline: decline invite.
 
 ## Flow
 1) Admin generates invite for email + role -> system emails invite link.
@@ -27,6 +29,6 @@
 - Role assigned on accept.
 
 ## Implementation checklist
-- Server: Invite model/table + routes + service layer.
-- Client: Invite landing page + auth gate + accept/decline UI.
+- Server: Invite model/table + routes + service layer. ✅
+- Client: Invite landing page + auth gate + accept/decline UI. ✅
 - Email: send invite link.

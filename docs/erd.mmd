@@ -1,6 +1,7 @@
 erDiagram
   users {
     varchar id PK
+    varchar auth_provider_id
     varchar email
     varchar first_name
     varchar last_name
@@ -13,7 +14,7 @@ erDiagram
   organizations {
     varchar id PK
     varchar name
-    varchar schema_name
+    varchar org_code
     varchar created_by FK
     timestamp created_at
     timestamp updated_at
@@ -28,11 +29,10 @@ erDiagram
     timestamp updated_at
   }
 
-  org_memberships {
+  org_team_memberships {
     varchar id PK
     varchar org_id FK
-    varchar user_id FK
-    org_role role
+    varchar team_id FK
     timestamp created_at
     timestamp updated_at
   }
@@ -41,7 +41,7 @@ erDiagram
     varchar id PK
     varchar team_id FK
     varchar user_id FK
-    org_role role
+    user_role role
     member_function member_function
     timestamp created_at
     timestamp updated_at
@@ -81,6 +81,21 @@ erDiagram
     timestamp updated_at
   }
 
+  team_invites {
+    varchar id PK
+    varchar team_id FK
+    varchar email
+    user_role role
+    member_function member_function
+    text message
+    varchar token_hash
+    team_invite_status status
+    timestamp expires_at
+    varchar created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
   event_songs {
     varchar id PK
     varchar event_id FK
@@ -91,19 +106,21 @@ erDiagram
 
   users ||--o{ organizations : created_by
   users ||--o{ teams : created_by
-  users ||--o{ org_memberships : user_id
   users ||--o{ team_memberships : user_id
+  users ||--o{ team_invites : created_by
   users ||--o{ events : created_by
   users ||--o{ songs : created_by
   users ||--o{ blockouts : user_id
 
   organizations ||--o{ teams : org_id
-  organizations ||--o{ org_memberships : org_id
+  organizations ||--o{ org_team_memberships : org_id
   organizations ||--o{ events : org_id
   organizations ||--o{ songs : org_id
   organizations ||--o{ blockouts : org_id
 
+  teams ||--o{ org_team_memberships : team_id
   teams ||--o{ team_memberships : team_id
+  teams ||--o{ team_invites : team_id
 
   events ||--o{ event_songs : event_id
   songs ||--o{ event_songs : song_id

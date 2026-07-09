@@ -4,9 +4,4 @@ export const securitySchemes = {
     scheme: 'bearer',
     bearerFormat: 'JWT',
   },
-  // ApiKeyAuth: {
-  //   type: 'apiKey',
-  //   in: 'header',
-  //   name: 'X-API-Key',
-  // },
 };

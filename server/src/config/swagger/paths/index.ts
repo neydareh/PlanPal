@@ -1,6 +1,7 @@
 import { blockoutPaths } from './blockouts';
 import { eventPaths } from './events';
 import { healthPaths } from './health';
+import { invitePaths } from './invites';
 import { orgPaths } from './orgs';
 import { songPaths } from './songs';
 import { teamPaths } from './teams';
@@ -11,6 +12,7 @@ export const paths = {
   ...songPaths,
   ...userPaths,
   ...healthPaths,
+  ...invitePaths,
   ...blockoutPaths,
   ...orgPaths,
   ...teamPaths,
