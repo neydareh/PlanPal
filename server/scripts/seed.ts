@@ -1,3 +1,4 @@
+/* global console, process */
 import { getDb } from "../src/db";
 import {
   orgTeamMemberships,

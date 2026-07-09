@@ -6,20 +6,14 @@ import {
   Card,
   CardContent,
   Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   useToast,
 } from "@neydareh/ui";
-import { Users, Plus, ArrowRight, Trash2 } from "lucide-react";
+import { Plus, ArrowRight } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useState } from "react";
-import { UserDisplay } from "@/components/UserDisplay";
 
 type Organization = {
   id: string;
@@ -52,8 +46,6 @@ export default function OrgDetail() {
   const orgId = params?.orgId;
 
   const [teamName, setTeamName] = useState("");
-  const [memberUserId, setMemberUserId] = useState("");
-  const [memberRole, setMemberRole] = useState<"admin" | "member">("member");
 
   const { data: org, isLoading: isLoadingOrg } = useQuery<Organization>({
     queryKey: ["/api/orgs", orgId ?? ""],
@@ -93,58 +85,6 @@ export default function OrgDetail() {
     },
     onError: () => {
       toast({ title: "Failed to create team", variant: "destructive" });
-    },
-  });
-
-  const addMemberMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest(
-        "POST",
-        `/api/orgs/${orgId}/members`,
-        { userId: memberUserId, role: memberRole }
-      );
-      return response.json();
-    },
-    onSuccess: () => {
-      setMemberUserId("");
-      setMemberRole("member");
-      void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "members"],
-      });
-      toast({ title: "Member added" });
-    },
-    onError: () => {
-      toast({ title: "Failed to add member", variant: "destructive" });
-    },
-  });
-
-  const updateMemberRoleMutation = useMutation({
-    mutationFn: async (payload: { memberId: string; role: "admin" | "member" }) =>
-      apiRequest(
-        "PATCH",
-        `/api/orgs/${orgId}/members/${payload.memberId}`,
-        { role: payload.role }
-      ),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "members"],
-      });
-    },
-    onError: () => {
-      toast({ title: "Failed to update role", variant: "destructive" });
-    },
-  });
-
-  const removeMemberMutation = useMutation({
-    mutationFn: async (memberId: string) =>
-      apiRequest("DELETE", `/api/orgs/${orgId}/members/${memberId}`),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["/api/orgs", orgId ?? "", "members"],
-      });
-    },
-    onError: () => {
-      toast({ title: "Failed to remove member", variant: "destructive" });
     },
   });
 
@@ -199,7 +139,9 @@ export default function OrgDetail() {
                       <Input
                         placeholder="Team name"
                         value={teamName}
-                        onChange={(event) => setTeamName(event.target.value)}
+                        onChange={(event) => {
+                          setTeamName(event.target.value);
+                        }}
                         className="sm:w-52"
                       />
                       <Button
@@ -252,117 +194,6 @@ export default function OrgDetail() {
                   )}
                 </CardContent>
               </Card>
-
-              {/* <Card className="glass-card">
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Users className="w-4 h-4 text-primary-500" />
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      Members
-                    </h3>
-                  </div>
-
-                  <div className="space-y-3 mb-5">
-                    <Input
-                      placeholder="User ID"
-                      value={memberUserId}
-                      onChange={(event) => setMemberUserId(event.target.value)}
-                    />
-                    <Select
-                      value={memberRole}
-                      onValueChange={(value: "admin" | "member") =>
-                        setMemberRole(value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="member">Member</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      onClick={() => {
-                        if (!memberUserId.trim()) {
-                          toast({
-                            title: "User ID required",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        addMemberMutation.mutate();
-                      }}
-                      disabled={addMemberMutation.isPending}
-                      className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Member
-                    </Button>
-                  </div>
-
-                  <div className="space-y-3">
-                    {members.map((member) => (
-                      <div
-                        key={member.id}
-                        className="border border-gray-200 dark:border-gray-700 rounded-lg p-3"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            {member.user ? (
-                              <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                {member.user.firstName || member.user.email}{" "}
-                                {member.user.lastName || ""}
-                              </div>
-                            ) : (
-                              <UserDisplay
-                                userId={member.userId}
-                                className="text-sm font-medium text-gray-900 dark:text-white"
-                                showEmail
-                              />
-                            )}
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {member.userId}
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeMemberMutation.mutate(member.id)}
-                            disabled={removeMemberMutation.isPending}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        <div className="mt-3">
-                          <Select
-                            value={member.role}
-                            onValueChange={(value: "admin" | "member") =>
-                              updateMemberRoleMutation.mutate({
-                                memberId: member.id,
-                                role: value,
-                              })
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Role" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="admin">Admin</SelectItem>
-                              <SelectItem value="member">Member</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    ))}
-                    {members.length === 0 && (
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        No members yet. Add someone to get started.
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card> */}
             </div>
           </main>
         )}

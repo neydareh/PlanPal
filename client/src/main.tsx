@@ -11,8 +11,13 @@ const kindeRedirectUrl =
 const kindeLogoutUrl =
   import.meta.env.VITE_KINDE_LOGOUT_URL ?? window.location.origin;
 const kindeAudience = import.meta.env.VITE_KINDE_AUDIENCE ?? "";
+const rootElement = document.getElementById("root");
 
-createRoot(document.getElementById("root")!).render(
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+
+createRoot(rootElement).render(
   <KindeProvider
     domain={kindeDomain}
     clientId={kindeClientId}

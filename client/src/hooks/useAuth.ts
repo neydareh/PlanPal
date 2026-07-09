@@ -5,6 +5,18 @@ import { setAuthToken } from "@/lib/authToken";
 import { apiRequest } from "@/lib/queryClient";
 
 export type AppUser = Omit<User, "authProviderId">;
+export type AppAuth = {
+  user: AppUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (options?: { orgCode?: string }) => Promise<void>;
+  register: () => Promise<void>;
+  logout: () => Promise<void>;
+  orgCodes: string[];
+  getToken: () => Promise<string | undefined>;
+  isTokenReady: boolean;
+};
+
 type KindeUser = {
   email?: string | null;
   givenName?: string | null;
@@ -15,7 +27,7 @@ type KindeUser = {
 const normalizeStringArrayClaim = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((item) => typeof item === "string") : [];
 
-export const useAuth = () => {
+export const useAuth = (): AppAuth => {
   const {
     user,
     isAuthenticated,

@@ -29,6 +29,7 @@ export default function EventDetailsModal({
   const queryClient = useQueryClient();
   const { orgId } = useOrgContext();
   const { user } = useAuthContext();
+  const isAdmin = user?.role === "admin";
 
   // Fetch event details
   const { data: event, isLoading: eventLoading } = useQuery<Event>({
@@ -270,7 +271,7 @@ export default function EventDetailsModal({
             </div>
 
             {/* Action Buttons */}
-            {user!.role === "admin" && (
+            {isAdmin && (
               <div className="flex items-center space-x-3 pt-4 border-t border-gray-200 dark:border-gray-600">
                 <Button
                   onClick={handleDelete}
@@ -288,7 +289,7 @@ export default function EventDetailsModal({
               </div>
             )}
 
-            {user!.role !== "admin" && (
+            {!isAdmin && (
               <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-600">
                 <Button variant="ghost" onClick={onClose}>
                   Close

@@ -46,7 +46,9 @@ export default function TopNavBar({ title }: TopNavBarProps) {
           {orgCodes.length > 0 && (
             <Select
               value={orgCodes[0] ?? ""}
-              onValueChange={(value) => void login({ orgCode: value })}
+              onValueChange={(value) => {
+                void login({ orgCode: value });
+              }}
             >
               <SelectTrigger className="w-48 hidden lg:flex">
                 <SelectValue placeholder="Select org" />

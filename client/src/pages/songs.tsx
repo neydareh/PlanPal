@@ -20,7 +20,6 @@ import {
 import { Search, Plus, Play, ExternalLink, Trash2 } from "lucide-react";
 import type { Song } from "@shared/schema";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { useOrgContext } from "@/hooks/useOrgContext";
 
 export default function Songs() {
   const { toast } = useToast();
@@ -111,7 +110,9 @@ export default function Songs() {
                   Song Library
                 </h2>
                 <Button
-                  onClick={() => setIsAddSongModalOpen(true)}
+                  onClick={() => {
+                    setIsAddSongModalOpen(true);
+                  }}
                   className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -126,7 +127,9 @@ export default function Songs() {
                   <Input
                     placeholder="Search songs..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(event) => {
+                      setSearchQuery(event.target.value);
+                    }}
                     className="pl-10"
                   />
                 </div>
@@ -164,7 +167,9 @@ export default function Songs() {
                   </p>
                   {!searchQuery && !keyFilter && (
                     <Button
-                      onClick={() => setIsAddSongModalOpen(true)}
+                      onClick={() => {
+                        setIsAddSongModalOpen(true);
+                      }}
                       className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -202,7 +207,9 @@ export default function Songs() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => deleteSongMutation.mutate(song.id)}
+                              onClick={() => {
+                                deleteSongMutation.mutate(song.id);
+                              }}
                               disabled={deleteSongMutation.isPending}
                             >
                               <Trash2 className="w-4 h-4" />

@@ -25,12 +25,12 @@ export const TeamMemberListCard = ({
   members,
   memberFunctions,
 }: ITeamMemberListCardProps) => {
-  const [_match, params] = useRoute("/orgs/:orgId/teams/:teamId");
+  const [, params] = useRoute("/orgs/:orgId/teams/:teamId");
   const orgId = params?.orgId;
   const teamId = params?.teamId;
 
   const updateMemberMutation = useMutation({
-    mutationFn: async (payload: {
+    mutationFn: (payload: {
       memberId: string;
       role: "admin" | "user";
       memberFunction?: MemberFunction | null;
@@ -56,7 +56,7 @@ export const TeamMemberListCard = ({
   });
 
   const removeMemberMutation = useMutation({
-    mutationFn: async (memberId: string) =>
+    mutationFn: (memberId: string) =>
       apiRequest(
         "DELETE",
         `/api/orgs/${orgId}/teams/${teamId}/members/${memberId}`,
@@ -107,7 +107,9 @@ export const TeamMemberListCard = ({
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => removeMemberMutation.mutate(member.id)}
+                  onClick={() => {
+                    removeMemberMutation.mutate(member.id);
+                  }}
                   disabled={removeMemberMutation.isPending}
                 >
                   Remove Member
@@ -117,7 +119,7 @@ export const TeamMemberListCard = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                 <Select
                   value={member.role}
-                  onValueChange={(value: "admin" | "user") =>
+                  onValueChange={(value: "admin" | "user") => {
                     updateMemberMutation.mutate({
                       memberId: member.id,
                       role: value,
@@ -126,8 +128,8 @@ export const TeamMemberListCard = ({
                           ? null
                           : ((member.memberFunction as MemberFunction | null) ??
                             "vocalist"),
-                    })
-                  }
+                    });
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Role" />

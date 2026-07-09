@@ -88,7 +88,9 @@ export default function Orgs() {
                     <Input
                       placeholder="Organization name"
                       value={orgName}
-                      onChange={(event) => setOrgName(event.target.value)}
+                      onChange={(event) => {
+                        setOrgName(event.target.value);
+                      }}
                       className="sm:w-64"
                     />
                     <Button

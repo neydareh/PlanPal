@@ -28,7 +28,7 @@ const inviteExpirations = [7, 14, 30] as const;
 export const TeamInviteListCard = ({
   memberFunctions,
 }: ITeamInviteListCardProps) => {
-  const [_match, params] = useRoute("/orgs/:orgId/teams/:teamId");
+  const [, params] = useRoute("/orgs/:orgId/teams/:teamId");
   const orgId = params?.orgId;
   const teamId = params?.teamId;
   const { toast } = useToast();
@@ -131,11 +131,15 @@ export const TeamInviteListCard = ({
             <Input
               placeholder="Email"
               value={inviteEmail}
-              onChange={(event) => setInviteEmail(event.target.value)}
+              onChange={(event) => {
+                setInviteEmail(event.target.value);
+              }}
             />
             <Select
               value={inviteRole}
-              onValueChange={(value: "admin" | "user") => setInviteRole(value)}
+              onValueChange={(value: "admin" | "user") => {
+                setInviteRole(value);
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Role" />
@@ -165,11 +169,11 @@ export const TeamInviteListCard = ({
             </Select>
             <Select
               value={String(inviteExpiresInDays)}
-              onValueChange={(value) =>
+              onValueChange={(value) => {
                 setInviteExpiresInDays(
                   Number(value) as (typeof inviteExpirations)[number],
-                )
-              }
+                );
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Expires in" />
@@ -187,7 +191,9 @@ export const TeamInviteListCard = ({
             <Textarea
               placeholder="Optional message"
               value={inviteMessage}
-              onChange={(event) => setInviteMessage(event.target.value)}
+              onChange={(event) => {
+                setInviteMessage(event.target.value);
+              }}
               rows={3}
             />
           </div>
@@ -256,7 +262,9 @@ export const TeamInviteListCard = ({
                         invite.status !== "pending" ||
                         regenerateInviteMutation.isPending
                       }
-                      onClick={() => regenerateInviteMutation.mutate(invite.id)}
+                      onClick={() => {
+                        regenerateInviteMutation.mutate(invite.id);
+                      }}
                     >
                       Regenerate link
                     </Button>

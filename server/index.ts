@@ -1,3 +1,4 @@
+/* global console, process */
 import "dotenv/config";
 import express from "express";
 import compression from "compression";
@@ -9,7 +10,6 @@ import { errorHandler } from "./src/middleware/error.middleware";
 import LoggerService from "./src/utils/logger";
 import { swaggerSpec } from "./src/config/swagger";
 import { registerRoutes } from "./src/routes";
-import { config } from "@server/config";
 
 const app = express();
 

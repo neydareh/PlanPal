@@ -1,4 +1,5 @@
 
+/* global console, process */
 import { getDb } from "../src/db";
 import { users, events, blockouts, organizations } from "../shared/schema";
 import { eq } from "drizzle-orm";

@@ -45,7 +45,9 @@ export default function Invite() {
       const response = await apiRequest("POST", `/api/invites/${token}/accept`);
       return response.json();
     },
-    onSuccess: () => setInviteAction("accepted"),
+    onSuccess: () => {
+      setInviteAction("accepted");
+    },
   });
 
   const declineMutation = useMutation({
@@ -56,7 +58,9 @@ export default function Invite() {
       );
       return response.json();
     },
-    onSuccess: () => setInviteAction("declined"),
+    onSuccess: () => {
+      setInviteAction("declined");
+    },
   });
 
   if (!match) {
@@ -75,8 +79,19 @@ export default function Invite() {
               Please log in or register to view this team invitation.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button onClick={() => login()}>Log in</Button>
-              <Button variant="outline" onClick={() => register()}>
+              <Button
+                onClick={() => {
+                  void login();
+                }}
+              >
+                Log in
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  void register();
+                }}
+              >
                 Register
               </Button>
             </div>
@@ -158,7 +173,9 @@ export default function Invite() {
           ) : (
             <div className="flex flex-wrap gap-3">
               <Button
-                onClick={() => acceptMutation.mutate()}
+                onClick={() => {
+                  acceptMutation.mutate();
+                }}
                 disabled={
                   acceptMutation.isPending || invite.status !== "pending"
                 }
@@ -167,7 +184,9 @@ export default function Invite() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => declineMutation.mutate()}
+                onClick={() => {
+                  declineMutation.mutate();
+                }}
                 disabled={
                   declineMutation.isPending || invite.status !== "pending"
                 }
