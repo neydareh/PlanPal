@@ -1,0 +1,74 @@
+import { Router } from "express";
+import { TeamController } from "../controllers/team.controller";
+import { TeamService } from "../services/team.service";
+import { OrgService } from "../services/org.service";
+import { validateRequest } from "../middleware/validation.middleware";
+import {
+  AddTeamMemberSchema,
+  CreateTeamSchema,
+  CreateTeamInviteSchema,
+  UpdateTeamMemberSchema,
+} from "../interfaces/dto";
+import { TeamInviteController } from "../controllers/team-invite.controller";
+import { TeamInviteService } from "../services/team-invite.service";
+import { UserService } from "../services/user.service";
+
+type TeamRouteGuards = {
+  requireOrgAdmin: (orgIdParam?: string) => any;
+  requireOrgMember: (orgIdParam?: string) => any;
+};
+
+export function createTeamRoutes(
+  teamService = new TeamService(),
+  orgService = new OrgService(),
+  _guards?: TeamRouteGuards,
+  userService = new UserService(),
+) {
+  const router = Router();
+  const teamController = new TeamController(teamService, orgService, userService);
+  const teamInviteController = new TeamInviteController(
+    new TeamInviteService(),
+    teamService,
+    orgService,
+  );
+
+  router.get("/:orgId/teams", (req, res) => teamController.getTeams(req, res));
+  router.post(
+    "/:orgId/teams",
+    validateRequest(CreateTeamSchema),
+    (req, res) => teamController.createTeam(req, res)
+  );
+  router.get("/:orgId/teams/:teamId", (req, res) =>
+    teamController.getTeam(req, res),
+  );
+
+  router.get("/:orgId/teams/:teamId/members", (req, res) =>
+    teamController.getTeamMembers(req, res),
+  );
+
+  router.get("/:orgId/teams/:teamId/invites", (req, res) =>
+    teamInviteController.listInvites(req, res),
+  );
+  router.post(
+    "/:orgId/teams/:teamId/invites",
+    validateRequest(CreateTeamInviteSchema),
+    (req, res) => teamInviteController.createInvite(req, res),
+  );
+  router.post("/:orgId/teams/:teamId/invites/:inviteId/regenerate", (req, res) =>
+    teamInviteController.regenerateInvite(req, res),
+  );
+  router.post(
+    "/:orgId/teams/:teamId/members",
+    validateRequest(AddTeamMemberSchema),
+    (req, res) => teamController.addTeamMember(req, res)
+  );
+  router.patch(
+    "/:orgId/teams/:teamId/members/:memberId",
+    validateRequest(UpdateTeamMemberSchema),
+    (req, res) => teamController.updateTeamMember(req, res)
+  );
+
+  return router;
+}
+
+export const teamRoutes = createTeamRoutes();

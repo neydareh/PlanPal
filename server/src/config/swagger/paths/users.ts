@@ -3,7 +3,7 @@ export const userPaths = {
     get: {
       summary: 'List users',
       tags: ['Users'],
-      security: [{ BearerAuth: [] }, { ApiKeyAuth: [] }],
+      security: [{ BearerAuth: [] }],
       parameters: [
         { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
         { in: 'query', name: 'limit', schema: { type: 'integer', default: 10, maximum: 100 } }
@@ -34,6 +34,21 @@ export const userPaths = {
       responses: {
         200: {
           description: 'Current user details',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/User' }
+            }
+          }
+        }
+      }
+    },
+    post: {
+      summary: 'Pair current Kinde user',
+      tags: ['Users'],
+      security: [{ BearerAuth: [] }],
+      responses: {
+        200: {
+          description: 'Current user paired',
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/User' }

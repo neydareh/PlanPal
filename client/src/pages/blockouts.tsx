@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
+import { useOrgContext } from "@/hooks/useOrgContext";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
@@ -24,54 +25,99 @@ import {
   DialogTitle,
   Badge,
 } from "@neydareh/ui";
-import { CalendarDays, Plus, Edit } from "lucide-react";
+import { CalendarDays, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertBlockoutSchema } from "@shared/schema";
-import type { Blockout, InsertBlockout, User } from "@shared/schema";
+import type { InsertBlockout } from "@shared/schema";
 import { z } from "zod";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { BlockoutUserDisplay } from "@/components/BlockoutUserDisplay";
+import { Blockout } from "@/types/blockout";
+import { Team, TeamMember } from "@/types";
+import { BlockoutCard } from "@/components/BlockoutCard";
 
-const blockoutFormSchema = insertBlockoutSchema.extend({
+const blockoutFormSchema = insertBlockoutSchema.omit({ orgId: true }).extend({
   startDate: z.string(),
   endDate: z.string(),
   userId: z.string().optional(),
 });
 
-type BlockoutFormData = z.infer<typeof blockoutFormSchema>;
+interface IBlockoutFormData {
+  startDate: string;
+  endDate: string;
+  userId: string;
+  reason: string;
+}
 
 export default function Blockouts() {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const queryClient = useQueryClient();
+  const { orgId } = useOrgContext();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingBlockout, setEditingBlockout] = useState<Blockout>();
   const [selectedBlockoutId, setSelectedBlockoutId] = useState<string | null>(
-    null
+    null,
   );
   const [isBlockoutDetailsModalOpen, setIsBlockoutDetailsModalOpen] =
     useState(false);
 
-  // useCallback
   const isUserAdmin = useCallback(() => user?.role === "admin", [user]);
 
-  // Fetch user's blockouts
-  const { data: blockoutData, isLoading: isBlockoutLoading } = useQuery<{ data: Blockout[] }>({
+  const { data: blockoutData, isLoading: isBlockoutLoading } = useQuery<{
+    data: Blockout[];
+  }>({
     queryKey: ["/api/blockouts"],
     retry: false,
   });
 
-  // Fetch users
-  const { data: userData, isLoading: isUserLoading } = useQuery<User[]>({
-    queryKey: ["/api/users"],
+  const { data: teams = [], isLoading: isTeamsLoading } = useQuery<Team[]>({
+    queryKey: ["/api/orgs", orgId ?? "", "teams"],
+    enabled: !!orgId,
     retry: false,
   });
 
+  const { data: memberData = [], isLoading: isMembersLoading } = useQuery<
+    TeamMember[]
+  >({
+    queryKey: [
+      "/api/orgs",
+      orgId ?? "",
+      "teams",
+      "members",
+      teams.map((team) => team.id).join(","),
+    ],
+    enabled: !!orgId && teams.length > 0,
+    queryFn: async () => {
+      const membersByTeam = await Promise.all(
+        teams.map(async (team) => {
+          const response = await apiRequest(
+            "GET",
+            `/api/orgs/${orgId}/teams/${team.id}/members`,
+          );
+          return response.json();
+        }),
+      );
 
+      const uniqueMembers = new Map<string, TeamMember>();
+      for (const teamMembers of membersByTeam) {
+        for (const member of teamMembers as TeamMember[]) {
+          const key = member.userId ?? member.id;
+          if (!uniqueMembers.has(key)) {
+            uniqueMembers.set(key, member);
+          }
+        }
+      }
+
+      return Array.from(uniqueMembers.values());
+    },
+    retry: false,
+  });
+
+  const isTeamMembersLoading = isTeamsLoading || isMembersLoading;
 
   // Form setup
-  const form = useForm<BlockoutFormData>({
+  const form = useForm<IBlockoutFormData>({
     resolver: zodResolver(blockoutFormSchema),
     defaultValues: {
       startDate: "",
@@ -82,15 +128,20 @@ export default function Blockouts() {
 
   // Get blockouts
   const blockouts = blockoutData?.data ?? [];
+  const visibleBlockouts = isUserAdmin()
+    ? blockouts
+    : blockouts.filter((blockout) => blockout.userId === user?.id);
 
   // Create blockout mutation
   const createBlockoutMutation = useMutation({
     mutationFn: async (data: InsertBlockout) => {
-      const response = await apiRequest("POST", "/api/blockouts", data);
+      const response = await apiRequest("POST", `/api/blockouts`, data);
       return response.json();
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/blockouts"],
+      });
       toast({
         title: "Success",
         description: "Blockout created successfully!",
@@ -120,7 +171,9 @@ export default function Blockouts() {
       return response.json();
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/blockouts"],
+      });
       toast({
         title: "Success",
         description: "Blockout updated successfully!",
@@ -143,7 +196,9 @@ export default function Blockouts() {
       await apiRequest("DELETE", `/api/blockouts/${blockoutId}`);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/blockouts"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/blockouts"],
+      });
       toast({
         title: "Success",
         description: "Blockout deleted successfully!",
@@ -158,12 +213,14 @@ export default function Blockouts() {
     },
   });
 
-  const onSubmit = (data: BlockoutFormData) => {
+  const onSubmit = (data: IBlockoutFormData) => {
+    if (!user?.id) return;
+
     const blockoutData: InsertBlockout = {
       startDate: new Date(data.startDate),
       endDate: new Date(data.endDate),
       reason: data.reason,
-      userId: data.userId || user?.id,
+      userId: isUserAdmin() ? data.userId || user.id : user.id,
     };
 
     if (editingBlockout) {
@@ -194,28 +251,20 @@ export default function Blockouts() {
   };
 
   // Sort blockouts by start date
-  const sortedBlockouts = [...blockouts].sort(
-    (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+  const sortedBlockouts = [...visibleBlockouts].sort(
+    (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
   );
-
-  const getFormattedDate = (date: Date) => {
-    // return string in format Nov 26, 2025
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar currentPath="/blockouts" />
+      <Sidebar currentPath={"/blockouts"} />
 
       <div className="lg:ml-64">
-        <TopNavBar title="My Blockouts" />
+        <TopNavBar title="" />
 
-        {isBlockoutLoading && isUserLoading ?
-          <LoadingSpinner /> :
+        {isBlockoutLoading || isTeamMembersLoading ? (
+          <LoadingSpinner />
+        ) : (
           <main className="p-4 lg:p-4 pt-20 lg:pt-6">
             {/* Header */}
             <div className="mb-6">
@@ -223,7 +272,7 @@ export default function Blockouts() {
                 {/* Title */}
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    My Blockouts
+                    {isUserAdmin() ? "Team Blockouts" : "My Blockouts"}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400 mt-1">
                     {isUserAdmin()
@@ -231,6 +280,7 @@ export default function Blockouts() {
                       : "Manage your unavailable dates"}
                   </p>
                 </div>
+
                 {/* Add Blockout Button */}
                 <Button
                   onClick={() => {
@@ -275,12 +325,16 @@ export default function Blockouts() {
                               <SelectValue placeholder="Select a user" />
                             </SelectTrigger>
                             <SelectContent>
-                              {userData?.map((user) => (
+                              {memberData?.map((member) => (
                                 <SelectItem
-                                  key={user.id}
-                                  value={user.id.toString()}
+                                  key={member.id}
+                                  value={member.userId?.toString() ?? member.id}
                                 >
-                                  {user.firstName} {user.lastName} ({user.email})
+                                  {member.user?.firstName ?? "Member"}{" "}
+                                  {member.user?.lastName ?? ""}{" "}
+                                  {member.user?.email
+                                    ? `(${member.user.email})`
+                                    : ""}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -385,70 +439,26 @@ export default function Blockouts() {
                   const isActive =
                     new Date() >= startDate && new Date() <= endDate;
                   const isPast = new Date() > endDate;
-                  // const isFuture = new Date() < startDate;
 
                   return (
-                    <Card
-                      key={blockout.id}
-                      className="glass-card cursor-pointer hover:shadow-lg transition-shadow"
-                      onClick={() => {
-                        setSelectedBlockoutId(blockout.id);
-                        setIsBlockoutDetailsModalOpen(true);
-                      }}
-                    >
-                      <CardContent className="p-4 lg:p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                {getFormattedDate(startDate)} to{" "}
-                                {getFormattedDate(endDate)}
-                              </h3>
-                              <Badge
-                                variant={
-                                  isActive
-                                    ? "destructive"
-                                    : isPast
-                                      ? "secondary"
-                                      : "default"
-                                }
-                              >
-                                {isActive
-                                  ? "Active"
-                                  : isPast
-                                    ? "Past"
-                                    : "Upcoming"}
-                              </Badge>
-                            </div>
-
-                            {blockout.userId && (
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                                Created by <BlockoutUserDisplay userId={blockout.userId} createdAt={blockout.createdAt} />
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(blockout);
-                              }}
-                              disabled={isPast}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <BlockoutCard
+                      blockout={blockout}
+                      isActive={isActive}
+                      isPast={isPast}
+                      startDate={startDate}
+                      endDate={endDate}
+                      handleEdit={handleEdit}
+                      setSelectedBlockoutId={setSelectedBlockoutId}
+                      setIsBlockoutDetailsModalOpen={
+                        setIsBlockoutDetailsModalOpen
+                      }
+                    />
                   );
                 })}
               </div>
             )}
-          </main>}
+          </main>
+        )}
       </div>
 
       <BlockoutDetailsModal

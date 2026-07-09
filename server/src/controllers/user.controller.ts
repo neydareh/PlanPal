@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { UpdateUserDTO } from "../interfaces/dto";
+import { IEnrichedUserData, IUserData } from "../interfaces/services";
 
 export class UserController {
   constructor(private userService: UserService) {}
 
-  async getUsers(req: Request, res: Response) {
+  async getUsers(_req: Request, res: Response) {
     try {
       const users = await this.userService.getUsers();
       res.json(users);
@@ -38,23 +39,35 @@ export class UserController {
 
   async getCurrentUser(req: Request, res: Response) {
     try {
-      // const sessionUser = (req as any).user;
-      
-      // if (!sessionUser) {
-      //   return res.status(401).json({ message: "Not authenticated" });
-      // }
-
-      // // get user email from auth0
-      // const management = authService.getManagementClient();
-      // const response = await management.users.get({ id: sessionUser.sub });
-      const user = await this.userService.getUserByEmail(req.body.email);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
+      const authProviderId = (req as any).user?.id ?? (req as any).user?.sub;
+      if (!authProviderId) {
+        return res.status(401).json({ message: "Not authenticated" });
       }
 
+      const userData = req.body as IUserData;
+      const user =
+        await this.userService.getOrCreateByAuthProviderId(authProviderId);
       res.json(user);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch current user" });
+    }
+  }
+
+  async pairCurrentUser(req: Request, res: Response) {
+    try {
+      const authProviderId = (req as any).user?.id ?? (req as any).user?.sub;
+      if (!authProviderId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const userData = req.body as IEnrichedUserData;
+      const user = await this.userService.createUserFromAuth(
+        authProviderId,
+        userData,
+      );
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to pair current user" });
     }
   }
 }

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="620" viewBox="0 0 980 620" role="img" aria-label="PlanPal entity relationship summary">
+  <style>
+    text { font-family: Arial, sans-serif; fill: #1f2937; }
+    .title { font-size: 24px; font-weight: 700; }
+    .label { font-size: 15px; font-weight: 700; }
+    .body { font-size: 13px; }
+    .box { fill: #f8fafc; stroke: #64748b; stroke-width: 1.5; rx: 6; }
+    .line { stroke: #64748b; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#64748b" />
+    </marker>
+  </defs>
+  <text x="30" y="42" class="title">PlanPal Entity Relationships</text>
+  <text x="30" y="68" class="body">Rendered summary of docs/erd.mmd.</text>
+
+  <rect x="30" y="95" width="190" height="100" class="box" />
+  <text x="48" y="124" class="label">users</text>
+  <text x="48" y="148" class="body">id, auth_provider_id</text>
+  <text x="48" y="168" class="body">email, profile fields</text>
+
+  <rect x="310" y="95" width="210" height="100" class="box" />
+  <text x="328" y="124" class="label">organizations</text>
+  <text x="328" y="148" class="body">id, name, org_code</text>
+  <text x="328" y="168" class="body">created_by -> users</text>
+
+  <rect x="610" y="95" width="190" height="100" class="box" />
+  <text x="628" y="124" class="label">teams</text>
+  <text x="628" y="148" class="body">org_id -> organizations</text>
+  <text x="628" y="168" class="body">created_by -> users</text>
+
+  <rect x="30" y="260" width="210" height="100" class="box" />
+  <text x="48" y="289" class="label">org_team_memberships</text>
+  <text x="48" y="313" class="body">org_id -> organizations</text>
+  <text x="48" y="333" class="body">team_id -> teams</text>
+
+  <rect x="310" y="260" width="210" height="100" class="box" />
+  <text x="328" y="289" class="label">team_memberships</text>
+  <text x="328" y="313" class="body">team_id -> teams</text>
+  <text x="328" y="333" class="body">user_id -> users</text>
+
+  <rect x="610" y="260" width="210" height="100" class="box" />
+  <text x="628" y="289" class="label">team_invites</text>
+  <text x="628" y="313" class="body">team_id -> teams</text>
+  <text x="628" y="333" class="body">created_by -> users</text>
+
+  <rect x="30" y="425" width="190" height="100" class="box" />
+  <text x="48" y="454" class="label">events</text>
+  <text x="48" y="478" class="body">org_id -> organizations</text>
+  <text x="48" y="498" class="body">created_by -> users</text>
+
+  <rect x="310" y="425" width="190" height="100" class="box" />
+  <text x="328" y="454" class="label">songs</text>
+  <text x="328" y="478" class="body">org_id -> organizations</text>
+  <text x="328" y="498" class="body">created_by -> users</text>
+
+  <rect x="590" y="425" width="190" height="100" class="box" />
+  <text x="608" y="454" class="label">blockouts</text>
+  <text x="608" y="478" class="body">org_id -> organizations</text>
+  <text x="608" y="498" class="body">user_id -> users</text>
+
+  <rect x="805" y="425" width="145" height="100" class="box" />
+  <text x="823" y="454" class="label">event_songs</text>
+  <text x="823" y="478" class="body">event_id -> events</text>
+  <text x="823" y="498" class="body">song_id -> songs</text>
+
+  <path d="M220 145 H310" class="line" />
+  <path d="M520 145 H610" class="line" />
+  <path d="M705 195 V260" class="line" />
+  <path d="M610 145 C520 205 230 205 135 260" class="line" />
+  <path d="M415 195 V260" class="line" />
+  <path d="M125 195 V425" class="line" />
+  <path d="M415 195 V425" class="line" />
+  <path d="M705 195 V425" class="line" />
+  <path d="M220 475 H310" class="line" />
+  <path d="M500 475 H805" class="line" />
+</svg>

@@ -10,29 +10,39 @@ import Home from "@/pages/home";
 import Calendar from "@/pages/calendar";
 import Songs from "@/pages/songs";
 import Blockouts from "@/pages/blockouts";
-import { useAuth } from "@/hooks/useAuth";
+import Orgs from "@/pages/orgs";
+import OrgDetail from "@/pages/org-detail";
+import TeamDetail from "@/pages/team-detail";
+import Invite from "@/pages/invite";
+import { AuthContextProvider, useAuthContext } from "@/context/AuthContext";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <AppContent />
-          <SpeedInsights />
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <AuthContextProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <AppContent />
+            <SpeedInsights />
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </AuthContextProvider>
   );
 }
 
 function AppContent() {
-  const { isLoading } = useAuth();
+  const { isLoading, isAuthenticated, isTokenReady } = useAuthContext();
 
-  if (isLoading) {
+  if (isLoading || (isAuthenticated && !isTokenReady)) {
     return <LoadingSpinner />;
+  }
+
+  if (!isAuthenticated) {
+    return <Landing />;
   }
 
   return (
@@ -41,6 +51,10 @@ function AppContent() {
       <Route path="/calendar" component={Calendar} />
       <Route path="/songs" component={Songs} />
       <Route path="/blockouts" component={Blockouts} />
+      <Route path="/orgs" component={Orgs} />
+      <Route path="/orgs/:orgId" component={OrgDetail} />
+      <Route path="/orgs/:orgId/teams/:teamId" component={TeamDetail} />
+      <Route path="/invites/:token" component={Invite} />
       <Route path="/landing" component={Landing} />
       <Route component={NotFound} />
     </Switch>

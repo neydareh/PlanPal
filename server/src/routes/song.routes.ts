@@ -2,7 +2,7 @@ import { SongController } from "@server/controllers/song.controller";
 import { SongService } from "@server/services/song.service";
 import { Router } from "express";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 const songService = new SongService();
 const songController = new SongController(songService);
 

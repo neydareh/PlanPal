@@ -66,9 +66,10 @@ import { CreateEventSchema, UpdateEventSchema } from "../interfaces/dto";
  *           format: date-time
  */
 
-const router = Router();
+const router = Router({ mergeParams: true });
 const eventService = new EventService();
 const eventController = new EventController(eventService);
+
 
 /**
  * @swagger
@@ -113,7 +114,7 @@ const eventController = new EventController(eventService);
  *       403:
  *         description: Insufficient permissions
  */
-router.get("/", (req, res) => {
+router.get<{}>("/", (req, res) => {
   return eventController.getEvents(req, res);
 });
 

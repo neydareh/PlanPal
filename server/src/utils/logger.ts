@@ -33,7 +33,7 @@ export class LoggerService {
   static getRequestContext(req: Request): LogContext {
     return {
       correlationId: (req as any).correlationId,
-      userId: (req as any).user?.sub,
+      userId: (req as any).user?.id ?? (req as any).user?.sub,
       path: req.path,
       method: req.method,
       ip: req.ip,

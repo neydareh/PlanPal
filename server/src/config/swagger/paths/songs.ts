@@ -3,7 +3,7 @@ export const songPaths = {
     get: {
       summary: 'List songs',
       tags: ['Songs'],
-      security: [{ BearerAuth: [] }, { ApiKeyAuth: [] }],
+      security: [{ BearerAuth: [] }],
       parameters: [
         { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
         { in: 'query', name: 'limit', schema: { type: 'integer', default: 10, maximum: 100 } }
@@ -29,6 +29,7 @@ export const songPaths = {
       summary: 'Create song',
       tags: ['Songs'],
       security: [{ BearerAuth: [] }],
+      parameters: [],
       requestBody: {
         required: true,
         content: {

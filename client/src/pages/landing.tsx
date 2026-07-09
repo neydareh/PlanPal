@@ -1,7 +1,10 @@
 import { Button, Card, CardContent } from "@neydareh/ui";
 import { Church, Calendar, Music, Users } from "lucide-react";
+import { useAuthContext } from "@/context/AuthContext";
 
 export default function Landing() {
+  const { login, register } = useAuthContext();
+
   return (
     <div className="min-h-screen bg-linear-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-16">
@@ -96,13 +99,29 @@ export default function Landing() {
                 Join thousands of churches already using ChurchFlow to
                 streamline their ministry operations.
               </p>
-              <Button
-                onClick={() => (window.location.href = "/")}
-                className="w-full bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
-                size="lg"
-              >
-                Enter App
-              </Button>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button
+                  onClick={() => {
+                    void register();
+                  }}
+                  type="button"
+                  className="w-full cursor-pointer bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
+                  size="lg"
+                >
+                  Get Started
+                </Button>
+                <Button
+                  onClick={() => {
+                    void login();
+                  }}
+                  type="button"
+                  variant="outline"
+                  className="w-full cursor-pointer"
+                  size="lg"
+                >
+                  Login
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

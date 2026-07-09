@@ -5,8 +5,9 @@ export const BlockoutUserDisplay = ({ userId, createdAt }: { userId: string, cre
 
   return (
     <span>
-      {user ? `${user.firstName} ${user.lastName}` : "Unknown User"} on{" "}
-      {createdAt ? new Date(createdAt).toLocaleDateString() : "Unknown date"}
+      {user ? `${user.firstName} ${user.lastName}` : "Unknown User"} 
+      {/* on{" "} */}
+      {/* {createdAt ? new Date(createdAt).toLocaleDateString() : "Unknown date"} */}
     </span>
   );
 };

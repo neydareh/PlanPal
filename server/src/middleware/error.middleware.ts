@@ -12,10 +12,8 @@ export function errorHandler(
 ) {
   const context = LoggerService.getRequestContext(req);
 
-  // Log the error
   LoggerService.error(error, context);
 
-  // Handle known errors
   if (error instanceof AppError) {
     return res.status(error.statusCode).json({
       message: error.message,

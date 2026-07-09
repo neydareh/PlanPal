@@ -23,7 +23,7 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Framework**: Express.js with TypeScript for the REST API server
 - **Database Layer**: Drizzle ORM with PostgreSQL for type-safe database operations
-- **Authentication**: Replit Auth integration with OpenID Connect (OIDC)
+- **Authentication**: Kinde Auth integration with OpenID Connect (OIDC)
 - **Session Management**: Express sessions with PostgreSQL session store
 - **API Design**: RESTful endpoints with proper error handling and validation
 
@@ -36,7 +36,7 @@ Preferred communication style: Simple, everyday language.
 - **Sessions**: Built-in session storage table for authentication
 
 ### Authentication System
-- **Provider**: Replit Auth for seamless integration with Replit platform
+- **Provider**: Kinde Auth for hosted OAuth/OIDC sign-in
 - **Session Handling**: Persistent sessions with configurable TTL
 - **Access Control**: Role-based permissions with admin-only features
 - **Security**: HTTPS-only cookies and proper CSRF protection
@@ -54,7 +54,7 @@ Preferred communication style: Simple, everyday language.
 - **Connection Pooling**: @neondatabase/serverless for optimized connections
 
 ### Authentication Services
-- **Replit Auth**: Platform-integrated OAuth with OpenID Connect
+- **Kinde Auth**: Hosted OAuth/OIDC authentication
 - **Session Storage**: PostgreSQL-backed sessions via connect-pg-simple
 
 ### UI/UX Libraries

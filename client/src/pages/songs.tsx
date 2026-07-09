@@ -29,18 +29,26 @@ export default function Songs() {
   const [isAddSongModalOpen, setIsAddSongModalOpen] = useState(false);
 
   const { data, isLoading } = useQuery<{ data: Song[] }>({
-    queryKey: ["/api/songs", searchQuery, keyFilter],
+    queryKey: ["/api/songs"],
     retry: false,
   });
 
-  const songs = data?.data ?? [];
+  const songs = (data?.data ?? []).filter((song) => {
+    const matchesSearch = searchQuery
+      ? song.title.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    const matchesKey = keyFilter ? song.key === keyFilter : true;
+    return matchesSearch && matchesKey;
+  });
 
   const deleteSongMutation = useMutation({
     mutationFn: async (songId: string) => {
       await apiRequest("DELETE", `/api/songs/${songId}`);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/songs"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/songs"],
+      });
       toast({
         title: "Success",
         description: "Song deleted successfully!",
@@ -86,7 +94,7 @@ export default function Songs() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar currentPath="/songs" />
+      <Sidebar currentPath={"/songs"} />
 
       <div className="lg:ml-64">
         <TopNavBar title="Song Library" />
@@ -102,7 +110,9 @@ export default function Songs() {
                   Song Library
                 </h2>
                 <Button
-                  onClick={() => setIsAddSongModalOpen(true)}
+                  onClick={() => {
+                    setIsAddSongModalOpen(true);
+                  }}
                   className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -117,7 +127,9 @@ export default function Songs() {
                   <Input
                     placeholder="Search songs..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(event) => {
+                      setSearchQuery(event.target.value);
+                    }}
                     className="pl-10"
                   />
                 </div>
@@ -155,7 +167,9 @@ export default function Songs() {
                   </p>
                   {!searchQuery && !keyFilter && (
                     <Button
-                      onClick={() => setIsAddSongModalOpen(true)}
+                      onClick={() => {
+                        setIsAddSongModalOpen(true);
+                      }}
                       className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700"
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -193,7 +207,9 @@ export default function Songs() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => deleteSongMutation.mutate(song.id)}
+                              onClick={() => {
+                                deleteSongMutation.mutate(song.id);
+                              }}
                               disabled={deleteSongMutation.isPending}
                             >
                               <Trash2 className="w-4 h-4" />

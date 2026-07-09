@@ -1,18 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@neydareh/ui";
 import { apiRequest } from "@/lib/queryClient";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@neydareh/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@neydareh/ui";
 import { Button } from "@neydareh/ui";
 import { Badge } from "@neydareh/ui";
 import { Calendar, Clock, Music, Users, Trash2 } from "lucide-react";
 import type { Event, Song, Blockout } from "@shared/schema";
 import { UserDisplay } from "@/components/UserDisplay";
+import { useOrgContext } from "@/hooks/useOrgContext";
+import { useAuthContext } from "@/context/AuthContext";
 
 interface EventDetailsModalProps {
   isOpen: boolean;
@@ -30,18 +26,20 @@ export default function EventDetailsModal({
   eventId,
 }: EventDetailsModalProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { orgId } = useOrgContext();
+  const { user } = useAuthContext();
+  const isAdmin = user?.role === "admin";
 
   // Fetch event details
   const { data: event, isLoading: eventLoading } = useQuery<Event>({
     queryKey: ["/api/events", eventId],
     queryFn: async () => {
-      if (!eventId) return null;
+      if (!eventId || !orgId) return null;
       const response = await apiRequest("GET", `/api/events/${eventId}`);
       return response.json();
     },
-    enabled: isOpen && !!eventId,
+    enabled: isOpen && !!eventId && !!orgId,
     retry: false,
   });
 
@@ -49,11 +47,11 @@ export default function EventDetailsModal({
   const { data: eventSongs = [] } = useQuery<EventSongDetails[]>({
     queryKey: ["/api/events", eventId, "songs"],
     queryFn: async () => {
-      if (!eventId) return [];
+      if (!eventId || !orgId) return [];
       const response = await apiRequest("GET", `/api/events/${eventId}/songs`);
       return response.json();
     },
-    enabled: isOpen && !!eventId,
+    enabled: isOpen && !!eventId && !!orgId,
     retry: false,
   });
 
@@ -61,14 +59,14 @@ export default function EventDetailsModal({
   const { data: blockoutsData } = useQuery<{ data: Blockout[] }>({
     queryKey: ["/api/blockouts", event?.date],
     queryFn: async () => {
-      if (!event?.date) return { data: [] };
+      if (!event?.date || !orgId) return { data: [] };
       const response = await apiRequest(
         "GET",
-        "/api/blockouts?page=1&limit=100"
+        `/api/blockouts?page=1&limit=100`,
       );
       return response.json();
     },
-    enabled: isOpen && !!event?.date,
+    enabled: isOpen && !!event?.date && !!orgId,
     retry: false,
   });
 
@@ -77,21 +75,23 @@ export default function EventDetailsModal({
   // Filter blockouts for the event date
   const eventDateBlockouts = event?.date
     ? allBlockouts.filter((blockout) => {
-      const eventDate = new Date(event.date);
-      const start = new Date(blockout.startDate);
-      const end = new Date(blockout.endDate);
-      return eventDate >= start && eventDate <= end;
-    })
+        const eventDate = new Date(event.date);
+        const start = new Date(blockout.startDate);
+        const end = new Date(blockout.endDate);
+        return eventDate >= start && eventDate <= end;
+      })
     : [];
 
   // Delete event mutation
   const deleteEventMutation = useMutation({
     mutationFn: async () => {
-      if (!eventId) return;
-      await apiRequest("DELETE", `/api/events/${eventId}`);
+      if (!eventId || !orgId) return;
+      await apiRequest("DELETE", `/api/orgs/${orgId}/events/${eventId}`);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["/api/events"],
+      });
       toast({
         title: "Success",
         description: "Event deleted successfully!",
@@ -209,7 +209,10 @@ export default function EventDetailsModal({
               ) : (
                 <div className="space-y-2">
                   {eventSongs
-                    .sort((a, b) => parseInt(a.order ?? "0") - parseInt(b.order ?? "0"))
+                    .sort(
+                      (a, b) =>
+                        parseInt(a.order ?? "0") - parseInt(b.order ?? "0"),
+                    )
                     .map((song, index) => (
                       <div
                         key={song.id}
@@ -223,12 +226,8 @@ export default function EventDetailsModal({
                             {song.title}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {song.artist
-                              ? `${song.artist} • `
-                              : ""}
-                            {song.key
-                              ? `Key: ${song.key}`
-                              : "No key specified"}
+                            {song.artist ? `${song.artist} • ` : ""}
+                            {song.key ? `Key: ${song.key}` : "No key specified"}
                           </p>
                         </div>
                       </div>
@@ -272,7 +271,7 @@ export default function EventDetailsModal({
             </div>
 
             {/* Action Buttons */}
-            {user.role === "admin" && (
+            {isAdmin && (
               <div className="flex items-center space-x-3 pt-4 border-t border-gray-200 dark:border-gray-600">
                 <Button
                   onClick={handleDelete}
@@ -290,7 +289,7 @@ export default function EventDetailsModal({
               </div>
             )}
 
-            {user.role !== "admin" && (
+            {!isAdmin && (
               <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-600">
                 <Button variant="ghost" onClick={onClose}>
                   Close

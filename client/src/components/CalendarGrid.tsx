@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { format } from "date-fns";
 
 import { DayEventsModal } from "./DayEventsModal";
+import { AppUser } from "@/hooks/useAuth";
 
 export const CalendarGrid = ({
   events,
@@ -15,7 +16,7 @@ export const CalendarGrid = ({
 }: {
   events: Event[];
   blockouts: Blockout[];
-  user: User;
+  user: AppUser;
   onCreateEventClick: () => void;
   onEventClick?: (eventId: string) => void;
 }) => {

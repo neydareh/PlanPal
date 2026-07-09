@@ -3,7 +3,7 @@ export const blockoutPaths = {
     get: {
       summary: 'List blockouts',
       tags: ['Blockouts'],
-      security: [{ BearerAuth: [] }, { ApiKeyAuth: [] }],
+      security: [{ BearerAuth: [] }],
       parameters: [
         { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
         { in: 'query', name: 'limit', schema: { type: 'integer', default: 10, maximum: 100 } }
@@ -29,6 +29,7 @@ export const blockoutPaths = {
       summary: 'Create blockout',
       tags: ['Blockouts'],
       security: [{ BearerAuth: [] }],
+      parameters: [],
       requestBody: {
         required: true,
         content: {

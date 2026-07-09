@@ -16,13 +16,24 @@ export interface IEventData {
 }
 
 export interface IEventService {
-  getEvents(page?: number, limit?: number): Promise<PaginatedResult<Event>>;
-  getEvent(id: string): Promise<Event | null>;
-  updateEvent(id: string, eventData: UpdateEventDTO): Promise<Event>;
-  deleteEvent(id: string): Promise<void>;
+  getEvents(
+    orgId: string,
+    page?: number,
+    limit?: number,
+  ): Promise<PaginatedResult<Event>>;
+  getEvent(orgId: string, id: string): Promise<Event | null>;
+  updateEvent(
+    orgId: string,
+    id: string,
+    eventData: UpdateEventDTO,
+  ): Promise<Event>;
+  deleteEvent(orgId: string, id: string): Promise<void>;
 }
 
-export type IUserData = Omit<User, "id" | "createdAt" | "updatedAt">;
+export type IUserData = Omit<User, "id" | "createdAt" | "updatedAt" >;
+export type IEnrichedUserData = IUserData & {
+  role: [{ id: string; key: string; name: "admin" | "user" }];
+};
 
 export interface IUserService {
   getUsers(): Promise<User[]>;
@@ -35,12 +46,18 @@ export interface ISongData {
 }
 
 export interface ISongService {
-  getSongs(page?: number, limit?: number): Promise<PaginatedResult<Song>>;
-  updateSong(id: string, songData: Partial<Song>): Promise<Song>;
-  deleteSong(id: string): Promise<void>;
+  getSongs(
+    orgId: string,
+    page?: number,
+    limit?: number,
+  ): Promise<PaginatedResult<Song>>;
+  updateSong(orgId: string, id: string, songData: Partial<Song>): Promise<Song>;
+  deleteSong(orgId: string, id: string): Promise<void>;
 }
 
 export interface IBlockoutService {
-  createBlockout(blockoutData: CreateBlockoutDTO): Promise<any>;
-  deleteBlockout(id: string): Promise<void>;
+  createBlockout(
+    blockoutData: CreateBlockoutDTO & { orgId: string },
+  ): Promise<any>;
+  deleteBlockout(orgId: string, id: string): Promise<void>;
 }

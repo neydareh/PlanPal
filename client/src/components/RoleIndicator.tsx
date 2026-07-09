@@ -1,8 +1,8 @@
 import { Users } from "lucide-react";
 import { Card, CardContent } from "@neydareh/ui";
-import { User } from "@shared/schema";
+import { AppUser } from "@/hooks/useAuth";
 
-const RoleIndicator = ({ user }: { user: User }) => {
+const RoleIndicator = ({ user }: { user: AppUser }) => {
   return (
     <Card className="glass-card">
       <CardContent className="p-4 lg:p-6">

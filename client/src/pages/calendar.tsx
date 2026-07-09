@@ -1,23 +1,24 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext";
 import Sidebar from "@/components/Sidebar";
 import TopNavBar from "@/components/TopNavBar";
 import CreateEventModal from "@/components/CreateEventModal";
 import EventDetailsModal from "@/components/EventDetailsModal";
-import { Card, CardContent } from "@neydareh/ui";
+import { Button, Card, CardContent } from "@neydareh/ui";
 import type { Event, Blockout } from "@shared/schema";
 import { CalendarGrid } from "@/components/CalendarGrid";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useOrgContext } from "@/hooks/useOrgContext";
+import { Link } from "wouter";
 
 export default function Calendar() {
-  const { user } = useAuth();
-  // const [currentDate, setCurrentDate] = useState(new Date());
+  const { user } = useAuthContext();
+  const { orgId } = useOrgContext();
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [isEventDetailsModalOpen, setIsEventDetailsModalOpen] = useState(false);
 
-  // Fetch events for current month
   const { data: eventsData, isLoading: isLoadingEvents } = useQuery<{
     data: Event[];
   }>({
@@ -27,7 +28,6 @@ export default function Calendar() {
 
   const events = eventsData?.data ?? [];
 
-  // Fetch blockouts for current month
   const { data: blockoutsData, isLoading: isLoadingBlockouts } = useQuery<{
     data: Blockout[];
   }>({
@@ -39,13 +39,31 @@ export default function Calendar() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar currentPath="/calendar" />
+      <Sidebar currentPath={"/calendar"} />
 
       <div className="lg:ml-64">
         <TopNavBar title="Calendar" />
 
         {isLoadingEvents && isLoadingBlockouts ? (
           <LoadingSpinner />
+        ) : !orgId ? (
+          <main className="p-4 lg:p-6 pt-20 lg:pt-6">
+            <Card className="glass-card">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Select an organization
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Choose an organization to view the shared calendar.
+                </p>
+                <Link href="/orgs">
+                  <Button className="bg-linear-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700">
+                    Go to Organizations
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </main>
         ) : (
           <main className="p-4 lg:p-6 pt-20 lg:pt-6">
             <Card className="glass-card">
@@ -53,7 +71,7 @@ export default function Calendar() {
                 <CalendarGrid
                   events={events}
                   blockouts={blockouts}
-                  user={user}
+                  user={user!}
                   onCreateEventClick={() => {
                     setIsCreateEventModalOpen(true);
                   }}
